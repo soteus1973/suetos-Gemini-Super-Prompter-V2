@@ -56,7 +56,6 @@ body.dark .hint-box{background:var(--dk-s2);border-color:var(--dk-s3)}
 body.dark .var-card{background:var(--dk-s2);border-color:var(--dk-s3)}
 body.dark .var-card.chosen{border-color:var(--or);background:var(--dk-s1)}
 body.dark .pgb{background:var(--dk-s3)}
-body.dark .live-preview{background: rgba(28,28,32,0.85); border-color:var(--dk-s3); color:var(--dk-s5);}
 
 body{
   font-family:var(--font);background:var(--bg);color:var(--blk);
@@ -92,12 +91,24 @@ body.dark .hdr{background:linear-gradient(135deg,#08080a 0%,#14100a 30%,#1e0f00 
 .brand-n{font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1;color:#fff; z-index:1; position:relative;}
 .brand-n span{color:var(--or);font-weight:300}
 .brand-s{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px;font-weight:500;letter-spacing:.06em;text-transform:uppercase; z-index:1; position:relative;}
-.hdr-right{display:flex;align-items:center;gap:8px; z-index:1; position:relative;}
-.lbtn{font-size:10px;font-weight:700;letter-spacing:.1em;border:none;background:none;cursor:pointer;padding:6px 10px;border-radius:8px;color:rgba(255,255,255,.5);transition:all .2s;font-family:var(--font)}
-.lbtn.on{color:#fff;background:rgba(255,92,0,.25)}
-.lbtn:hover{color:rgba(255,255,255,.9)}
-.icon-btn{width:34px;height:34px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);cursor:pointer;border-radius:100px;color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);}
-.icon-btn:hover{border-color:var(--or);color:var(--or);background:rgba(255,92,0,.12)}
+
+/* Header Buttons Clean Redesign */
+.hdr-right{display:flex;align-items:center;gap:6px; z-index:1; position:relative;}
+.lbtn{font-size:11px;font-weight:700;letter-spacing:.05em;border:none;background:transparent;cursor:pointer;padding:8px 12px;border-radius:8px;color:rgba(255,255,255,.5);transition:all .2s;font-family:var(--font)}
+.lbtn.on{color:#fff;background:var(--or)}
+.lbtn:hover:not(.on){color:#fff;background:rgba(255,255,255,.1)}
+
+.icon-btn, .btnhist, .lib-btn {
+    background: transparent; border: none;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer; padding: 8px 12px;
+    border-radius: 8px; font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font);
+}
+.icon-btn { padding: 8px; width: 34px; height: 34px; justify-content: center; }
+.icon-btn i { font-size: 14px; }
+.icon-btn:hover, .btnhist:hover, .lib-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
 /* ── CARD ── */
 .card{background:rgba(255,255,255,0.95); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-radius:28px;box-shadow:var(--shlg);border:1px solid var(--glass-border);position:relative;transition:var(--trans); flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden;}
@@ -154,7 +165,7 @@ textarea.tinp{min-height:88px;line-height:1.6;overflow-y:hidden}
 .ccrd::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg, rgba(255,92,0,.08), rgba(255,140,58,.03));opacity:0;transition:opacity .3s;z-index:-1;}
 .ccrd:hover{border-color:var(--or);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.05);}
 .ccrd:hover::before{opacity:1;}
-.ccrd.on{background:var(--blk);border-color:var(--blk);color:#fff;box-shadow:0 8px 24px rgba(12,12,14,.25);}
+.ccrd.on{background:var(--blk);border-color:var(--blk);box-shadow:0 8px 24px rgba(12,12,14,.25);}
 .ccrd.on svg .sf{stroke:#fff}.ccrd.on svg .so{stroke:#fff}.ccrd.on svg .acc{fill:var(--or);stroke:var(--or)}
 .ccrd svg{width:40px;height:32px;z-index:1;}
 .ccrd span{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;line-height:1.3;color:inherit;z-index:1;}
@@ -369,6 +380,9 @@ body.dark .compare-col-hdr{background:var(--dk-s2);color:#fff;}
 body.dark .compare-prompt{background:var(--dk-s2);border-color:var(--dk-s3);color:var(--dk-s5)}
 body.dark .view-toggle{border-color:var(--dk-s3)}
 
+/* Modale Settings */
+#settings-modal .modal-box { max-width: 400px; }
+
 @media(max-width:640px){
   .sbody,.nav,.pgw{padding-left:20px;padding-right:20px}
   .stitle{font-size:22px}
@@ -416,6 +430,22 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="settings-title">Settings</div>
+    <div class="modal-desc" id="settings-desc">Enter your Gemini API key if you host this app yourself.</div>
+    <div>
+      <label class="modal-label" id="settings-lbl-key">Gemini API Key</label>
+      <input type="password" class="modal-inp" id="st-key" placeholder="AIzaSy...">
+    </div>
+    <div class="modal-row">
+      <button class="modal-btn secondary" onclick="closeSettingsModal()" id="settings-btn-cancel">Cancel</button>
+      <button class="modal-btn primary" onclick="saveSettings()" id="settings-btn-save"><i class="fa-solid fa-check"></i> <span id="settings-btn-save-lbl">Save</span></button>
+    </div>
+  </div>
+</div>
+
 <div class="lib-panel" id="lib-panel">
   <div class="lib-panel-hdr">
     <div class="lib-panel-title" id="lib-title">Prompt Library</div>
@@ -442,7 +472,8 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
       </div>
     </div>
     <div class="hdr-right">
-      <button class="icon-btn" id="btn-dark" onclick="toggleDark()" title="Dark mode"><i class="fa-solid fa-moon" id="dark-icon"></i></button>
+      <button class="icon-btn" id="btn-dark" onclick="toggleDark()" title="Toggle Theme"><i class="fa-solid fa-sun" id="dark-icon"></i></button>
+      <button class="icon-btn" id="btn-settings" onclick="openSettingsModal()" title="Settings"><i class="fa-solid fa-gear"></i></button>
       <button class="lib-btn" id="btn-lib" onclick="openLib()" style="display:none"><i class="fa-solid fa-bookmark"></i> <span id="lllib">Library</span></button>
       <button class="btnhist" id="btn-hist" onclick="openHist()"><i class="fa-solid fa-clock-rotate-left"></i> <span id="lbl-hist">History</span></button>
       <button class="btnhist" onclick="openToolsModal()"><i class="fa-solid fa-screwdriver-wrench"></i> <span id="lbl-tools">Tools</span></button>
@@ -613,6 +644,7 @@ en:{
   eSubj:'Please describe your concept first.',eApi:'Generation failed.',eCopy:'Copied!',
   libTitle:'Prompt Library',libSaveLbl:'Save current prompts',libSaveTxt:'Save to Library',libSavedLbl:'Saved Prompts',libEmpty:'No saved prompts yet.\nGenerate prompts and click "Save to Library".',libNamePh:'Name this set…',libLoaded:'Prompts loaded!',libSaved:'Saved to library!',libDeleted:'Deleted.',
   phSD:'e.g. influenced by Moebius, neon accents…',phMood:'e.g. eerie silence, sense of wonder…',
+  set:'Settings', setDesc:'Enter your Gemini API key to enable AI features if you host this app yourself.', setKey:'Gemini API Key', setSave:'Save',
   styles:['None','Anime','Architecture','B&W Photo','Cinematic','Concept Art','Cyberpunk','Fine Art','Illustration','Impressionism','Minimalism','Octane 3D','Photo Pro HD','Photorealism','Pop Art','Street Photo','Surrealism','Watercolor'],
   sicons:['fa-ban','fa-dragon','fa-building','fa-circle-half-stroke','fa-clapperboard','fa-pencil','fa-bolt','fa-paintbrush','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-star','fa-camera-retro','fa-shapes','fa-street-view','fa-eye','fa-droplet'],
   lights:['None','Chiaroscuro','Dark Cinema','Dreamy','Ethereal','Golden Hour','Gothic','Gritty','High-Key','Melancholic','Moody Blue','Mystical','Neon Night','Noir','Pastel','Retro 50s','Retro 60s','Retro 70s-80s','Sci-Fi','Soft Studio','Studio Photo','Summertime','Sunrays','Vintage'],
@@ -643,6 +675,7 @@ fr:{
   eSubj:'Veuillez décrire votre concept.',eApi:'Génération échouée.',eCopy:'Copié !',
   libTitle:'Bibliothèque',libSaveLbl:'Sauvegarder les prompts actuels',libSaveTxt:'Sauvegarder',libSavedLbl:'Prompts Sauvegardés',libEmpty:'Aucun prompt sauvegardé.\nGénérez des prompts et cliquez "Sauvegarder".',libNamePh:'Nommer ce jeu de prompts…',libLoaded:'Prompts chargés !',libSaved:'Sauvegardé !',libDeleted:'Supprimé.',
   phSD:'ex. inspiré de Moebius, accents néon…',phMood:'ex. silence inquiétant, émerveillement…',
+  set:'Paramètres', setDesc:'Entrez votre clé API Gemini si vous hébergez cette application vous-même.', setKey:'Clé API Gemini', setSave:'Enregistrer',
   styles:['Aucun','Anime','Aquarelle','Architecture','Beaux-Arts','Cinématique','Concept Art','Cyberpunk','Illustration','Impressionnisme','Minimalisme','Octane 3D','Photo de Rue','Photo N&B','Photo Pro HD','Photoréalisme','Pop Art','Surréalisme'],
   sicons:['fa-ban','fa-dragon','fa-droplet','fa-building','fa-paintbrush','fa-clapperboard','fa-pencil','fa-bolt','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-street-view','fa-circle-half-stroke','fa-star','fa-camera-retro','fa-shapes','fa-eye'],
   lights:['Aucun','Bleu Moody','Brut','Clair-obscur','Dark Ciné','Golden Hour','Gothic','High-Key','Mystique','Mélancolique','Noir','Nuit Néon','Onirique','Pastel','Rayons Soleil','Rétro 50s','Rétro 60s','Rétro 70s-80s','Sci-Fi','Studio Doux','Studio Photo','Summertime','Vintage','Éthéré'],
@@ -683,7 +716,7 @@ function toggleDark(){
   isDark=!isDark;
   document.body.classList.toggle('dark',isDark);
   const icon=document.getElementById('dark-icon');
-  icon.className=isDark?'fa-solid fa-sun':'fa-solid fa-moon';
+  icon.className=isDark?'fa-solid fa-moon':'fa-solid fa-sun';
   localStorage.setItem('suetos_dark',isDark?'1':'');
 }
 
@@ -840,6 +873,11 @@ function syncLangUI() {
    se('lbl-compare',fr?'Comparer':'Compare');
    se('lbl-copyall',fr?'Tout Copier':'Copy All');
    se('lbl-dice',fr?'Inspiration':'Inspire Me');
+   se('settings-title',T[lang].set);
+   se('settings-desc',T[lang].setDesc);
+   se('settings-lbl-key',T[lang].setKey);
+   se('settings-btn-cancel',fr?'Annuler':'Cancel');
+   se('settings-btn-save-lbl',T[lang].setSave);
 }
 
 function goToStep(n) {
@@ -902,6 +940,24 @@ async function setLang(l){
 // ══ GEMINI 2.5 API INTEGRATION ══
 const apiKey = ""; // L'environnement fournit automatiquement la clé à l'exécution !
 
+function getActiveKey() {
+  return localStorage.getItem('suetos_api_key') || apiKey;
+}
+
+function openSettingsModal() {
+  document.getElementById('st-key').value = localStorage.getItem('suetos_api_key') || "";
+  document.getElementById('settings-modal').classList.add('on');
+}
+function closeSettingsModal() {
+  document.getElementById('settings-modal').classList.remove('on');
+}
+function saveSettings() {
+  const k = document.getElementById('st-key').value.trim();
+  localStorage.setItem('suetos_api_key', k);
+  closeSettingsModal();
+  toast(lang==='fr' ? 'Paramètres enregistrés !' : 'Settings saved!');
+}
+
 async function fetchGeminiWithBackoff(url, payload) {
   let retries = 5;
   let delay = 1000;
@@ -924,7 +980,7 @@ async function fetchGeminiWithBackoff(url, payload) {
 }
 
 async function callGeminiText(prompt, systemInstruction) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${getActiveKey()}`;
   const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
   if (systemInstruction) {
     payload.systemInstruction = { parts: [{ text: systemInstruction }] };
@@ -933,7 +989,7 @@ async function callGeminiText(prompt, systemInstruction) {
 }
 
 async function callGeminiVision(prompt, images) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${getActiveKey()}`;
   const parts = [{ text: prompt }];
   images.forEach(img => {
       parts.push({ inlineData: { mimeType: img.mime, data: img.b64 } });
@@ -950,7 +1006,7 @@ async function callGeminiVision(prompt, images) {
 async function callImagenAPI(promptText) {
   let retries = 5;
   let delay = 1000;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${getActiveKey()}`;
   const payload = { instances: { prompt: promptText }, parameters: { sampleCount: 1 } };
 
   for (let i = 0; i < retries; i++) {
@@ -1101,6 +1157,7 @@ async function generate(){
     if(step!==STEPS){step=5;ui();}
     document.getElementById('errtxt').textContent=String(e).slice(0,200);
     document.getElementById('errbox').classList.add('on');
+    if (!getActiveKey()) toast(lang==='fr'?'Clé API requise (Cliquez sur ⚙️)':'API Key required (Click ⚙️)');
   }
 }
 
@@ -1115,7 +1172,11 @@ async function refine(){
     prompts=parseJSON(raw);
     renderResults(prompts);
     document.getElementById('rfinp').value='';
-  }catch(e){console.error(e);toast(T[lang].eApi);}
+  }catch(e){
+      console.error(e);
+      toast(T[lang].eApi);
+      if (!getActiveKey()) toast(lang==='fr'?'Clé API requise (Cliquez sur ⚙️)':'API Key required (Click ⚙️)');
+  }
   hideLoad();btn.disabled=false;
 }
 
@@ -1139,6 +1200,7 @@ async function translatePrompts(targetLang) {
     console.error('Translation failed:', e);
     toast(targetLang === 'fr' ? 'Erreur de traduction.' : 'Translation failed.');
     renderResults(prompts);
+    if (!getActiveKey()) toast(lang==='fr'?'Clé API requise (Cliquez sur ⚙️)':'API Key required (Click ⚙️)');
   } finally {
     hideLoad();
   }
@@ -1226,9 +1288,15 @@ async function aiDescribeImages(){
       btn.classList.remove('loading');
     },2500);
   }catch(e){
-    lbl.textContent='Error';
+    lbl.textContent=lang==='fr'?'Erreur API':'API Error';
+    btn.style.background='#dc2626';
     btn.classList.remove('loading');
     console.error("AI Describe Failed", e);
+    if (!getActiveKey()) toast(lang==='fr'?'Clé API requise (Cliquez sur ⚙️)':'API Key required (Click ⚙️)');
+    setTimeout(()=>{
+      lbl.textContent=lang==='fr'?'AI Describe - Remplir le Concept':'AI Describe - Fill Main Concept';
+      btn.style.background='';
+    },3500);
   }
 }
 
@@ -1533,6 +1601,7 @@ async function generateInlineImage(promptText, container) {
     } catch (e) {
         console.error(e);
         imgBox.innerHTML = `<div class="pneg" style="text-align:left;"><i class="fa-solid fa-triangle-exclamation"></i> ${lang==='fr'?'Échec de la génération.':'Generation failed.'}</div>`;
+        if (!getActiveKey()) toast(lang==='fr'?'Clé API requise (Cliquez sur ⚙️)':'API Key required (Click ⚙️)');
     }
 }
 
@@ -1542,7 +1611,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('lib-name-inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveToLib();});
   
   const dark=localStorage.getItem('suetos_dark');
-  if(dark){isDark=true;document.body.classList.add('dark');document.getElementById('dark-icon').className='fa-solid fa-sun';}
+  if(dark){isDark=true;document.body.classList.add('dark');document.getElementById('dark-icon').className='fa-solid fa-moon';}
   syncLangUI();
 });
 
@@ -1712,7 +1781,7 @@ async function getSuggestions(){
   btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';
   btn.disabled=true;
   try{
-    const sys=`You are a creative director for AI image generation. Given a concept, return ONLY a valid JSON array of 3 creative variations that expand or reinterpret the idea. Each variation must be a single detailed prompt sentence of 40-60 words. Return ONLY the JSON array, no markdown, no explanation: ["variation 1","variation 2","variation 3"]`;
+    const sys=`You are a creative director for AI image generation. Given a concept, return ONLY a valid JSON array of 3 creative variations that expand or reinterpret the idea. Each variation must be a single detailed prompt sentence of 40-60 words. Return ONLY the JSON array, no markdown, no explanation: ["variation 1","variation 2","variation 3"]. DO NOT add any new lines or trailing commas inside the array.`;
     const prompt = `Give me 3 creative variations of: "${subj}"\nOutput language: ${lang==='fr'?'French':'English'}`;
     const raw = await callGeminiText(prompt, sys);
     
@@ -1723,6 +1792,7 @@ async function getSuggestions(){
   }catch(e){
     console.error(e);
     toast('Suggest failed.');
+    if (!getActiveKey()) toast(lang==='fr'?'Clé API requise (Cliquez sur ⚙️)':'API Key required (Click ⚙️)');
   }finally{
     btn.innerHTML=orig;
     btn.disabled=false;
