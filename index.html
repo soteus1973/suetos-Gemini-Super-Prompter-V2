@@ -1429,7 +1429,7 @@ async function autoFill() {
       
       btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Prêt !':'Ready!'}`;
       setTimeout(() => {
-          goToStep(STEPS);
+          generate(); // Lance la génération directement et emmène à la page des résultats
       }, 500);
 
   } catch(e) {
