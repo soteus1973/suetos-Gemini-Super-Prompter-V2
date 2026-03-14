@@ -8,8 +8,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<!-- Ajout de la librairie pour l'export PDF direct -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- Ajout de jsPDF pour générer de "vrais" PDF texte ultra-légers -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --or:#FF5C00;--blk:#0C0C0E;--bg:#F4F3EF;
@@ -649,7 +649,7 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
 let lang='en', step=1, isDark=false;
 let uploads=[], prompts=null, scores=null, variations=null;
 const STEPS=6;
-const sel={subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0};
+const sel={subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0, mjRaw: false};
 
 // ══ TRANSLATIONS ══
 const T={
@@ -947,7 +947,7 @@ function goNext(){ goToStep(step + 1); }
 
 function restart(){
   step=1;
-  Object.assign(sel,{subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0});
+  Object.assign(sel,{subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0,mjRaw:false});
   uploads=[];prompts=null;scores=null;variations=null;
   document.getElementById('fgrid').innerHTML='';
   document.getElementById('dz').classList.remove('has-files');
@@ -1152,7 +1152,7 @@ function parseJSON(raw) {
 
 function getMJParamsStr() {
   let p = sel.mjVersion || '--v 7';
-  if (!p.includes('niji')) p += ' --style raw';
+  if (!p.includes('niji') && sel.mjRaw) p += ' --style raw';
   p += ` --stylize ${sel.mjStylize}`;
   if (sel.mjChaos > 0) p += ` --chaos ${sel.mjChaos}`;
   if (sel.mjWeird > 0) p += ` --weird ${sel.mjWeird}`;
@@ -1163,34 +1163,43 @@ function getMJParamsStr() {
 
 function autoAdaptMJParams() {
   sel.mjVersion = '--v 7';
-  sel.mjStylize = 250;
+  sel.mjStylize = 150;
   sel.mjChaos = 0;
   sel.mjWeird = 0;
+  sel.mjRaw = false;
 
   const style = T['en'].styles[sel.siIdx] || '';
   const light = T['en'].lights[sel.liIdx] || '';
 
-  if (style === 'Anime') {
+  const photoStyles = ['B&W Photo', 'Cinematic', 'Photo Pro HD', 'Photorealism', 'Street Photo'];
+  const animeStyles = ['Anime', 'Illustration', 'Watercolor'];
+  const digitalStyles = ['Concept Art', 'Cyberpunk', 'Octane 3D'];
+  const artStyles = ['Fine Art', 'Impressionism', 'Surrealism', 'Pop Art'];
+  const minimalStyles = ['Minimalism'];
+
+  if (photoStyles.includes(style)) {
+      sel.mjVersion = '--v 7';
+      sel.mjRaw = true; 
+      sel.mjStylize = (style === 'Cinematic' || style === 'Photo Pro HD') ? 150 : 80;
+  } else if (animeStyles.includes(style)) {
       sel.mjVersion = '--niji 6';
-      sel.mjStylize = 300;
-  } else if (style === 'Surrealism') {
-      sel.mjWeird = 250;
-      sel.mjChaos = 10;
-  } else if (style === 'Photorealism' || style === 'Photo Pro HD') {
-      sel.mjStylize = 100;
-  } else if (style === 'Concept Art') {
-      sel.mjStylize = 400;
-  } else if (style === 'Pop Art') {
-      sel.mjWeird = 100;
-      sel.mjChaos = 15;
-  } else if (style === 'Watercolor' || style === 'Illustration') {
-      sel.mjVersion = '--niji 6';
-      sel.mjStylize = 350;
+      sel.mjStylize = 250;
+  } else if (digitalStyles.includes(style)) {
+      sel.mjVersion = '--v 7';
+      sel.mjStylize = 350; 
+  } else if (artStyles.includes(style)) {
+      sel.mjVersion = '--v 7';
+      sel.mjStylize = 250;
+      if (style === 'Surrealism') { sel.mjWeird = 250; sel.mjChaos = 10; }
+      if (style === 'Pop Art') { sel.mjWeird = 100; sel.mjChaos = 15; }
+  } else if (minimalStyles.includes(style)) {
+      sel.mjStylize = 50; 
   }
 
-  if (light === 'Ethereal' || light === 'Mystical') {
+  if (light === 'Ethereal' || light === 'Mystical' || light === 'Dreamy') {
       sel.mjWeird += 50;
-  } else if (light === 'Noir' || light === 'Dark Cinema') {
+      sel.mjStylize += 50;
+  } else if (light === 'Noir' || light === 'Dark Cinema' || light === 'Gritty') {
       sel.mjChaos += 5;
   }
   
@@ -1211,17 +1220,19 @@ function brief(){
 }
 
 function getSys() {
-  return `You are an elite AI image generation prompt architect. Create highly specific professional prompts for 5 tools.
+  return `You are an elite AI image generation prompt architect. Your objective is to create AESTHETICALLY STUNNING, HIGH-IMPACT prompts.
 
-CRITICAL INSTRUCTIONS:
-1. Write ALL prompt text in the output language specified in the creative brief. If French, write descriptive text in French (keep Midjourney parameters --v 7 --style raw --ar etc. unchanged).
-2. DO NOT use any line breaks or newlines (\\n) inside the JSON values. Keep all text as a single continuous line per value.
-3. Evaluate how accurately the prompt captures the user's intent, references, and best practices for the specific tool. Provide a "score" integer from 0 to 100 for each tool.
+CRITICAL PROMPT ENGINEERING RULES:
+1. AVOID WORD SALADS. Modern models (Midjourney v7, DALL-E 3) perform badly with outdated terms like "masterpiece, 8k, trending on artstation". Do NOT use them.
+2. USE CONCISE, NATURAL LANGUAGE. Structure logically: [Subject Details] + [Environment/Setting] + [Lighting/Mood] + [Camera/Medium Details].
+3. Keep the 'detailed' prompt highly evocative but under 60 words. Over-prompting destroys the composition and aesthetic.
+4. Write ALL descriptive text in the requested output language (keep parameters like --v 7 unchanged).
+5. Evaluate a "score" (0-100) based on how professional, visually striking, and structurally perfect the prompt is.
 
 Tool-specific rules:
-- midjourney: V7 optimized. Natural language prose. Include atmosphere, lighting, mood as flowing sentences. End with the EXACT parameters from the brief (do not change them): ${getMJParamsStr()}
-- gpt: Clear descriptive sentences. Mention style, lighting, mood explicitly.
-- nanobanana: Surreal, maximally creative visual language.
+- midjourney: Focus on masterful composition and precise photographic/artistic terminology. End EXACTLY with the provided parameters (do not alter them): ${getMJParamsStr()}
+- gpt: Literal, highly descriptive, coherent physical space. Focus on vivid atmosphere.
+- nanobanana: Highly poetic, surreal, focusing on rich textures and award-winning cinematography.
 
 RETURN ONLY VALID JSON, no markdown, no extra text:
 {"midjourney":{"detailed":"...","short":"...","negative":"...","score":98},"gpt":{"detailed":"...","short":"...","negative":"...","score":95},"nanobanana":{"detailed":"...","short":"...","negative":"...","score":90}}`;
@@ -1652,7 +1663,6 @@ function renderResults(data){
   list.innerHTML='';
   renderMJSliders();
   
-  // Normalisation au cas où l'IA a emballé les données dans un tableau ou sous-objet
   if (Array.isArray(data)) data = data[0] || {};
   if (data && data.prompts) data = data.prompts;
 
@@ -1662,14 +1672,12 @@ function renderResults(data){
   let renderedCount = 0;
 
   allTools.forEach(tool=>{
-    // Recherche fuzzy (Tolérance sur les majuscules et les suffixes)
     let toolKey = Object.keys(data).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
     let d = toolKey ? data[toolKey] : data[tool.id];
     
     if(!d) return;
     renderedCount++;
 
-    // Si l'IA a renvoyé une chaîne simple au lieu d'un objet (detailed, short, negative)
     if(typeof d === 'string') {
         d = { detailed: d, short: d, negative: "" };
     }
@@ -1687,7 +1695,6 @@ function renderResults(data){
     card.appendChild(hdr);
     const body=document.createElement('div');body.className='tcrdbody';
 
-    // Detailed prompt
     const detBlk=document.createElement('div');detBlk.className='pblk';
     const detLbl=document.createElement('div');detLbl.className='plbl';
     const detSp=document.createElement('span');detSp.textContent=t.ldet;
@@ -1702,7 +1709,7 @@ function renderResults(data){
         genImgBtn.style.background = 'linear-gradient(135deg, #FF5C00, #ff8c3a)';
         genImgBtn.style.boxShadow = '0 2px 8px rgba(255,92,0,0.3)';
         genImgBtn.innerHTML = `<i class="fa-solid fa-image"></i> ${lang==='fr'?'Générer Image':'Generate Image'}`;
-        genImgBtn.onclick = () => generateInlineImage(d.detailed, body);
+        genImgBtn.onclick = () => generateInlineImage(d.detailed, body, genImgBtn);
         actionsDiv.appendChild(genImgBtn);
     }
 
@@ -1720,7 +1727,6 @@ function renderResults(data){
     detBlk.appendChild(detLbl);detBlk.appendChild(detTxt);
     body.appendChild(detBlk);
 
-    // Short + Negative
     [{lbl:t.lshort,txt:d.short,cls:'ptxt'},{lbl:t.lneg,txt:d.negative,cls:'pneg'}]
     .forEach(({lbl,txt,cls})=>{
       if(!txt)return;
@@ -1737,7 +1743,6 @@ function renderResults(data){
     card.appendChild(body);list.appendChild(card);
   });
 
-  // Affichage de secours (Fallback) au cas où l'IA ne respecte aucune consigne de structure
   if(renderedCount === 0) {
       list.innerHTML = `
       <div class="errbox on" style="display:flex; flex-direction:column; gap:12px;">
@@ -2060,17 +2065,34 @@ function exportPDF() {
     if (!prompts) return toast(lang==='fr'?"Aucun prompt à exporter.":"No prompts to export.");
     toast(lang==='fr'?"Génération du PDF en cours...":"Generating PDF...");
     
-    const container = document.createElement('div');
-    container.style.padding = '30px';
-    container.style.fontFamily = 'sans-serif';
-    container.style.color = '#111';
-    container.style.background = '#fff';
+    // Utilisation de jsPDF pour générer un document 100% texte, ultra léger et sélectionnable
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 20;
+    const margin = 20;
+    const maxW = 170; // A4 (210) moins marges (20*2)
+
+    const addText = (txt, size, isBold, color) => {
+        doc.setFont("helvetica", isBold ? "bold" : "normal");
+        doc.setFontSize(size);
+        doc.setTextColor(color[0], color[1], color[2]);
+        const lines = doc.splitTextToSize(txt, maxW);
+        const lineHeight = size * 0.4;
+        
+        if (y + (lines.length * lineHeight) > 280) {
+            doc.addPage();
+            y = 20;
+        }
+        doc.text(lines, margin, y);
+        y += lines.length * lineHeight + 2; 
+    };
+
+    addText("SUETOS ImagePrompter", 18, true, [255, 92, 0]);
+    y += 5;
     
-    container.innerHTML = `<h1 style="color:#FF5C00; margin-bottom:24px; font-size:24px;">SUETOS ImagePrompter</h1>
-                           <div style="margin-bottom:24px; padding:16px; background:#f4f4f4; border-radius:12px;">
-                              <strong>Concept:</strong> ${escHtml(sel.subj)}<br>
-                              <strong>Style:</strong> ${escHtml(T[lang].styles[sel.siIdx] || 'None')} ${escHtml(sel.sd ? '('+sel.sd+')' : '')}
-                           </div>`;
+    addText("Concept: " + sel.subj, 12, false, [50, 50, 50]);
+    addText("Style: " + (T[lang].styles[sel.siIdx] || 'None') + (sel.sd ? ' ('+sel.sd+')' : ''), 12, false, [50, 50, 50]);
+    y += 10;
 
     const allTools=[...TOOLS,...getCustomTools()];
     allTools.forEach(tool => {
@@ -2079,56 +2101,47 @@ function exportPDF() {
         if(!d) return;
         if(typeof d === 'string') d = { detailed: d, short: '', negative: '', score: null };
 
-        let scoreText = d.score ? `<span style="float:right; font-size:12px; color:#16a34a;">Score: ${d.score}%</span>` : '';
+        let scoreTxt = d.score ? ` (${d.score}% Match)` : '';
+        addText(tool.name + scoreTxt, 14, true, [0, 0, 0]);
+        y += 2;
+
+        addText(T[lang].ldet.toUpperCase(), 10, true, [100, 100, 100]);
+        addText(d.detailed || '', 10, false, [0, 0, 0]);
+        y += 3;
+
+        if(d.short) {
+            addText(T[lang].lshort.toUpperCase(), 10, true, [100, 100, 100]);
+            addText(d.short, 10, false, [50, 50, 50]);
+            y += 3;
+        }
         
-        container.innerHTML += `
-            <div style="margin-bottom: 24px; page-break-inside: avoid;">
-                <h2 style="font-size:18px; border-bottom: 2px solid #FF5C00; padding-bottom: 4px; margin-bottom: 12px;">${escHtml(tool.name)} ${scoreText}</h2>
-                <div style="margin-bottom:12px;">
-                    <strong style="font-size:12px; color:#555; text-transform:uppercase;">${T[lang].ldet}</strong>
-                    <div style="background:#fff; border:1px solid #ddd; border-radius:8px; padding:12px; font-family:monospace; font-size:12px; margin-top:4px;">${escHtml(d.detailed || '')}</div>
-                </div>
-                ${d.short ? `
-                <div style="margin-bottom:12px;">
-                    <strong style="font-size:12px; color:#555; text-transform:uppercase;">${T[lang].lshort}</strong>
-                    <div style="background:#fff; border:1px solid #ddd; border-radius:8px; padding:12px; font-family:monospace; font-size:12px; margin-top:4px;">${escHtml(d.short)}</div>
-                </div>` : ''}
-                ${d.negative ? `
-                <div style="margin-bottom:12px;">
-                    <strong style="font-size:12px; color:#d93025; text-transform:uppercase;">${T[lang].lneg}</strong>
-                    <div style="background:#fff; border:1px dashed #f5c6cb; border-radius:8px; padding:12px; font-family:monospace; font-size:12px; color:#d93025; margin-top:4px;">${escHtml(d.negative)}</div>
-                </div>` : ''}
-            </div>
-        `;
+        if(d.negative) {
+            addText(T[lang].lneg.toUpperCase(), 10, true, [217, 48, 37]);
+            addText(d.negative, 10, false, [217, 48, 37]);
+            y += 3;
+        }
+        y += 5;
     });
 
-    const opt = {
-        margin:       10,
-        filename:     'SUETOS_Prompts.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(container).save().then(() => {
-        toast(lang==='fr'?"PDF téléchargé dans votre dossier !":"PDF downloaded to your folder!");
-    }).catch(err => {
-        console.error(err);
-        toast(lang==='fr'?"Erreur lors de l'export PDF.":"PDF export error.");
-    });
+    doc.save("SUETOS_Prompts.pdf");
+    toast(lang==='fr'?"PDF téléchargé dans votre dossier !":"PDF downloaded to your folder!");
 }
 
-async function generateInlineImage(promptText, container) {
+async function generateInlineImage(promptText, container, btn) {
+    let origHtml = '';
+    if(btn) {
+        origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${lang==='fr'?'Création...':'Thinking...'}`;
+    }
+    
     toast(lang==='fr'?"Génération d'image en cours...":"Generating image...");
-    const btn = container.querySelector('.cpybtn');
-    if(btn) btn.disabled = true;
     try {
         const currentKey = getActiveKey();
         const hasCustomKey = currentKey !== "";
         let imgB64 = null;
         
         if (hasCustomKey) {
-            // L'utilisateur a SA PROPRE clé : on peut utiliser le vrai modèle "Nano Banana"
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
             const payload = { 
                 contents: [{ parts: [{ text: promptText }] }], 
@@ -2139,9 +2152,6 @@ async function generateInlineImage(promptText, container) {
             const data = await response.json();
             imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
         } else {
-            // L'utilisateur n'a PAS de clé (mode gratuit intégré) : 
-            // On utilise Imagen 4 (seul autorisé pour la génération gratuite pure) 
-            // mais on injecte des mots clés pour imiter l'esthétique Nano Banana.
             const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + promptText;
             const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=`;
             const payload = { instances: { prompt: enhancedPrompt }, parameters: { sampleCount: 1 } };
@@ -2158,10 +2168,13 @@ async function generateInlineImage(promptText, container) {
         imgEl.style.width = '100%';
         imgEl.style.borderRadius = '12px';
         imgEl.style.marginTop = '12px';
+        
+        if(btn) btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Image Générée':'Generated'}`;
         container.appendChild(imgEl);
         toast(lang==='fr'?"Image générée !":"Image generated!");
     } catch(e) {
         console.error("Image generation error:", e);
+        if(btn) btn.innerHTML = origHtml;
         if (e.message === "INVALID_API_KEY" || e.message.includes("INVALID_API_KEY")) {
             openSettingsModal();
             toast(lang==='fr' ? "Erreur 401: Clé API invalide." : "Error 401: Invalid API Key.");
