@@ -8,7 +8,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<!-- Ajout de jsPDF pour générer de "vrais" PDF texte ultra-légers -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
@@ -418,10 +417,8 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
 </head>
 <body>
 
-<!-- LIBRARY OVERLAY + PANEL -->
 <div class="lib-overlay" id="lib-overlay" onclick="closeLib()"></div>
 
-<!-- HISTORY PANEL -->
 <div class="hist-panel" id="hist-panel">
   <div class="lib-panel-hdr">
     <div class="lib-panel-title" id="hist-title">Generation History</div>
@@ -432,7 +429,6 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
 </div>
 <div class="lib-overlay" id="hist-overlay" onclick="closeHist()"></div>
 
-<!-- CUSTOM TOOLS MODAL -->
 <div class="modal-overlay" id="tools-modal">
   <div class="modal-box">
     <div class="modal-title" id="tools-modal-title">Custom Tool Profiles</div>
@@ -453,7 +449,6 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title" id="settings-title">Settings</div>
@@ -484,7 +479,6 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
   <div id="lib-list"></div>
 </div>
 
-<!-- MAIN APP -->
 <div class="shell">
   <div class="hdr">
     <div class="logo-g">
@@ -515,14 +509,12 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
       <div class="lsub" id="lsub">AI is crafting your prompts.</div>
     </div>
 
-    <!-- TIMELINE CLIQUABLE -->
     <div class="pgw">
       <div class="pgbs" id="pgbs"></div>
       <div class="pglbl" id="pglbl">Subject</div>
     </div>
 
     <div class="sbody">
-      <!-- STEP 1 -->
       <div class="pane on" id="p1">
         <div class="stitle" id="t1">Subject & <em>References</em></div>
         <div class="sdesc" id="d1">Describe your visual concept. Upload reference images to automatically extract details.</div>
@@ -559,7 +551,6 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         </div>
       </div>
 
-      <!-- STEP 2 -->
       <div class="pane" id="p2">
         <div class="stitle" id="t2">Visual <em>Style</em></div>
         <div class="sdesc" id="d2">Pick an aesthetic direction for your image.</div>
@@ -567,7 +558,6 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         <div class="frow"><label class="flbl" id="lsd">Refine Your Style</label><input type="text" class="tinp" id="inp-sd" placeholder="e.g. influenced by Moebius…"></div>
       </div>
 
-      <!-- STEP 3 -->
       <div class="pane" id="p3">
         <div class="stitle" id="t3">Lighting & <em>Atmosphere</em></div>
         <div class="sdesc" id="d3">Set the emotional tone and lighting quality.</div>
@@ -575,14 +565,12 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         <div class="frow"><label class="flbl" id="lm">Additional Mood Notes</label><input type="text" class="tinp" id="inp-mood" placeholder="e.g. eerie silence, sense of wonder…"></div>
       </div>
 
-      <!-- STEP 4 -->
       <div class="pane" id="p4">
         <div class="stitle" id="t4">Framing & <em>Composition</em></div>
         <div class="sdesc" id="d4">Choose how the camera frames the scene.</div>
         <div class="cgrid" id="cgrid"></div>
       </div>
 
-      <!-- STEP 5 -->
       <div class="pane" id="p5">
         <div class="stitle" id="t5">Technical <em>Settings</em></div>
         <div class="sdesc" id="d5">Define aspect ratio and camera/lens profile.</div>
@@ -591,10 +579,8 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         <div class="errbox" id="errbox"><i class="fa-solid fa-triangle-exclamation" style="margin-top:2px;flex-shrink:0;color:var(--or)"></i><span id="errtxt">Generation failed.</span></div>
       </div>
 
-      <!-- STEP 6 RESULTS -->
       <div class="pane" id="p6">
         
-        <!-- FIXE : En-tête et Actions -->
         <div>
             <div class="res-top">
               <div class="stitle" id="t6" style="margin:0;">Your <em>Prompts</em></div>
@@ -619,7 +605,6 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
             </div>
         </div>
 
-        <!-- ZONE DE DEFILEMENT : Resultats -->
         <div class="reswrap">
             <div id="stack-view" style="display:block;">
               <div id="mj-sliders-panel"></div>
@@ -998,10 +983,20 @@ function getActiveKey() {
 }
 
 function getGeminiModel() {
+  const k = localStorage.getItem('suetos_api_key');
+  if (k && k.trim() !== '') {
+      // Clé API personnalisée : on bascule sur le modèle public standard
+      return 'gemini-2.5-flash';
+  }
+  // Mode gratuit intégré : on utilise le modèle preview réservé
   return 'gemini-2.5-flash-preview-09-2025';
 }
 
 function getImagenModel() {
+  const k = localStorage.getItem('suetos_api_key');
+  if (k && k.trim() !== '') {
+      return 'imagen-3.0-generate-001';
+  }
   return 'imagen-4.0-generate-001'; 
 }
 
@@ -2065,12 +2060,11 @@ function exportPDF() {
     if (!prompts) return toast(lang==='fr'?"Aucun prompt à exporter.":"No prompts to export.");
     toast(lang==='fr'?"Génération du PDF en cours...":"Generating PDF...");
     
-    // Utilisation de jsPDF pour générer un document 100% texte, ultra léger et sélectionnable
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     let y = 20;
     const margin = 20;
-    const maxW = 170; // A4 (210) moins marges (20*2)
+    const maxW = 170; 
 
     const addText = (txt, size, isBold, color) => {
         doc.setFont("helvetica", isBold ? "bold" : "normal");
@@ -2142,23 +2136,24 @@ async function generateInlineImage(promptText, container, btn) {
         let imgB64 = null;
         
         if (hasCustomKey) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
-            const payload = { 
-                contents: [{ parts: [{ text: promptText }] }], 
-                generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
-            };
+            // Clé API personnalisée : On utilise Imagen 3 (modèle public)
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${currentKey}`;
+            const payload = { instances: { prompt: promptText }, parameters: { sampleCount: 1 } };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) throw new Error(response.status === 401 ? "INVALID_API_KEY" : "API Error");
             const data = await response.json();
-            imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+            imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
         } else {
-            const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + promptText;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=`;
-            const payload = { instances: { prompt: enhancedPrompt }, parameters: { sampleCount: 1 } };
+            // Mode sans clé (Environnement intégré) : On utilise Nano Banana
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=`;
+            const payload = { 
+                contents: [{ role: "user", parts: [{ text: promptText }] }], 
+                generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
+            };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) throw new Error("API Error");
             const data = await response.json();
-            imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
+            imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
         }
         
         if (!imgB64) throw new Error("Aucune donnée d'image retournée.");
