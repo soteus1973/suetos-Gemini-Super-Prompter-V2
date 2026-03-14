@@ -291,6 +291,8 @@ body.dark .sug-card p { color: var(--dk-s5); }
 .btnback:hover, .btn-dice:hover{color:var(--blk);border-color:var(--s4); transform:translateY(-2px); box-shadow:var(--sh);}
 .btn-dice{color:var(--acc); border-color:rgba(0,150,199,.2); background:rgba(0,150,199,.05);}
 .btn-dice:hover{color:#fff; background:var(--acc); border-color:var(--acc); box-shadow: 0 6px 20px rgba(0,150,199, 0.3);}
+.btn-reset{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--s5);border:1px solid transparent;background:transparent;cursor:pointer;padding:12px 18px;border-radius:100px;transition:all .3s ease;font-family:var(--font);}
+.btn-reset:hover{color:#E63946; background:rgba(230,57,70,0.08); transform:translateY(-2px);}
 .btnnext{display:inline-flex;align-items:center;gap:12px;background:var(--blk);color:#fff;border:none;cursor:pointer;padding:14px 34px;border-radius:100px;font-size:14px;font-weight:700;letter-spacing:.03em;font-family:var(--font);transition:all .3s cubic-bezier(.22,1,.36,1);box-shadow:0 8px 24px rgba(11,17,32,.25)}
 .btnnext:hover{background:var(--acc);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,150,199,.35)}
 .btnnext.gen{background:linear-gradient(135deg, var(--acc), var(--acc-light));box-shadow:0 8px 28px rgba(0,150,199,.35)}
@@ -462,6 +464,8 @@ body.dark .tscore.low { background: rgba(230, 57, 70, 0.15); color: #f87171; bor
 body.dark .btnnext{color:var(--dk-bg);}
 body.dark .btnnext:hover{color:#fff;}
 body.dark .btnnext.gen{color:#fff;}
+body.dark .btn-reset{color:var(--dk-s4);}
+body.dark .btn-reset:hover{color:#f87171; background:rgba(248,113,113,0.15);}
 
 /* NEW: Fixing Dark Mode Visibility Issues for Modals, Inputs, Toasts */
 body.dark .toast { background: var(--dk-s1); color: #fff; border: 1px solid var(--dk-s3); box-shadow: 0 16px 40px rgba(0,0,0,.6); }
@@ -763,6 +767,7 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
       <div class="btn-group-left">
         <button class="btnback" id="btnback" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i><span id="lback">Back</span></button>
         <button class="btn-dice" id="btn-dice" onclick="randomizeAll()"><i class="fa-solid fa-dice"></i> <span id="lbl-dice">Inspiration</span></button>
+        <button class="btn-reset" id="btn-reset" onclick="restart()"><i class="fa-solid fa-rotate-left"></i> <span id="lbl-reset">Start over</span></button>
       </div>
       <button class="btnnext" id="btnnext" onclick="goNext()"><span id="lnext">Continue</span><i class="fa-solid fa-arrow-right"></i></button>
     </div>
@@ -1010,7 +1015,7 @@ function ui(isForward = true){
   if (aiMagicLbl) aiMagicLbl.textContent=lang==='fr'?'Baguette Magique (Auto-fill)':'Magic Wand (Auto-fill)';
   const szn=document.getElementById('img-opt-txt');if(szn)szn.textContent=' '+(lang==='fr'?'Images automatiquement compressées et optimisées':'Images are automatically compressed and optimized');
   
-  const map={'brand-s':t.bs,'t1':t.t1,'d1':t.d1,'t2':t.t2,'d2':t.d2,'t3':t.t3,'d3':t.d3,'t4':t.t4,'d4':t.d4,'t5':t.t5,'d5':t.d5,'t6':t.t6,'d6':t.d6,'lc':t.lc,'lsd':t.lsd,'lm':t.lm,'lar':t.lar,'lop':t.lop,'lrst':t.lrst,'fnt':t.fnt,'lrf':t.lrf,'hint-lbl':t.hintLbl,'dzp':t.dzp,'dzs':t.dzs, 'lbl-mode':t.modeLbl, 'lbl-mode-ref':t.modeRef, 'lbl-mode-edit':t.modeEdit};
+  const map={'brand-s':t.bs,'t1':t.t1,'d1':t.d1,'t2':t.t2,'d2':t.d2,'t3':t.t3,'d3':t.d3,'t4':t.t4,'d4':t.d4,'t5':t.t5,'d5':t.d5,'t6':t.t6,'d6':t.d6,'lc':t.lc,'lsd':t.lsd,'lm':t.lm,'lar':t.lar,'lop':t.lop,'lbl-reset':t.lrst,'fnt':t.fnt,'lrf':t.lrf,'hint-lbl':t.hintLbl,'dzp':t.dzp,'dzs':t.dzs, 'lbl-mode':t.modeLbl, 'lbl-mode-ref':t.modeRef, 'lbl-mode-edit':t.modeEdit};
   Object.entries(map).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
   
   document.getElementById('mode-desc').textContent = T[lang][sel.isEditMode ? 'modeDescEdit' : 'modeDescRef'];
@@ -1123,8 +1128,10 @@ function restart(){
   document.getElementById('hint-chips').innerHTML='';
   document.getElementById('rlist').innerHTML='';
   document.getElementById('rfinp').value='';
+  document.getElementById('sug-box').classList.remove('on');
   setImgMode('ref');
   buildSG();buildLG();buildCG();buildAR();buildOP();ui();
+  toast(lang==='fr'?'Tout a été réinitialisé !':'Started over!');
 }
 
 async function setLang(l){
