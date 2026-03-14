@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SUETOS ImagePrompter v14 | Pro AI</title>
+<title>SUETOS ImagePrompter v15 | Studio AI</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBjbGMwZSIvPjx0ZXh0IHk9IjUwIiB4PSI1MCIgZmlsbD0iI2ZmNWMwMCIgZm9udC1zaXplPSI2MCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5TPC90ZXh0Pjwvc3ZnPg==">
 
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -112,6 +112,21 @@ body.dark .hdr{background:linear-gradient(135deg,#08080a 0%,#14100a 30%,#1e0f00 
 .icon-btn i { font-size: 14px; }
 .icon-btn:hover, .btnhist:hover, .lib-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
+/* ── TOOLTIPS (Nouveau) ── */
+[data-tooltip] { position: relative; cursor: help; }
+[data-tooltip]::before {
+  content: attr(data-tooltip); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+  background: var(--blk); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 10px;
+  white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 1000;
+  font-family: var(--font); font-weight: normal; text-transform: none; letter-spacing: normal;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+[data-tooltip]:hover::before { opacity: 1; }
+
+/* ── DIFF HIGHLIGHT (Nouveau) ── */
+.diff-add { background: rgba(255, 92, 0, 0.15); color: #b83b00; border-radius: 3px; padding: 0 2px; font-weight: 600; }
+body.dark .diff-add { background: rgba(255, 92, 0, 0.25); color: #ff8c3a; }
+
 /* ── CARD ── */
 .card{background:rgba(255,255,255,0.95); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-radius:28px;box-shadow:var(--shlg);border:1px solid var(--glass-border);position:relative;transition:var(--trans); flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden;}
 
@@ -181,7 +196,7 @@ textarea.tinp{min-height:88px;line-height:1.6;overflow-y:hidden}
 .arcrd svg{display:block}
 .arcrd span{font-size:9px;font-weight:700;letter-spacing:.04em;color:inherit;white-space:nowrap}
 
-/* ── DROPZONE (Robust & Anti-Shrink) ── */
+/* ── DROPZONE ── */
 .dz{border:2px dashed var(--s3);border-radius:var(--r);padding:24px 20px;text-align:center;cursor:pointer;transition:all .25s;background:var(--s2);margin-bottom:14px;position:relative;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:110px;}
 .dz:hover,.dz.over{border-color:var(--or);background:rgba(255,92,0,.04)}
 #dz-text{transition:all .25s; display:flex; flex-direction:column; align-items:center; pointer-events:none;}
@@ -204,12 +219,18 @@ textarea.tinp{min-height:88px;line-height:1.6;overflow-y:hidden}
 
 .fnotice{background:rgba(255,92,0,.06);border:1px solid rgba(255,92,0,.18);border-radius:var(--rsm);padding:9px 13px;font-size:11.5px;color:#b83b00;margin-bottom:12px;display:none;align-items:center;gap:8px}
 .fnotice.on{display:flex}
-.btn-ai-describe{display:none;align-items:center;gap:7px;padding:10px 18px;border-radius:100px;border:none;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,#ff5c00,#ff8c3a);color:#fff;box-shadow:0 4px 18px rgba(255,92,0,.35);transition:all .25s;margin-bottom:14px;width:100%}
-.btn-ai-describe.on{display:flex;justify-content:center}
+
+.btn-ai-group { display:flex; gap:8px; margin-bottom:14px; }
+.btn-ai-describe, .btn-magic{display:none;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:100px;border:none;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;box-shadow:0 4px 18px rgba(255,92,0,.35);transition:all .25s;flex:1;}
+.btn-ai-describe { background:linear-gradient(135deg,#ff5c00,#ff8c3a); }
+.btn-magic { background:linear-gradient(135deg,#8b5cf6,#d946ef); box-shadow:0 4px 18px rgba(139,92,246,.35); display:flex; }
+.btn-ai-describe.on{display:flex;}
 .btn-ai-describe:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,92,0,.5)}
-.btn-ai-describe:active{transform:translateY(0)}
-.btn-ai-describe.loading{opacity:.7;pointer-events:none}
-.btn-ai-describe i{font-size:13px}
+.btn-magic:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.5)}
+.btn-ai-describe:active, .btn-magic:active{transform:translateY(0)}
+.btn-ai-describe.loading, .btn-magic.loading{opacity:.7;pointer-events:none}
+.btn-ai-describe i, .btn-magic i{font-size:13px}
+
 .img-size-notice{display:none;align-items:center;gap:6px;font-size:10.5px;font-weight:600;color:#b86000;background:rgba(184,96,0,.07);border:1px solid rgba(184,96,0,.2);border-radius:var(--rsm);padding:7px 11px;margin-bottom:12px}
 .img-size-notice.on{display:flex}
 .img-size-notice i{font-size:11px;flex-shrink:0}
@@ -318,6 +339,7 @@ body.dark .reswrap::-webkit-scrollbar-thumb{background:var(--dk-s3)}
 .modal-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);}
 .modal-overlay.on{display:flex; animation:fadeIn .2s ease;}
 .modal-box{border-radius:28px;box-shadow:var(--shlg);border:1px solid var(--glass-border);width:100%;max-width:500px;padding:40px;animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both;max-height:85vh;overflow-y:auto}
+.modal-box.large { max-width: 600px; }
 .modal-title{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px;color:var(--blk)}
 .modal-desc{font-size:12px;color:var(--s4);margin-bottom:24px;line-height:1.6}
 .modal-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--s4);margin-bottom:6px;display:block}
@@ -325,7 +347,7 @@ body.dark .reswrap::-webkit-scrollbar-thumb{background:var(--dk-s3)}
 .modal-inp:focus{background:var(--s1);border-color:var(--or);box-shadow:0 0 0 3px rgba(255,92,0,.1)}
 .modal-ta{resize:vertical;min-height:80px;font-family:var(--mono);font-size:11.5px;line-height:1.6}
 .modal-row{display:flex;gap:12px;margin-top:20px}
-.modal-btn{flex:1;padding:13px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .2s}
+.modal-btn{flex:1;padding:13px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:var(--font);transition:all .2s; display:inline-flex; align-items:center; justify-content:center; gap:8px;}
 .modal-btn.primary{background:var(--blk);color:#fff}
 .modal-btn.primary:hover{background:var(--or); box-shadow:0 4px 16px rgba(255,92,0,0.3);}
 .modal-btn.secondary{background:var(--s2);color:var(--blk)}
@@ -382,6 +404,10 @@ body.dark .reswrap::-webkit-scrollbar-thumb{background:var(--dk-s3)}
 .errbox{background:#fff5f2;border:1px solid rgba(255,92,0,.3);border-radius:var(--rsm);padding:14px 16px;font-size:12px;color:#c43d00;margin-top:12px;display:none;align-items:flex-start;gap:10px;line-height:1.6}
 .errbox.on{display:flex}
 
+/* ── FILE INPUT CUSTOM ── */
+.file-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--s2); color: var(--blk); border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: 1.5px solid transparent; font-family: var(--font); }
+.file-btn:hover { background: var(--s3); }
+
 /* Dark mode specifics */
 body.dark .tbadge{background:var(--or);color:#fff;}
 body.dark .cpybtn{background:var(--or);color:#fff;}
@@ -400,6 +426,8 @@ body.dark .compare-col{background:var(--dk-s1);border-color:var(--dk-s3)}
 body.dark .compare-col-hdr{background:var(--dk-s2);color:#fff;}
 body.dark .compare-prompt{background:var(--dk-s2);border-color:var(--dk-s3);color:var(--dk-s5)}
 body.dark .view-toggle{border-color:var(--dk-s3)}
+body.dark .file-btn { background: var(--dk-s2); color: var(--dk-s5); }
+body.dark .file-btn:hover { background: var(--dk-s3); }
 
 /* Modale Settings */
 #settings-modal .modal-box { max-width: 400px; }
@@ -417,8 +445,10 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
 </head>
 <body>
 
+<!-- LIBRARY OVERLAY + PANEL -->
 <div class="lib-overlay" id="lib-overlay" onclick="closeLib()"></div>
 
+<!-- HISTORY PANEL -->
 <div class="hist-panel" id="hist-panel">
   <div class="lib-panel-hdr">
     <div class="lib-panel-title" id="hist-title">Generation History</div>
@@ -429,26 +459,43 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
 </div>
 <div class="lib-overlay" id="hist-overlay" onclick="closeHist()"></div>
 
+<!-- CUSTOM TOOLS MODAL & IMPORT/EXPORT -->
 <div class="modal-overlay" id="tools-modal">
-  <div class="modal-box">
+  <div class="modal-box large">
     <div class="modal-title" id="tools-modal-title">Custom Tool Profiles</div>
-    <div class="modal-desc" id="tools-modal-desc">Add your own AI image tool with custom syntax rules. The app will tailor prompts to your tool's format.</div>
+    <div class="modal-desc" id="tools-modal-desc">Add your own AI image tool with custom syntax rules.</div>
     <div class="custom-tool-list" id="custom-tool-list"></div>
     <div id="add-tool-form">
       <label class="modal-label" id="tools-lbl-name">Tool Name</label>
       <input class="modal-inp" id="ct-name" placeholder="e.g. Adobe Firefly, Ideogram...">
-      <label class="modal-label" id="tools-lbl-badge">Short Badge</label>
-      <input class="modal-inp" id="ct-badge" placeholder="e.g. FF 3.0">
+      <div style="display:flex; gap:12px;">
+        <div style="flex:1">
+          <label class="modal-label" id="tools-lbl-badge">Short Badge</label>
+          <input class="modal-inp" id="ct-badge" placeholder="e.g. FF 3.0">
+        </div>
+      </div>
       <label class="modal-label" id="tools-lbl-rules">Syntax Rules</label>
       <textarea class="modal-inp modal-ta" id="ct-rules" placeholder="e.g. Use descriptive adjectives separated by commas. Always end with quality: high. Avoid verbs."></textarea>
     </div>
-    <div class="modal-row">
-      <button class="modal-btn secondary" onclick="closeToolsModal()" id="tools-btn-cancel">Cancel</button>
+    <div class="modal-row" style="margin-bottom: 24px; border-bottom: 1px solid var(--s2); padding-bottom: 24px;">
+      <button class="modal-btn secondary" onclick="closeToolsModal()" id="tools-btn-cancel">Close</button>
       <button class="modal-btn primary" onclick="addCustomTool()" id="tools-btn-add"><i class="fa-solid fa-plus"></i> <span id="tools-btn-add-lbl">Add Tool</span></button>
+    </div>
+    
+    <!-- DATA SYNC -->
+    <div class="modal-title" style="font-size: 16px;" id="sync-title">Data Sync (Local Cloud)</div>
+    <div class="modal-desc" id="sync-desc">Export or backup all your custom tools, history, and library.</div>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <button class="file-btn" onclick="exportData()"><i class="fa-solid fa-download"></i> <span id="lbl-exp-data">Export All Data</span></button>
+      <label class="file-btn">
+        <i class="fa-solid fa-upload"></i> <span id="lbl-imp-data">Import Data</span>
+        <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
+      </label>
     </div>
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title" id="settings-title">Settings</div>
@@ -461,6 +508,22 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
     <div class="modal-row">
       <button class="modal-btn secondary" onclick="closeSettingsModal()" id="settings-btn-cancel">Cancel</button>
       <button class="modal-btn primary" onclick="saveSettings()" id="settings-btn-save"><i class="fa-solid fa-check"></i> <span id="settings-btn-save-lbl">Save</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- PRESETS MODAL -->
+<div class="modal-overlay" id="presets-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="presets-title">Global Presets</div>
+    <div class="modal-desc" id="presets-desc">Save your favorite combinations of style, lighting, and framing for quick reuse.</div>
+    <div id="presets-list" style="margin-bottom: 20px;"></div>
+    <div style="display:flex; gap:12px;">
+      <input class="modal-inp" id="preset-name" placeholder="Name this preset..." style="margin-bottom:0;">
+      <button class="modal-btn primary" onclick="savePreset()" style="flex:0 0 auto;"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div class="modal-row">
+      <button class="modal-btn secondary" onclick="closePresetsModal()">Close</button>
     </div>
   </div>
 </div>
@@ -479,6 +542,7 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
   <div id="lib-list"></div>
 </div>
 
+<!-- MAIN APP -->
 <div class="shell">
   <div class="hdr">
     <div class="logo-g">
@@ -491,6 +555,7 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
     </div>
     <div class="hdr-right">
       <button class="icon-btn" id="btn-dark" onclick="toggleDark()" title="Toggle Theme"><i class="fa-solid fa-moon" id="dark-icon"></i></button>
+      <button class="icon-btn" id="btn-presets" onclick="openPresetsModal()" title="Global Presets"><i class="fa-solid fa-sliders"></i></button>
       <button class="icon-btn" id="btn-settings" onclick="openSettingsModal()" title="API Key"><i class="fa-solid fa-key"></i></button>
       <button class="lib-btn" id="btn-lib" onclick="openLib()" style="display:none"><i class="fa-solid fa-bookmark"></i> <span id="lllib">Library</span></button>
       <button class="btnhist" id="btn-hist" onclick="openHist()"><i class="fa-solid fa-clock-rotate-left"></i> <span id="lbl-hist">History</span></button>
@@ -509,12 +574,14 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
       <div class="lsub" id="lsub">AI is crafting your prompts.</div>
     </div>
 
+    <!-- TIMELINE CLIQUABLE -->
     <div class="pgw">
       <div class="pgbs" id="pgbs"></div>
       <div class="pglbl" id="pglbl">Subject</div>
     </div>
 
     <div class="sbody">
+      <!-- STEP 1 -->
       <div class="pane on" id="p1">
         <div class="stitle" id="t1">Subject & <em>References</em></div>
         <div class="sdesc" id="d1">Describe your visual concept. Upload reference images to automatically extract details.</div>
@@ -530,7 +597,10 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         </div>
         
         <div class="fnotice" id="fn"><i class="fa-solid fa-circle-info"></i><span id="fnt">Reference images will inform the generation.</span></div>
-        <button class="btn-ai-describe" id="btn-ai-describe" onclick="aiDescribeImages()"><i class="fa-solid fa-wand-magic-sparkles"></i><span id="ai-describe-lbl">AI Describe - Fill Main Concept</span></button>
+        <div class="btn-ai-group">
+            <button class="btn-ai-describe" id="btn-ai-describe" onclick="aiDescribeImages()"><i class="fa-solid fa-eye"></i><span id="ai-describe-lbl">AI Analyze Images</span></button>
+            <button class="btn-magic" id="btn-magic" onclick="autoFill()"><i class="fa-solid fa-wand-magic-sparkles"></i><span id="ai-magic-lbl">Magic Wand (Auto-Fill)</span></button>
+        </div>
         <div class="img-size-notice" id="img-size-notice"><i class="fa-solid fa-bolt"></i><span id="img-opt-txt"> Images are automatically compressed and optimized</span></div>
         
         <div class="hint-box" id="hint-box">
@@ -551,13 +621,15 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         </div>
       </div>
 
+      <!-- STEP 2 -->
       <div class="pane" id="p2">
         <div class="stitle" id="t2">Visual <em>Style</em></div>
-        <div class="sdesc" id="d2">Pick an aesthetic direction for your image.</div>
+        <div class="sdesc" id="d2">Pick an aesthetic direction for your image. Hover for info.</div>
         <div class="vgrid" id="sgrid"></div>
         <div class="frow"><label class="flbl" id="lsd">Refine Your Style</label><input type="text" class="tinp" id="inp-sd" placeholder="e.g. influenced by Moebius…"></div>
       </div>
 
+      <!-- STEP 3 -->
       <div class="pane" id="p3">
         <div class="stitle" id="t3">Lighting & <em>Atmosphere</em></div>
         <div class="sdesc" id="d3">Set the emotional tone and lighting quality.</div>
@@ -565,12 +637,14 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         <div class="frow"><label class="flbl" id="lm">Additional Mood Notes</label><input type="text" class="tinp" id="inp-mood" placeholder="e.g. eerie silence, sense of wonder…"></div>
       </div>
 
+      <!-- STEP 4 -->
       <div class="pane" id="p4">
         <div class="stitle" id="t4">Framing & <em>Composition</em></div>
         <div class="sdesc" id="d4">Choose how the camera frames the scene.</div>
         <div class="cgrid" id="cgrid"></div>
       </div>
 
+      <!-- STEP 5 -->
       <div class="pane" id="p5">
         <div class="stitle" id="t5">Technical <em>Settings</em></div>
         <div class="sdesc" id="d5">Define aspect ratio and camera/lens profile.</div>
@@ -579,8 +653,10 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
         <div class="errbox" id="errbox"><i class="fa-solid fa-triangle-exclamation" style="margin-top:2px;flex-shrink:0;color:var(--or)"></i><span id="errtxt">Generation failed.</span></div>
       </div>
 
+      <!-- STEP 6 RESULTS -->
       <div class="pane" id="p6">
         
+        <!-- FIXE : En-tête et Actions -->
         <div>
             <div class="res-top">
               <div class="stitle" id="t6" style="margin:0;">Your <em>Prompts</em></div>
@@ -605,6 +681,7 @@ body.dark .view-toggle{border-color:var(--dk-s3)}
             </div>
         </div>
 
+        <!-- ZONE DE DEFILEMENT : Resultats -->
         <div class="reswrap">
             <div id="stack-view" style="display:block;">
               <div id="mj-sliders-panel"></div>
@@ -664,6 +741,7 @@ en:{
   set:'Settings', setDesc:'Enter your own Gemini API key (leave empty to use the free built-in AI).', setKey:'Gemini API Key', setSave:'Save',
   styles:['None','Anime','Architecture','B&W Photo','Cinematic','Concept Art','Cyberpunk','Fine Art','Illustration','Impressionism','Minimalism','Octane 3D','Photo Pro HD','Photorealism','Pop Art','Street Photo','Surrealism','Watercolor'],
   sicons:['fa-ban','fa-dragon','fa-building','fa-circle-half-stroke','fa-clapperboard','fa-pencil','fa-bolt','fa-paintbrush','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-star','fa-camera-retro','fa-shapes','fa-street-view','fa-eye','fa-droplet'],
+  styleDesc:['No specific style','Japanese animation aesthetic','Architectural rendering','Black and white photography','Movie-like dramatic lighting','Video game/movie concept art','Neon futuristic sci-fi','Classic museum painting','Digital or traditional illustration','Visible brush strokes, light focus','Clean, sparse, simple','High-end 3D render','High resolution crisp photography','Hyper-realistic rendering','Vibrant comic-style art','Urban candid photography','Dreamlike bizarre imagery','Soft transparent paint'],
   lights:['None','Chiaroscuro','Dark Cinema','Dreamy','Ethereal','Golden Hour','Gothic','Gritty','High-Key','Melancholic','Moody Blue','Mystical','Neon Night','Noir','Pastel','Retro 50s','Retro 60s','Retro 70s-80s','Sci-Fi','Soft Studio','Studio Photo','Summertime','Sunrays','Vintage'],
   licons:['fa-ban','fa-circle-half-stroke','fa-ghost','fa-sparkles','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
   comps:['None','Close Up','Wide Shot','Aerial View','Low Angle','Macro','Symmetry','Rule of Thirds',"Bird's Eye",'Side View','POV','Panoramic','Dutch Angle','Fisheye','Over Shoulder','Full Body'],
@@ -695,6 +773,7 @@ en:{
   set:'Paramètres', setDesc:'Entrez votre propre clé API Gemini (laissez vide pour utiliser l\'IA intégrée gratuite).', setKey:'Clé API Gemini', setSave:'Enregistrer',
   styles:['Aucun','Anime','Aquarelle','Architecture','Beaux-Arts','Cinématique','Concept Art','Cyberpunk','Illustration','Impressionnisme','Minimalisme','Octane 3D','Photo de Rue','Photo N&B','Photo Pro HD','Photoréalisme','Pop Art','Surréalisme'],
   sicons:['fa-ban','fa-dragon','fa-droplet','fa-building','fa-paintbrush','fa-clapperboard','fa-pencil','fa-bolt','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-street-view','fa-circle-half-stroke','fa-star','fa-camera-retro','fa-shapes','fa-eye'],
+  styleDesc:['Aucun style imposé','Animation japonaise','Rendu architectural','Photographie noir et blanc classique','Lumière de film, profondeur de champ','Art conceptuel jeu/film','Futuriste néon SF','Peinture classique','Illustration numérique ou manuelle','Coups de pinceaux visibles','Très épuré, simple','Rendu 3D haute qualité','Photo très haute définition','Rendu hyper-réaliste','Style bande dessinée coloré','Photographie urbaine sur le vif','Image de rêve bizarre','Peinture douce et transparente'],
   lights:['Aucun','Bleu Moody','Brut','Clair-obscur','Dark Ciné','Golden Hour','Gothic','High-Key','Mystique','Mélancolique','Noir','Nuit Néon','Onirique','Pastel','Rayons Soleil','Rétro 50s','Rétro 60s','Rétro 70s-80s','Sci-Fi','Studio Doux','Studio Photo','Summertime','Vintage','Éthéré'],
   licons:['fa-ban','fa-water','fa-hammer','fa-circle-half-stroke','fa-ghost','fa-sun','fa-skull','fa-sun','fa-wand-magic-sparkles','fa-cloud-rain','fa-film','fa-moon','fa-sparkles','fa-ice-cream','fa-sun-plant-wilt','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-camera-retro','fa-cloud'],
   comps:['Aucun','Gros Plan','Plan Large','Vue Aérienne','Contre-plongée','Macro','Symétrie','Règle des Tiers','Plongée','Vue Profil','Point de Vue','Panoramique','Plan Incliné','Fisheye','Par-dessus Épaule','Plan Pied'],
@@ -703,7 +782,7 @@ en:{
 
 const TOOLS=[
   {id:'midjourney',name:'Midjourney',badge:'V7 / Niji'},
-  {id:'gpt',name:'GPT Images (DALL·E)',badge:'GPT-4o'},
+  {id:'gpt',name:'GPT Images',badge:'DALL·E 3'},
   {id:'nanobanana',name:'Nano Banana',badge:'NB Pro'}
 ];
 
@@ -771,6 +850,11 @@ function buildVGrid(cid,items,icons,key){
   items.forEach((label,i)=>{
     const d=document.createElement('div');
     d.className='vcrd'+(sel[key]===i?' on':'');
+    
+    if(key === 'siIdx' && T[lang].styleDesc && T[lang].styleDesc[i]) {
+        d.setAttribute('data-tooltip', T[lang].styleDesc[i]);
+    }
+    
     d.innerHTML=`<i class="fa-solid ${icons[i]||'fa-star'}"></i><span>${label}</span>`;
     d.onclick=()=>{c.querySelectorAll('.vcrd').forEach(x=>x.classList.remove('on'));d.classList.add('on');sel[key]=i; };
     c.appendChild(d);
@@ -840,7 +924,9 @@ function ui(isForward = true){
   }
   
   document.getElementById('lbl-sug').textContent=lang==='fr'?'Suggérer':'Suggest';
-  document.getElementById('ai-describe-lbl').textContent=lang==='fr'?'AI Describe - Remplir le Concept':'AI Describe - Fill Main Concept';
+  document.getElementById('ai-describe-lbl').textContent=lang==='fr'?'AI Analyse Images':'AI Analyze Images';
+  const aiMagicLbl = document.getElementById('ai-magic-lbl');
+  if (aiMagicLbl) aiMagicLbl.textContent=lang==='fr'?'Baguette Magique (Auto-fill)':'Magic Wand (Auto-fill)';
   const szn=document.getElementById('img-opt-txt');if(szn)szn.textContent=' '+(lang==='fr'?'Images automatiquement compressées et optimisées':'Images are automatically compressed and optimized');
   const map={'brand-s':t.bs,'t1':t.t1,'d1':t.d1,'t2':t.t2,'d2':t.d2,'t3':t.t3,'d3':t.d3,'t4':t.t4,'d4':t.d4,'t5':t.t5,'d5':t.d5,'t6':t.t6,'d6':t.d6,'lc':t.lc,'lsd':t.lsd,'lm':t.lm,'lar':t.lar,'lop':t.lop,'lrst':t.lrst,'fnt':t.fnt,'lrf':t.lrf,'hint-lbl':t.hintLbl,'dzp':t.dzp,'dzs':t.dzs};
   Object.entries(map).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
@@ -884,12 +970,21 @@ function syncLangUI() {
    se('hist-title',fr?'Historique des Générations':'Generation History');
    se('hist-desc',fr?'Chaque génération est sauvegardée automatiquement. Rien n\'est jamais perdu.':'Every generation is automatically saved here. Nothing is ever lost.');
    se('tools-modal-title',fr?'Profils d\'Outils Personnalisés':'Custom Tool Profiles');
-   se('tools-modal-desc',fr?'Ajoutez votre propre outil IA avec des règles de syntaxe. L\'app adaptera les prompts à votre format.':'Add your own AI image tool with custom syntax rules. The app will tailor prompts to your tool\'s format.');
+   se('tools-modal-desc',fr?'Ajoutez votre propre outil IA avec des règles de syntaxe.':'Add your own AI image tool with custom syntax rules.');
    se('tools-lbl-name',fr?'Nom de l\'Outil':'Tool Name');
    se('tools-lbl-badge',fr?'Badge Court':'Short Badge');
    se('tools-lbl-rules',fr?'Règles de Syntaxe':'Syntax Rules');
-   se('tools-btn-cancel',fr?'Annuler':'Cancel');
+   se('tools-btn-cancel',fr?'Fermer':'Close');
    se('tools-btn-add-lbl',fr?'Ajouter':'Add Tool');
+   
+   se('sync-title',fr?'Synchronisation (Cloud Local)':'Data Sync (Local Cloud)');
+   se('sync-desc',fr?'Sauvegardez ou restaurez vos outils, historique et librairie.':'Export or backup all your custom tools, history, and library.');
+   se('lbl-exp-data',fr?'Exporter':'Export All Data');
+   se('lbl-imp-data',fr?'Importer':'Import Data');
+   
+   se('presets-title',fr?'Presets Globaux':'Global Presets');
+   se('presets-desc',fr?'Sauvegardez vos combinaisons favorites de style, lumière et format.':'Save your favorite combinations of style, lighting, and framing for quick reuse.');
+
    se('lbl-hist',fr?'Historique':'History');
    se('lbl-tools',fr?'Outils':'Tools');
    se('lbl-sug-hdr',fr?'Variations Créatives':'Creative Variations');
@@ -985,10 +1080,8 @@ function getActiveKey() {
 function getGeminiModel() {
   const k = localStorage.getItem('suetos_api_key');
   if (k && k.trim() !== '') {
-      // Clé API personnalisée : on bascule sur le modèle public standard
       return 'gemini-2.5-flash';
   }
-  // Mode gratuit intégré : on utilise le modèle preview réservé
   return 'gemini-2.5-flash-preview-09-2025';
 }
 
@@ -1281,7 +1374,15 @@ async function refine(){
   showLoad(T[lang].rtxt,T[lang].rsub);
   try{
     const sys='Apply refinement to all tools preserving each tool syntax. Return ONLY valid JSON, same structure. NO LINE BREAKS inside string values.';
-    const raw = await callGeminiText(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, sys, true);
+    
+    // MEMORY: Send references if any
+    let raw;
+    if (uploads.length > 0) {
+        raw = await callGeminiVision(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, uploads, sys, true);
+    } else {
+        raw = await callGeminiText(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, sys, true);
+    }
+
     prompts=parseJSON(raw);
     renderResults(prompts);
     document.getElementById('rfinp').value='';
@@ -1296,6 +1397,47 @@ async function refine(){
       }
   }
   hideLoad();btn.disabled=false;
+}
+
+// ── AUTO-FILL (Baguette Magique) ──
+async function autoFill() {
+  const subj = document.getElementById('inp-subj').value.trim();
+  if(!subj){ toast(T[lang].eSubj); return; }
+  
+  const btn = document.getElementById('btn-magic');
+  const origHtml = btn.innerHTML;
+  btn.classList.add('loading');
+  btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${lang==='fr'?'Magie en cours...':'Magic Loading...'}`;
+  
+  try {
+      const sys = `Given the visual subject, pick the MOST aesthetically pleasing and fitting index for style, lighting, and composition. Return ONLY valid JSON: {"styleIdx": int, "lightIdx": int, "compIdx": int, "ar": "string"}.
+      Styles (0-17): ${T.en.styles.join(', ')}.
+      Lights (0-23): ${T.en.lights.join(', ')}.
+      Comps (0-15): ${T.en.comps.join(', ')}.
+      AR options: 1:1, 16:9, 9:16, 2:3, 3:2, 4:5, 5:4, 21:9.`;
+      
+      const raw = await callGeminiText(`Subject: ${subj}`, sys, true);
+      const res = parseJSON(raw);
+      
+      if(res.styleIdx !== undefined) sel.siIdx = res.styleIdx;
+      if(res.lightIdx !== undefined) sel.liIdx = res.lightIdx;
+      if(res.compIdx !== undefined) sel.ciIdx = res.compIdx;
+      if(res.ar) sel.ar = res.ar;
+      
+      // Force UI updates to show the magic
+      buildSG(); buildLG(); buildCG(); buildAR();
+      
+      btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Prêt !':'Ready!'}`;
+      setTimeout(() => {
+          goToStep(STEPS);
+      }, 500);
+
+  } catch(e) {
+      console.error(e);
+      toast(lang==='fr'?'Erreur de baguette magique.':'Magic fill failed.');
+      btn.innerHTML = origHtml;
+      btn.classList.remove('loading');
+  }
 }
 
 async function translatePrompts(targetLang) {
@@ -1389,12 +1531,16 @@ function renderUploads() {
         g.style.display = 'grid'; 
         document.getElementById('fn').classList.add('on');
         document.getElementById('btn-ai-describe').classList.add('on');
+        const btnMagic = document.getElementById('btn-magic');
+        if(btnMagic) btnMagic.style.display='none';
         document.getElementById('img-size-notice').classList.add('on');
     } else {
         dz.classList.remove('has-files');
         g.style.display = 'none'; 
         document.getElementById('fn').classList.remove('on');
         document.getElementById('btn-ai-describe').classList.remove('on');
+        const btnMagic = document.getElementById('btn-magic');
+        if(btnMagic) btnMagic.style.display='flex';
         document.getElementById('img-size-notice').classList.remove('on');
         document.getElementById('hint-box').classList.remove('on');
     }
@@ -1478,7 +1624,7 @@ async function aiDescribeImages(){
     lbl.textContent=lang==='fr'?'Concept rempli !':'Concept filled!';
     btn.style.background='linear-gradient(135deg,#16a34a,#22c55e)';
     setTimeout(()=>{
-      lbl.textContent=lang==='fr'?'AI Describe - Remplir le Concept':'AI Describe - Fill Main Concept';
+      lbl.textContent=lang==='fr'?'AI Analyse Images':'AI Analyze Images';
       btn.style.background='';
       btn.classList.remove('loading');
     },2500);
@@ -1497,7 +1643,7 @@ async function aiDescribeImages(){
     }
     btn.style.background='#dc2626';
     setTimeout(()=>{
-      lbl.textContent=lang==='fr'?'AI Describe - Remplir le Concept':'AI Describe - Fill Main Concept';
+      lbl.textContent=lang==='fr'?'AI Analyse Images':'AI Analyze Images';
       btn.style.background='';
     },3500);
   }
@@ -1698,15 +1844,13 @@ function renderResults(data){
     actionsDiv.style.display = 'flex';
     actionsDiv.style.gap = '6px';
     
-    if (tool.id === 'nanobanana') {
-        const genImgBtn = document.createElement('button');
-        genImgBtn.className = 'cpybtn';
-        genImgBtn.style.background = 'linear-gradient(135deg, #FF5C00, #ff8c3a)';
-        genImgBtn.style.boxShadow = '0 2px 8px rgba(255,92,0,0.3)';
-        genImgBtn.innerHTML = `<i class="fa-solid fa-image"></i> ${lang==='fr'?'Générer Image':'Generate Image'}`;
-        genImgBtn.onclick = () => generateInlineImage(d.detailed, body, genImgBtn);
-        actionsDiv.appendChild(genImgBtn);
-    }
+    const genImgBtn = document.createElement('button');
+    genImgBtn.className = 'cpybtn';
+    genImgBtn.style.background = 'linear-gradient(135deg, #FF5C00, #ff8c3a)';
+    genImgBtn.style.boxShadow = '0 2px 8px rgba(255,92,0,0.3)';
+    genImgBtn.innerHTML = `<i class="fa-solid fa-image"></i> Preview`;
+    genImgBtn.onclick = () => generateInlineImage(d.detailed, body, genImgBtn);
+    actionsDiv.appendChild(genImgBtn);
 
     const detCb=document.createElement('button');detCb.className='cpybtn';
     detCb.innerHTML=`<i class="fa-regular fa-copy"></i> ${t.lcpy}`;
@@ -1897,13 +2041,17 @@ function applySuggestion(text){
 /* * ==========================================
  * HISTORIQUE, OUTILS ET FONCTIONS UTILES
  * ========================================== */
+
 function autoSaveToHist(subject) {
     try {
         const h = JSON.parse(localStorage.getItem('suetos_hist')||'[]');
         h.push({ subj: subject, date: Date.now(), prompts: prompts });
-        if(h.length > 50) h.shift(); // Conserve les 50 derniers
+        if(h.length > 20) h.shift(); 
         localStorage.setItem('suetos_hist', JSON.stringify(h));
-    } catch(e) {}
+    } catch(e) {
+        console.warn("Storage Full, clearing history.");
+        localStorage.setItem('suetos_hist', '[]'); 
+    }
 }
 
 function openHist() {
@@ -1940,6 +2088,97 @@ function loadHist(index) {
         closeHist();
         toast(lang==='fr'?'Historique chargé !':'History loaded!');
     }
+}
+
+function openPresetsModal() {
+    renderPresets();
+    document.getElementById('presets-modal').classList.add('on');
+}
+function closePresetsModal() { document.getElementById('presets-modal').classList.remove('on'); }
+
+function renderPresets() {
+    const list = document.getElementById('presets-list');
+    const presets = JSON.parse(localStorage.getItem('suetos_presets')||'[]');
+    if(presets.length === 0) {
+        list.innerHTML = `<div style="font-size:11px; color:var(--s4); text-align:center;">${lang==='fr'?'Aucun preset.':'No presets.'}</div>`;
+        return;
+    }
+    list.innerHTML = presets.map((p, i) => `
+        <div style="background:var(--s2); padding:10px 14px; border-radius:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="loadPreset(${i})">
+            <div>
+              <strong style="font-size:12px; color:var(--blk);">${escHtml(p.name)}</strong>
+              <div style="font-size:9px; color:var(--s4); margin-top:4px;">Style: ${T['en'].styles[p.s]} | Light: ${T['en'].lights[p.l]}</div>
+            </div>
+            <button onclick="deletePreset(${i}, event)" style="background:none; border:none; color:#dc2626; cursor:pointer; padding:6px;"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function savePreset() {
+    const name = document.getElementById('preset-name').value.trim();
+    if(!name) return toast("Name required");
+    const presets = JSON.parse(localStorage.getItem('suetos_presets')||'[]');
+    presets.push({ name, s: sel.siIdx, sd: sel.sd, l: sel.liIdx, m: sel.mood, c: sel.ciIdx, ar: sel.ar, op: sel.op });
+    localStorage.setItem('suetos_presets', JSON.stringify(presets));
+    document.getElementById('preset-name').value = '';
+    renderPresets();
+    toast("Preset saved!");
+}
+
+function loadPreset(index) {
+    const presets = JSON.parse(localStorage.getItem('suetos_presets')||'[]');
+    if(presets[index]) {
+        const p = presets[index];
+        sel.siIdx = p.s; sel.sd = p.sd; sel.liIdx = p.l; sel.mood = p.m; sel.ciIdx = p.c; sel.ar = p.ar; sel.op = p.op;
+        buildSG(); buildLG(); buildCG(); buildAR(); buildOP();
+        closePresetsModal();
+        toast("Preset applied!");
+    }
+}
+
+function deletePreset(index, e) {
+    e.stopPropagation();
+    const presets = JSON.parse(localStorage.getItem('suetos_presets')||'[]');
+    presets.splice(index, 1);
+    localStorage.setItem('suetos_presets', JSON.stringify(presets));
+    renderPresets();
+}
+
+function exportData() {
+    const data = {
+        hist: localStorage.getItem('suetos_hist'),
+        lib: localStorage.getItem('suetos_lib'),
+        tools: localStorage.getItem('suetos_custom_tools'),
+        presets: localStorage.getItem('suetos_presets')
+    };
+    const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; 
+    a.download = 'suetos_backup.json'; 
+    a.click();
+    toast(lang==='fr'?'Données exportées':'Data exported');
+}
+
+function importData(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const data = JSON.parse(event.target.result);
+            if(data.hist) localStorage.setItem('suetos_hist', data.hist);
+            if(data.lib) localStorage.setItem('suetos_lib', data.lib);
+            if(data.tools) localStorage.setItem('suetos_custom_tools', data.tools);
+            if(data.presets) localStorage.setItem('suetos_presets', data.presets);
+            toast(lang==='fr'?'Données restaurées !':'Data imported successfully!');
+            renderCustomTools();
+        } catch(err) {
+            toast(lang==='fr'?'Fichier invalide':'Invalid file');
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; 
 }
 
 function getCustomTools() { return JSON.parse(localStorage.getItem('suetos_custom_tools')||'[]'); }
@@ -2002,12 +2241,31 @@ function setView(viewMode) {
   }
 }
 
+function getDiffHtml(baseText, compareText) {
+    if(!baseText || !compareText) return escHtml(compareText);
+    const bWords = new Set(baseText.toLowerCase().match(/\b(\w+)\b/g) || []);
+    let result = '';
+    const tokens = compareText.split(/(\b\w+\b)/);
+    tokens.forEach(tok => {
+        if(/\w+/.test(tok) && !bWords.has(tok.toLowerCase())) {
+            result += `<span class="diff-add">${escHtml(tok)}</span>`;
+        } else {
+            result += escHtml(tok);
+        }
+    });
+    return result;
+}
+
 function renderCompareView(data) {
     const grid = document.getElementById('compare-grid');
     grid.innerHTML = '';
     const allTools=[...TOOLS,...getCustomTools()];
     grid.style.gridTemplateColumns = `repeat(${allTools.length}, 1fr)`;
     
+    let mjData = data.midjourney;
+    if(typeof mjData === 'string') mjData = {detailed: mjData};
+    const basePrompt = mjData ? mjData.detailed : '';
+
     allTools.forEach(tool=>{
         let toolKey = Object.keys(data).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
         let d = toolKey ? data[toolKey] : data[tool.id];
@@ -2020,6 +2278,8 @@ function renderCompareView(data) {
             scoreHTML = `<span class="tscore ${scClass}">${d.score}%</span>`;
         }
 
+        let promptHtml = (tool.id !== 'midjourney') ? getDiffHtml(basePrompt, d.detailed) : escHtml(d.detailed || '');
+
         grid.innerHTML += `
             <div class="compare-col">
                 <div class="compare-col-hdr">
@@ -2031,7 +2291,7 @@ function renderCompareView(data) {
                 </div>
                 <div class="compare-col-body">
                     <div class="compare-lbl">${T[lang].ldet}</div>
-                    <div class="compare-prompt">${escHtml(d.detailed || '')}</div>
+                    <div class="compare-prompt">${promptHtml}</div>
                     ${d.short ? `<div class="compare-lbl">${T[lang].lshort}</div><div class="compare-prompt" style="opacity:0.8">${escHtml(d.short)}</div>` : ''}
                 </div>
             </div>
@@ -2062,9 +2322,55 @@ function exportPDF() {
     
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    let y = 20;
+    let y = 0;
     const margin = 20;
     const maxW = 170; 
+
+    doc.setFillColor(255, 92, 0);
+    doc.rect(0, 0, 210, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("SUETOS Creative Brief", margin, 20);
+
+    y = 40;
+
+    if (uploads.length > 0) {
+        try {
+            doc.setFillColor(240, 240, 240);
+            doc.roundedRect(margin, y, 40, 40, 3, 3, 'F');
+            doc.addImage(uploads[0].dataUrl, 'JPEG', margin, y, 40, 40);
+            
+            doc.setTextColor(30, 30, 30);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.text("CONCEPT:", margin + 45, y + 5);
+            
+            doc.setFont("helvetica", "normal");
+            const cLines = doc.splitTextToSize(sel.subj, maxW - 45);
+            doc.text(cLines, margin + 45, y + 10);
+            
+            y = Math.max(y + 45, y + 10 + (cLines.length * 4) + 5);
+        } catch(e) {
+            console.error("PDF Image Error", e);
+            y = 40;
+        }
+    } else {
+        doc.setTextColor(30, 30, 30);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("CONCEPT:", margin, y);
+        doc.setFont("helvetica", "normal");
+        const cLines = doc.splitTextToSize(sel.subj, maxW);
+        doc.text(cLines, margin, y + 5);
+        y += 5 + (cLines.length * 4) + 5;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.text("STYLE:", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text((T[lang].styles[sel.siIdx] || 'None') + (sel.sd ? ' ('+sel.sd+')' : ''), margin + 15, y);
+    y += 12;
 
     const addText = (txt, size, isBold, color) => {
         doc.setFont("helvetica", isBold ? "bold" : "normal");
@@ -2081,13 +2387,6 @@ function exportPDF() {
         y += lines.length * lineHeight + 2; 
     };
 
-    addText("SUETOS ImagePrompter", 18, true, [255, 92, 0]);
-    y += 5;
-    
-    addText("Concept: " + sel.subj, 12, false, [50, 50, 50]);
-    addText("Style: " + (T[lang].styles[sel.siIdx] || 'None') + (sel.sd ? ' ('+sel.sd+')' : ''), 12, false, [50, 50, 50]);
-    y += 10;
-
     const allTools=[...TOOLS,...getCustomTools()];
     allTools.forEach(tool => {
         let toolKey = Object.keys(prompts).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
@@ -2095,30 +2394,34 @@ function exportPDF() {
         if(!d) return;
         if(typeof d === 'string') d = { detailed: d, short: '', negative: '', score: null };
 
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, y, 210 - margin, y);
+        y += 8;
+
         let scoreTxt = d.score ? ` (${d.score}% Match)` : '';
         addText(tool.name + scoreTxt, 14, true, [0, 0, 0]);
         y += 2;
 
-        addText(T[lang].ldet.toUpperCase(), 10, true, [100, 100, 100]);
-        addText(d.detailed || '', 10, false, [0, 0, 0]);
+        addText(T[lang].ldet.toUpperCase(), 9, true, [100, 100, 100]);
+        addText(d.detailed || '', 10, false, [40, 40, 40]);
         y += 3;
 
         if(d.short) {
-            addText(T[lang].lshort.toUpperCase(), 10, true, [100, 100, 100]);
-            addText(d.short, 10, false, [50, 50, 50]);
+            addText(T[lang].lshort.toUpperCase(), 9, true, [100, 100, 100]);
+            addText(d.short, 10, false, [80, 80, 80]);
             y += 3;
         }
         
         if(d.negative) {
-            addText(T[lang].lneg.toUpperCase(), 10, true, [217, 48, 37]);
+            addText(T[lang].lneg.toUpperCase(), 9, true, [217, 48, 37]);
             addText(d.negative, 10, false, [217, 48, 37]);
             y += 3;
         }
         y += 5;
     });
 
-    doc.save("SUETOS_Prompts.pdf");
-    toast(lang==='fr'?"PDF téléchargé dans votre dossier !":"PDF downloaded to your folder!");
+    doc.save("SUETOS_Creative_Brief.pdf");
+    toast(lang==='fr'?"Brief PDF téléchargé !":"Creative Brief downloaded!");
 }
 
 async function generateInlineImage(promptText, container, btn) {
@@ -2136,24 +2439,23 @@ async function generateInlineImage(promptText, container, btn) {
         let imgB64 = null;
         
         if (hasCustomKey) {
-            // Clé API personnalisée : On utilise Imagen 3 (modèle public)
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${currentKey}`;
-            const payload = { instances: { prompt: promptText }, parameters: { sampleCount: 1 } };
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(response.status === 401 ? "INVALID_API_KEY" : "API Error");
-            const data = await response.json();
-            imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
-        } else {
-            // Mode sans clé (Environnement intégré) : On utilise Nano Banana
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
             const payload = { 
-                contents: [{ role: "user", parts: [{ text: promptText }] }], 
+                contents: [{ parts: [{ text: promptText }] }], 
                 generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
             };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error("API Error");
+            if (!response.ok) throw new Error(response.status === 401 ? "INVALID_API_KEY" : "API Error");
             const data = await response.json();
             imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+        } else {
+            const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + promptText;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=`;
+            const payload = { instances: { prompt: enhancedPrompt }, parameters: { sampleCount: 1 } };
+            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error("API Error");
+            const data = await response.json();
+            imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
         }
         
         if (!imgB64) throw new Error("Aucune donnée d'image retournée.");
