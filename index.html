@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SUETOS ImagePrompter v15 | Studio AI</title>
+<title>SUETOS ImagePrompter v16 | Studio AI</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBjMGMwZSIvPjx0ZXh0IHk9IjUwIiB4PSI1MCIgZmlsbD0iIzAwOTZjNyIgZm9udC1zaXplPSI2MCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5TPC90ZXh0Pjwvc3ZnPg==">
 
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -234,6 +234,16 @@ textarea.tinp{min-height:96px;line-height:1.6;overflow-y:hidden}
 .fnotice{background:rgba(0,150,199,.06);border:1px solid rgba(0,150,199,.15);border-radius:var(--rsm);padding:12px 16px;font-size:12px;color:var(--acc-hover);margin-bottom:16px;display:none;align-items:center;gap:10px; font-weight: 500;}
 .fnotice.on{display:flex}
 
+/* ── MODE SELECTION (Img2Img vs Text2Img) ── */
+.mode-wrap{display:none; margin-bottom: 16px; animation: fadeIn 0.4s ease;}
+.mode-wrap.on{display:block;}
+.mode-btns{display:flex; gap:10px; background:var(--s2); padding:6px; border-radius:100px; border:1px solid var(--s3); display:inline-flex;}
+.mode-btn{padding:8px 16px;font-size:12px;font-weight:700;font-family:var(--font);letter-spacing:.02em;border:none;cursor:pointer;background:transparent;color:var(--s4);transition:all .3s ease; border-radius: 100px; display:flex; align-items:center; gap:8px;}
+.mode-btn.on{background:var(--blk);color:#fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+body.dark .mode-btns{background:var(--dk-s2); border-color:var(--dk-s3);}
+body.dark .mode-btn{color:var(--dk-s4);}
+body.dark .mode-btn.on{background:var(--acc);color:#fff; box-shadow: 0 4px 12px rgba(0,150,199,0.3);}
+
 .btn-ai-group { display:flex; gap:10px; margin-bottom:16px; }
 .btn-ai-describe, .btn-magic{display:none;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:100px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;box-shadow:0 6px 20px rgba(0,150,199,.3);transition:all .3s cubic-bezier(.22,1,.36,1);flex:1;}
 .btn-ai-describe { background:linear-gradient(135deg,#0096C7,#48CAE4); }
@@ -379,6 +389,8 @@ body.dark .reswrap::-webkit-scrollbar-thumb{background:rgba(255, 255, 255, 0.2)}
 .btnall.ok{background:#10b981;color:#fff; border-color:#10b981;}
 .btnpdf{display:inline-flex;align-items:center;gap:8px;background:rgba(0,150,199,.08);color:var(--acc-hover);border:1px solid rgba(0,150,199,.2);cursor:pointer;padding:10px 18px;border-radius:100px;font-size:11px;font-weight:700;transition:all .3s ease;font-family:var(--font);letter-spacing:.04em}
 .btnpdf:hover{background:var(--acc);color:#fff; transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,150,199,0.3);}
+.btnsave{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#fff;border:none;cursor:pointer;padding:10px 18px;border-radius:100px;font-size:11px;font-weight:700;transition:all .3s ease;font-family:var(--font);letter-spacing:.04em; box-shadow: 0 4px 12px rgba(0,150,199,0.3);}
+.btnsave:hover{background:var(--acc-hover); transform:translateY(-2px); box-shadow: 0 6px 16px rgba(0,150,199,0.4);}
 
 /* ── LOADING & TOAST ── */
 .lov{position:absolute;inset:0;background:var(--glass-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:32px;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
@@ -393,15 +405,28 @@ body.dark .reswrap::-webkit-scrollbar-thumb{background:rgba(255, 255, 255, 0.2)}
 .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%) translateY(24px) scale(0.95);background:var(--blk);color:#fff;padding:14px 28px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.22,1,.36,1);z-index:9999;box-shadow:0 16px 40px rgba(0,0,0,.3);font-family:var(--font)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
 
-/* ── MJ Sliders Panel ── */
-.mj-sliders-inner{background:rgba(0, 180, 216, 0.05);border:1px solid rgba(0, 180, 216, 0.2);border-radius:20px;padding:20px 26px;margin-bottom:24px;}
-.mj-sliders-title{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#00B4D8;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
-.mj-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: center; }
-.mj-item { display: flex; flex-direction: column; gap: 10px; }
-.mj-item label { font-size: 10.5px; font-weight: 700; color: var(--s4); text-transform: uppercase; letter-spacing: .05em; margin:0;}
-.mj-slider-ctrl { display: flex; align-items: center; gap: 10px; }
-.mj-slider-ctrl input[type=range] { flex: 1; accent-color: #00B4D8; height: 5px; cursor: pointer; }
-.mj-val { font-size: 14px; font-weight: 800; color: var(--acc); min-width: 36px; text-align: right; letter-spacing: -0.02em; font-family: var(--mono); }
+/* ── UI Panels (MJ & NB) ── */
+.sliders-inner{border-radius:20px;padding:20px 26px;margin-bottom:24px;}
+.sliders-inner.mj{background:rgba(0, 180, 216, 0.05);border:1px solid rgba(0, 180, 216, 0.2);}
+.sliders-inner.nb{background:rgba(139, 92, 246, 0.05);border:1px solid rgba(139, 92, 246, 0.2);}
+body.dark .sliders-inner.mj{background:rgba(0, 180, 216, 0.05);border-color:rgba(0, 180, 216, 0.15);}
+body.dark .sliders-inner.nb{background:rgba(139, 92, 246, 0.05);border-color:rgba(139, 92, 246, 0.15);}
+
+.sliders-title{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.sliders-title.mj{color:#00B4D8;}
+.sliders-title.nb{color:#8b5cf6;}
+
+.sliders-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: center; }
+.sliders-grid.nb-grid { grid-template-columns: 1fr; }
+.slider-item { display: flex; flex-direction: column; gap: 10px; }
+.slider-item label { font-size: 10.5px; font-weight: 700; color: var(--s4); text-transform: uppercase; letter-spacing: .05em; margin:0;}
+body.dark .slider-item label{color:var(--dk-s5) !important;}
+.slider-ctrl { display: flex; align-items: center; gap: 10px; }
+.slider-ctrl input[type=range].mj-range { flex: 1; accent-color: #00B4D8; height: 5px; cursor: pointer; }
+.slider-ctrl input[type=range].nb-range { flex: 1; accent-color: #8b5cf6; height: 5px; cursor: pointer; }
+.slider-val { font-size: 14px; font-weight: 800; min-width: 36px; text-align: right; letter-spacing: -0.02em; font-family: var(--mono); }
+.slider-val.mj-val { color: var(--acc); }
+.slider-val.nb-val { color: #8b5cf6; }
 
 /* ── SCORE BADGES ── */
 .tscore { font-size: 10px; padding: 5px 10px; border-radius: 100px; font-weight: 800; letter-spacing: .05em; display: flex; align-items: center; gap: 6px; text-transform: uppercase; }
@@ -431,14 +456,24 @@ body.dark .btnall{background:var(--acc);color:#fff;border-color:var(--acc);}
 body.dark .view-btn{background:transparent; color:var(--dk-s4);}
 body.dark .view-btn.on{background:var(--acc);color:#fff; box-shadow: 0 4px 12px rgba(0,150,199,0.3);}
 body.dark .view-toggle{background: var(--dk-s2); border-color: var(--dk-s3);}
-body.dark .mj-sliders-inner{background:rgba(0, 180, 216, 0.05);border-color:rgba(0, 180, 216, 0.15);}
-body.dark .mj-item label{color:var(--dk-s5) !important;}
 body.dark .tscore.high { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
 body.dark .tscore.med { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
 body.dark .tscore.low { background: rgba(230, 57, 70, 0.15); color: #f87171; border-color: rgba(230, 57, 70, 0.3); }
 body.dark .btnnext{color:var(--dk-bg);}
 body.dark .btnnext:hover{color:#fff;}
 body.dark .btnnext.gen{color:#fff;}
+
+/* NEW: Fixing Dark Mode Visibility Issues for Modals, Inputs, Toasts */
+body.dark .toast { background: var(--dk-s1); color: #fff; border: 1px solid var(--dk-s3); box-shadow: 0 16px 40px rgba(0,0,0,.6); }
+body.dark .modal-inp { background: var(--dk-s2); border-color: var(--dk-s3); color: var(--dk-s5); }
+body.dark .modal-inp:focus { background: var(--dk-s1); border-color: var(--acc); box-shadow:0 0 0 4px rgba(0,150,199,.15); }
+body.dark .modal-btn.primary { background: var(--acc); color: #fff; }
+body.dark .modal-btn.primary:hover { background: var(--acc-hover); }
+body.dark .modal-btn.secondary { background: var(--dk-s2); color: var(--dk-s5); border-color: var(--dk-s3); }
+body.dark .modal-btn.secondary:hover { background: var(--dk-s3); }
+body.dark .lib-save-inp { background: var(--dk-s2); border-color: var(--dk-s3); color: var(--dk-s5); }
+body.dark .lib-save-inp:focus { background: var(--dk-s1); border-color: var(--acc); }
+
 body.dark .compare-col{background:var(--dk-s1);border-color:var(--dk-s3)}
 body.dark .compare-col-hdr{background:var(--dk-s2);color:#fff; border-color:var(--dk-s3);}
 body.dark .compare-prompt{background:var(--dk-s2);border-color:var(--dk-s3);color:var(--dk-s5)}
@@ -453,7 +488,7 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
   .stitle{font-size:26px}
   .vgrid{grid-template-columns:repeat(3,1fr)}
   .cgrid{grid-template-columns:repeat(3,1fr)}
-  .mj-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .sliders-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .lib-panel, .hist-panel {width:100%; right:-100%; left:auto;}
   .hist-panel.open {left: 0; right:0;}
 }
@@ -612,7 +647,18 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
           <div class="fgrid" id="fgrid"></div>
         </div>
         
+        <!-- NEW: MODE SELECTION (EDIT VS REF) -->
+        <div class="mode-wrap" id="mode-wrap">
+           <label class="flbl" id="lbl-mode">Generation Mode</label>
+           <div class="mode-btns">
+              <button class="mode-btn on" id="btn-mode-ref" onclick="setImgMode('ref')"><i class="fa-solid fa-palette"></i> <span id="lbl-mode-ref">Style Reference</span></button>
+              <button class="mode-btn" id="btn-mode-edit" onclick="setImgMode('edit')"><i class="fa-solid fa-wand-magic-sparkles"></i> <span id="lbl-mode-edit">Image-to-Image (Edit)</span></button>
+           </div>
+           <small style="font-size:11px; color:var(--s4); display:block; margin-top:8px;" id="mode-desc">Uses uploaded image as aesthetic inspiration for a new creation.</small>
+        </div>
+
         <div class="fnotice" id="fn"><i class="fa-solid fa-circle-info"></i><span id="fnt">Reference images will inform the generation.</span></div>
+        
         <div class="btn-ai-group">
             <button class="btn-ai-describe" id="btn-ai-describe" onclick="aiDescribeImages()"><i class="fa-solid fa-eye"></i><span id="ai-describe-lbl">AI Analyze Images</span></button>
             <button class="btn-magic" id="btn-magic" onclick="autoFill()"><i class="fa-solid fa-wand-magic-sparkles"></i><span id="ai-magic-lbl">Magic Wand (Auto-Fill)</span></button>
@@ -677,7 +723,7 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
             <div class="res-top">
               <div class="stitle" id="t6" style="margin:0;">Your <em>Prompts</em></div>
               <div style="display:flex;gap:10px">
-                <button class="lib-btn" onclick="openLib()"><i class="fa-solid fa-bookmark"></i> <span id="lllib2">Save to Library</span></button>
+                <button class="btnsave" onclick="openLib()"><i class="fa-solid fa-bookmark"></i> <span id="lllib2">Save to Library</span></button>
               </div>
             </div>
             <div class="sdesc" id="d6" style="margin-bottom:20px;">Copy directly into your AI image tool. Pick variations, save to library, or refine.</div>
@@ -701,6 +747,8 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
         <div class="reswrap">
             <div id="stack-view" style="display:block;">
               <div id="mj-sliders-panel"></div>
+              <!-- NOUVEAU PANNEAU NANO BANANA -->
+              <div id="nb-sliders-panel"></div>
               <div id="rlist"></div>
             </div>
             <div id="compare-view" style="display:none; padding-bottom: 16px;">
@@ -727,7 +775,9 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
 let lang='en', step=1, isDark=false;
 let uploads=[], prompts=null, scores=null, variations=null;
 const STEPS=6;
-const sel={subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0, mjRaw: false};
+
+// Ajout des états pour le mode édition (Img2Img) et le paramètre Nano Banana
+const sel={subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0, mjRaw: false, isEditMode: false, nbDenoising: 0.55};
 
 // ══ TRANSLATIONS ══
 const T={
@@ -755,6 +805,10 @@ en:{
   libTitle:'Prompt Library',libSaveLbl:'Save current prompts',libSaveTxt:'Save to Library',libSavedLbl:'Saved Prompts',libEmpty:'No saved prompts yet.\nGenerate prompts and click "Save to Library".',libNamePh:'Name this set…',libLoaded:'Prompts loaded!',libSaved:'Saved to library!',libDeleted:'Deleted.',
   phSD:'e.g. influenced by Moebius, neon accents…',phMood:'e.g. eerie silence, sense of wonder…',
   set:'Settings', setDesc:'Enter your own Gemini API key (leave empty to use the free built-in AI).', setKey:'Gemini API Key', setSave:'Save',
+  modeLbl: 'Generation Mode',
+  modeRef: 'Style Reference', modeEdit: 'Image-to-Image (Edit)',
+  modeDescRef: 'Uses uploaded image as aesthetic inspiration for a new creation.',
+  modeDescEdit: 'Edits the physical structure of the original image (e.g. colorizing, renovating).',
   styles:['None','Anime','Architecture','B&W Photo','Cinematic','Concept Art','Cyberpunk','Fine Art','Illustration','Impressionism','Minimalism','Octane 3D','Photo Pro HD','Photorealism','Pop Art','Street Photo','Surrealism','Watercolor'],
   sicons:['fa-ban','fa-dragon','fa-building','fa-circle-half-stroke','fa-clapperboard','fa-pencil','fa-bolt','fa-paintbrush','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-star','fa-camera-retro','fa-shapes','fa-street-view','fa-eye','fa-droplet'],
   styleDesc:['No specific style','Japanese animation aesthetic','Architectural rendering','Black and white photography','Movie-like dramatic lighting','Video game/movie concept art','Neon futuristic sci-fi','Classic museum painting','Digital or traditional illustration','Visible brush strokes, light focus','Clean, sparse, simple','High-end 3D render','High resolution crisp photography','Hyper-realistic rendering','Vibrant comic-style art','Urban candid photography','Dreamlike bizarre imagery','Soft transparent paint'],
@@ -787,6 +841,10 @@ en:{
   libTitle:'Bibliothèque',libSaveLbl:'Sauvegarder les prompts actuels',libSaveTxt:'Sauvegarder',libSavedLbl:'Prompts Sauvegardés',libEmpty:'Aucun prompt sauvegardé.\nGénérez des prompts et cliquez "Sauvegarder".',libNamePh:'Nommer ce jeu de prompts…',libLoaded:'Prompts chargés !',libSaved:'Sauvegardé !',libDeleted:'Supprimé.',
   phSD:'ex. inspiré de Moebius, accents néon…',phMood:'ex. silence inquiétant, émerveillement…',
   set:'Paramètres', setDesc:'Entrez votre propre clé API Gemini (laissez vide pour utiliser l\'IA intégrée gratuite).', setKey:'Clé API Gemini', setSave:'Enregistrer',
+  modeLbl: 'Mode de Génération',
+  modeRef: 'Inspiration (Style)', modeEdit: 'Image-to-Image (Édition)',
+  modeDescRef: 'Utilise l\'image uploadée comme inspiration esthétique pour créer une nouvelle image.',
+  modeDescEdit: 'Modifie la structure physique de l\'image d\'origine (ex: rénover une ruine, coloriser).',
   styles:['Aucun','Anime','Aquarelle','Architecture','Beaux-Arts','Cinématique','Concept Art','Cyberpunk','Illustration','Impressionnisme','Minimalisme','Octane 3D','Photo de Rue','Photo N&B','Photo Pro HD','Photoréalisme','Pop Art','Surréalisme'],
   sicons:['fa-ban','fa-dragon','fa-droplet','fa-building','fa-paintbrush','fa-clapperboard','fa-pencil','fa-bolt','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-street-view','fa-circle-half-stroke','fa-star','fa-camera-retro','fa-shapes','fa-eye'],
   styleDesc:['Aucun style imposé','Animation japonaise','Rendu architectural','Photographie noir et blanc classique','Lumière de film, profondeur de champ','Art conceptuel jeu/film','Futuriste néon SF','Peinture classique','Illustration numérique ou manuelle','Coups de pinceaux visibles','Très épuré, simple','Rendu 3D haute qualité','Photo très haute définition','Rendu hyper-réaliste','Style bande dessinée coloré','Photographie urbaine sur le vif','Image de rêve bizarre','Peinture douce et transparente'],
@@ -804,7 +862,6 @@ const TOOLS=[
 
 const ARS=[['Auto',32,20],['1:1',20,20],['16:9',32,18],['9:16',18,32],['2:3',18,27],['3:2',27,18],['4:5',20,25],['5:4',25,20],['4:3',24,18],['3:4',18,24],['21:9',32,14],['2:1',32,16]];
 
-/* UPDATED SVGs TO MATCH NEW TURQUOISE BASE (Replaced #FF5C00 with #0096C7) */
 const CSVG=[
 `<svg viewBox="0 0 42 34"><rect x="3" y="3" width="36" height="28" rx="3" class="sf" stroke="#bbb" stroke-width="1.5" fill="none"/><line x1="12" y1="12" x2="30" y2="22" stroke="#bbb" stroke-width="1.5"/></svg>`,
 `<svg viewBox="0 0 42 34"><rect x="3" y="3" width="36" height="28" rx="3" class="sf" stroke="#333" stroke-width="1.5" fill="none"/><circle cx="21" cy="15" r="8" class="so" stroke="#333" stroke-width="1.5" fill="none"/><circle cx="21" cy="15" r="3" class="acc" fill="#0096C7" stroke="none"/></svg>`,
@@ -922,6 +979,13 @@ function buildPB(){
 }
 
 // ══ UI ══
+function setImgMode(mode) {
+  sel.isEditMode = (mode === 'edit');
+  document.getElementById('btn-mode-ref').classList.toggle('on', mode === 'ref');
+  document.getElementById('btn-mode-edit').classList.toggle('on', mode === 'edit');
+  document.getElementById('mode-desc').textContent = T[lang][mode === 'ref' ? 'modeDescRef' : 'modeDescEdit'];
+}
+
 function ui(isForward = true){
   const t=T[lang];
   for(let i=1;i<=STEPS;i++){
@@ -945,8 +1009,12 @@ function ui(isForward = true){
   const aiMagicLbl = document.getElementById('ai-magic-lbl');
   if (aiMagicLbl) aiMagicLbl.textContent=lang==='fr'?'Baguette Magique (Auto-fill)':'Magic Wand (Auto-fill)';
   const szn=document.getElementById('img-opt-txt');if(szn)szn.textContent=' '+(lang==='fr'?'Images automatiquement compressées et optimisées':'Images are automatically compressed and optimized');
-  const map={'brand-s':t.bs,'t1':t.t1,'d1':t.d1,'t2':t.t2,'d2':t.d2,'t3':t.t3,'d3':t.d3,'t4':t.t4,'d4':t.d4,'t5':t.t5,'d5':t.d5,'t6':t.t6,'d6':t.d6,'lc':t.lc,'lsd':t.lsd,'lm':t.lm,'lar':t.lar,'lop':t.lop,'lrst':t.lrst,'fnt':t.fnt,'lrf':t.lrf,'hint-lbl':t.hintLbl,'dzp':t.dzp,'dzs':t.dzs};
+  
+  const map={'brand-s':t.bs,'t1':t.t1,'d1':t.d1,'t2':t.t2,'d2':t.d2,'t3':t.t3,'d3':t.d3,'t4':t.t4,'d4':t.d4,'t5':t.t5,'d5':t.d5,'t6':t.t6,'d6':t.d6,'lc':t.lc,'lsd':t.lsd,'lm':t.lm,'lar':t.lar,'lop':t.lop,'lrst':t.lrst,'fnt':t.fnt,'lrf':t.lrf,'hint-lbl':t.hintLbl,'dzp':t.dzp,'dzs':t.dzs, 'lbl-mode':t.modeLbl, 'lbl-mode-ref':t.modeRef, 'lbl-mode-edit':t.modeEdit};
   Object.entries(map).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+  
+  document.getElementById('mode-desc').textContent = T[lang][sel.isEditMode ? 'modeDescEdit' : 'modeDescRef'];
+
   document.getElementById('lback').textContent=t.lback;
   document.getElementById('lllib').textContent=t.lllib;
   document.getElementById('lllib2').textContent=t.lllib2;
@@ -1044,16 +1112,18 @@ function goNext(){ goToStep(step + 1); }
 
 function restart(){
   step=1;
-  Object.assign(sel,{subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0,mjRaw:false});
+  Object.assign(sel,{subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0,mjRaw:false, isEditMode:false, nbDenoising:0.55});
   uploads=[];prompts=null;scores=null;variations=null;
   document.getElementById('fgrid').innerHTML='';
   document.getElementById('dz').classList.remove('has-files');
   document.getElementById('fgrid').classList.remove('has-files');
   document.getElementById('fn').classList.remove('on');
+  document.getElementById('mode-wrap').classList.remove('on');
   document.getElementById('hint-box').classList.remove('on');
   document.getElementById('hint-chips').innerHTML='';
   document.getElementById('rlist').innerHTML='';
   document.getElementById('rfinp').value='';
+  setImgMode('ref');
   buildSG();buildLG();buildCG();buildAR();buildOP();ui();
 }
 
@@ -1266,6 +1336,10 @@ function getMJParamsStr() {
   return p;
 }
 
+function getNBParamsStr() {
+  return ` --strength ${sel.nbDenoising.toFixed(2)}`;
+}
+
 function autoAdaptMJParams() {
   sel.mjVersion = '--v 7';
   sel.mjStylize = 150;
@@ -1321,23 +1395,28 @@ function brief(){
   const ar=(sel.ar&&sel.ar!=='Auto')?sel.ar:'free';
   const op=(sel.op&&sel.op!=='None')?sel.op:'unspecified';
   
-  return `CREATIVE BRIEF\nSubject: ${sel.subj}\nStyle: ${style}${sel.sd?' | extra: '+sel.sd:''}\nLighting: ${light}${sel.mood?' | mood: '+sel.mood:''}\nComposition: ${comp}\nAspect ratio: ${ar} (use this for all tools)\nCamera/optics: ${op}\nOutput language: ${lang==='fr'?'French':'English'}\nMidjourney parameters (use EXACTLY): ${getMJParamsStr()}\nGPT Images: end prompt with [ratio: ${ar}]\nNano Banana: end prompt with [ratio: ${ar}]`;
+  return `CREATIVE BRIEF\nSubject: ${sel.subj}\nStyle: ${style}${sel.sd?' | extra: '+sel.sd:''}\nLighting: ${light}${sel.mood?' | mood: '+sel.mood:''}\nComposition: ${comp}\nAspect ratio: ${ar} (use this for all tools)\nCamera/optics: ${op}\nOutput language: ${lang==='fr'?'French':'English'}\nMidjourney parameters (use EXACTLY): ${getMJParamsStr()}`;
 }
 
 function getSys() {
-  return `You are an elite AI image generation prompt architect. Your objective is to create AESTHETICALLY STUNNING, HIGH-IMPACT prompts.
+  let modeInstruction = "";
+  if (sel.isEditMode && uploads.length > 0) {
+      modeInstruction = "\n\nCRITICAL (IMAGE-TO-IMAGE MODE): The user wants to perform an IMAGE-TO-IMAGE edit. The prompts MUST describe the exact layout/subject of the original image, but strictly applying the requested changes (e.g. restoring, colorizing, changing weather). DO NOT describe a completely new random scene. Describe the transformed final state of the existing image.";
+  }
+
+  return `You are an elite AI image generation prompt architect. Your objective is to create AESTHETICALLY STUNNING, HIGH-IMPACT prompts.${modeInstruction}
 
 CRITICAL PROMPT ENGINEERING RULES:
-1. AVOID WORD SALADS. Modern models (Midjourney v7, DALL-E 3) perform badly with outdated terms like "masterpiece, 8k, trending on artstation". Do NOT use them.
+1. AVOID WORD SALADS. Modern models perform badly with outdated terms.
 2. USE CONCISE, NATURAL LANGUAGE. Structure logically: [Subject Details] + [Environment/Setting] + [Lighting/Mood] + [Camera/Medium Details].
-3. Keep the 'detailed' prompt highly evocative but under 60 words. Over-prompting destroys the composition and aesthetic.
-4. Write ALL descriptive text in the requested output language (keep parameters like --v 7 unchanged).
-5. Evaluate a "score" (0-100) based on how professional, visually striking, and structurally perfect the prompt is.
+3. Keep the 'detailed' prompt highly evocative but under 60 words.
+4. Write ALL descriptive text in the requested output language.
+5. Evaluate a "score" (0-100) based on how professional the prompt is.
 
 Tool-specific rules:
-- midjourney: Focus on masterful composition and precise photographic/artistic terminology. End EXACTLY with the provided parameters (do not alter them): ${getMJParamsStr()}
-- gpt: Literal, highly descriptive, coherent physical space. Focus on vivid atmosphere.
-- nanobanana: Highly poetic, surreal, focusing on rich textures and award-winning cinematography.
+- midjourney: Masterful composition and precise terminology. End EXACTLY with the provided parameters.
+- gpt: Literal, highly descriptive, coherent physical space.
+- nanobanana: Highly poetic, surreal, focusing on rich textures and award-winning cinematography. End EXACTLY with: ${getNBParamsStr()}
 
 RETURN ONLY VALID JSON, no markdown, no extra text:
 {"midjourney":{"detailed":"...","short":"...","negative":"...","score":98},"gpt":{"detailed":"...","short":"...","negative":"...","score":95},"nanobanana":{"detailed":"...","short":"...","negative":"...","score":90}}`;
@@ -1356,7 +1435,7 @@ async function generate(){
   try{
     let raw;
     if(uploads.length > 0) {
-        const promptText = brief() + "\n\nReference images provided. Incorporate their aesthetic strongly.";
+        const promptText = brief() + "\n\nReference images provided. " + (sel.isEditMode ? "EDIT the structure." : "Incorporate their aesthetic strongly.");
         raw = await callGeminiVision(promptText, uploads, buildSysWithCustomTools(), true);
     } else {
         raw = await callGeminiText(brief(), buildSysWithCustomTools(), true);
@@ -1392,7 +1471,6 @@ async function refine(){
   try{
     const sys='Apply refinement to all tools preserving each tool syntax. Return ONLY valid JSON, same structure. NO LINE BREAKS inside string values.';
     
-    // MEMORY: Send references if any
     let raw;
     if (uploads.length > 0) {
         raw = await callGeminiVision(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, uploads, sys, true);
@@ -1441,12 +1519,11 @@ async function autoFill() {
       if(res.compIdx !== undefined) sel.ciIdx = res.compIdx;
       if(res.ar) sel.ar = res.ar;
       
-      // Force UI updates to show the magic
       buildSG(); buildLG(); buildCG(); buildAR();
       
       btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Prêt !':'Ready!'}`;
       setTimeout(() => {
-          generate(); // Lance la génération directement et emmène à la page des résultats
+          generate(); 
       }, 500);
 
   } catch(e) {
@@ -1464,7 +1541,7 @@ async function translatePrompts(targetLang) {
     const sys = `You are a professional AI image prompt translator. Translate the provided JSON object containing generated prompts into ${targetLang === 'fr' ? 'French' : 'English'}.
     CRITICAL INSTRUCTIONS:
     1. Translate ONLY the descriptive, natural language parts.
-    2. DO NOT translate or modify ANY technical parameters, tags, or weights (e.g. keep "--ar 16:9", "--v 7", "--style raw", "[ratio: 16:9]" exactly as they are).
+    2. DO NOT translate or modify ANY technical parameters, tags, or weights (e.g. keep "--ar 16:9", "--v 7", "--style raw", "[ratio: 16:9]", "--strength 0.50" exactly as they are).
     3. Return ONLY a valid JSON object with the exact same structure. No markdown. NO LINE BREAKS inside JSON string values.`;
     const raw = await callGeminiText(JSON.stringify(prompts), sys, true);
     const newPrompts = parseJSON(raw);
@@ -1543,9 +1620,11 @@ function renderUploads() {
     });
 
     const dz = document.getElementById('dz');
+    const modeWrap = document.getElementById('mode-wrap');
     if (uploads.length > 0) {
         dz.classList.add('has-files');
         g.style.display = 'grid'; 
+        modeWrap.classList.add('on');
         document.getElementById('fn').classList.add('on');
         document.getElementById('btn-ai-describe').classList.add('on');
         const btnMagic = document.getElementById('btn-magic');
@@ -1554,6 +1633,9 @@ function renderUploads() {
     } else {
         dz.classList.remove('has-files');
         g.style.display = 'none'; 
+        modeWrap.classList.remove('on');
+        sel.isEditMode = false; // Reset
+        setImgMode('ref');
         document.getElementById('fn').classList.remove('on');
         document.getElementById('btn-ai-describe').classList.remove('on');
         const btnMagic = document.getElementById('btn-magic');
@@ -1761,6 +1843,23 @@ function updateMJParams(){
   }
 }
 
+function updateNBParams(){
+  const s = document.getElementById('nb-denoising');
+  if(!s) return;
+  sel.nbDenoising = parseFloat(s.value);
+  document.getElementById('nb-denoising-val').textContent = sel.nbDenoising.toFixed(2);
+
+  const nbTxt = document.getElementById('nb-detailed-txt');
+  if(nbTxt && prompts && prompts.nanobanana){
+    let p = prompts.nanobanana.detailed;
+    if(p) {
+        p = p.replace(/\s*--strength\s+[0-9\.]+/g, '');
+        prompts.nanobanana.detailed = p.trim() + getNBParamsStr();
+        nbTxt.textContent = prompts.nanobanana.detailed;
+    }
+  }
+}
+
 function renderMJSliders(){
   const panel=document.getElementById('mj-sliders-panel');
   if(!panel)return;
@@ -1780,10 +1879,10 @@ function renderMJSliders(){
   let vHTML = vOpts.map(o => `<option value="${o.v}" ${sel.mjVersion===o.v?'selected':''}>${o.l}</option>`).join('');
 
   panel.innerHTML=`
-  <div class="mj-sliders-inner">
-    <div class="mj-sliders-title"><i class="fa-brands fa-envira" style="color:#00B4D8"></i> Midjourney Parameters</div>
-    <div class="mj-grid">
-      <div class="mj-item">
+  <div class="sliders-inner mj">
+    <div class="sliders-title mj"><i class="fa-brands fa-envira"></i> Midjourney Parameters</div>
+    <div class="sliders-grid">
+      <div class="slider-item">
         <label>${lang==='fr'?'Modèle / Version':'Version Model'}</label>
         <div class="swrap">
           <select class="sinp" id="mj-version" onchange="updateMJParams()" style="padding: 8px 14px; font-size:11.5px;">
@@ -1791,35 +1890,64 @@ function renderMJSliders(){
           </select>
         </div>
       </div>
-      <div class="mj-item">
+      <div class="slider-item">
         <label>Stylize</label>
-        <div class="mj-slider-ctrl">
-          <input type="range" id="mj-stylize" min="0" max="1000" step="50" value="${sel.mjStylize}" oninput="updateMJParams()">
-          <span class="mj-val" id="mj-stylize-val">${sel.mjStylize}</span>
+        <div class="slider-ctrl">
+          <input type="range" class="mj-range" id="mj-stylize" min="0" max="1000" step="50" value="${sel.mjStylize}" oninput="updateMJParams()">
+          <span class="slider-val mj-val" id="mj-stylize-val">${sel.mjStylize}</span>
         </div>
       </div>
-      <div class="mj-item">
+      <div class="slider-item">
         <label>Chaos</label>
-        <div class="mj-slider-ctrl">
-          <input type="range" id="mj-chaos" min="0" max="100" step="5" value="${sel.mjChaos}" oninput="updateMJParams()">
-          <span class="mj-val" id="mj-chaos-val">${sel.mjChaos}</span>
+        <div class="slider-ctrl">
+          <input type="range" class="mj-range" id="mj-chaos" min="0" max="100" step="5" value="${sel.mjChaos}" oninput="updateMJParams()">
+          <span class="slider-val mj-val" id="mj-chaos-val">${sel.mjChaos}</span>
         </div>
       </div>
-      <div class="mj-item">
+      <div class="slider-item">
         <label>Weird</label>
-        <div class="mj-slider-ctrl">
-          <input type="range" id="mj-weird" min="0" max="3000" step="100" value="${sel.mjWeird}" oninput="updateMJParams()">
-          <span class="mj-val" id="mj-weird-val">${sel.mjWeird}</span>
+        <div class="slider-ctrl">
+          <input type="range" class="mj-range" id="mj-weird" min="0" max="3000" step="100" value="${sel.mjWeird}" oninput="updateMJParams()">
+          <span class="slider-val mj-val" id="mj-weird-val">${sel.mjWeird}</span>
         </div>
       </div>
     </div>
   </div>`;
 }
 
+function renderNBSliders(){
+  const panel=document.getElementById('nb-sliders-panel');
+  if(!panel)return;
+  
+  if(sel.isEditMode && uploads.length > 0) {
+      panel.style.display = 'block';
+      panel.innerHTML=`
+      <div class="sliders-inner nb">
+        <div class="sliders-title nb"><i class="fa-solid fa-wand-magic-sparkles"></i> Nano Banana Editor (Img2Img)</div>
+        <div class="sliders-grid nb-grid">
+          <div class="slider-item">
+            <label>${lang==='fr'?'Force de Transformation (Denoising)':'Transformation Strength (Denoising)'}</label>
+            <div class="slider-ctrl" style="max-width: 400px;">
+              <input type="range" class="nb-range" id="nb-denoising" min="0.1" max="1.0" step="0.05" value="${sel.nbDenoising}" oninput="updateNBParams()">
+              <span class="slider-val nb-val" id="nb-denoising-val">${sel.nbDenoising.toFixed(2)}</span>
+            </div>
+            <small style="font-size:10.5px; color:var(--s4);">${lang==='fr'?'0.1 = Modification très légère, 1.0 = Transformation totale.':'0.1 = Very light edit, 1.0 = Total transformation.'}</small>
+          </div>
+        </div>
+      </div>`;
+  } else {
+      panel.style.display = 'none';
+      panel.innerHTML = '';
+  }
+}
+
 function renderResults(data){
   const t=T[lang],list=document.getElementById('rlist');
   list.innerHTML='';
+  
+  // Render Custom UI Panels
   renderMJSliders();
+  renderNBSliders();
   
   if (Array.isArray(data)) data = data[0] || {};
   if (data && data.prompts) data = data.prompts;
@@ -1879,7 +2007,9 @@ function renderResults(data){
     detLbl.appendChild(actionsDiv);
     
     const detTxt=document.createElement('div');detTxt.className='ptxt';detTxt.textContent=d.detailed || '';
-    if(tool.id==='midjourney')detTxt.id='mj-detailed-txt';
+    if(tool.id==='midjourney') detTxt.id='mj-detailed-txt';
+    if(tool.id==='nanobanana') detTxt.id='nb-detailed-txt';
+    
     detBlk.appendChild(detLbl);detBlk.appendChild(detTxt);
     body.appendChild(detBlk);
 
@@ -2456,22 +2586,42 @@ async function generateInlineImage(promptText, container, btn) {
         const hasCustomKey = currentKey !== "";
         let imgB64 = null;
         
-        if (hasCustomKey) {
+        // Clean up specific AI parameters so the preview API doesn't get confused
+        let cleanPrompt = promptText.replace(/--[a-zA-Z0-9\-\s\.\:]+/g, '').replace(/\[ratio:\s*[0-9:]+\]/gi, '').substring(0, 800).trim();
+        
+        const isEdit = sel.isEditMode && uploads.length > 0;
+
+        if (isEdit || hasCustomKey) {
+            // Use Gemini 2.5 Flash Image Preview (Supports Image-to-Image editing)
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
+            const parts = [{ text: isEdit ? "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt : cleanPrompt }];
+            
+            // Inject the original image into the payload if we are in Edit Mode!
+            if (isEdit) {
+                parts.push({ inlineData: { mimeType: uploads[0].mime, data: uploads[0].b64 } });
+            }
+
             const payload = { 
-                contents: [{ parts: [{ text: promptText }] }], 
+                contents: [{ parts: parts }], 
                 generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
             };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(response.status === 401 ? "INVALID_API_KEY" : "API Error");
+            if (!response.ok) {
+                const errData = await response.json().catch(()=>({}));
+                throw new Error(response.status === 401 ? "INVALID_API_KEY" : (errData.error?.message || "API Error"));
+            }
             const data = await response.json();
             imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
         } else {
-            const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + promptText;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=`;
-            const payload = { instances: { prompt: enhancedPrompt }, parameters: { sampleCount: 1 } };
+            // Free tier text-to-image fallback
+            const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + cleanPrompt;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${currentKey}`;
+            const payload = { instances: [{ prompt: enhancedPrompt }], parameters: { sampleCount: 1 } };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error("API Error");
+            if (!response.ok) {
+                const errData = await response.json().catch(()=>({}));
+                throw new Error(errData.error?.message || "API Error");
+            }
             const data = await response.json();
             imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
         }
