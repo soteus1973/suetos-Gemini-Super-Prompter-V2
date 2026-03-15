@@ -2630,14 +2630,28 @@ async function generateInlineImage(promptText, container, btn) {
             imgEl.src = `data:image/png;base64,${imgB64}`;
 
         } else {
-            // 100% FREE PREVIEWS for Standard Text-to-Image (No API Key needed!)
+            // 100% FREE PREVIEWS (No API Key needed)
             const seed = Math.floor(Math.random() * 1000000);
-            const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?seed=${seed}&nologo=true&enhance=false`;
             
-            // Load via promise to handle the loading state correctly
+            // Fix: Truncate and sanitize prompt to avoid "URI Too Long" Server Errors from Pollinations
+            const safePrompt = cleanPrompt.replace(/[^a-zA-Z0-9\s,]/g, '').substring(0, 300).trim();
+            const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(safePrompt)}?seed=${seed}&nologo=true&enhance=false`;
+            
             await new Promise((resolve, reject) => {
-                imgEl.onload = resolve;
-                imgEl.onerror = () => reject(new Error("Preview rendering failed."));
+                // Prevent infinite "Thinking..." with a 20s timeout
+                const timer = setTimeout(() => {
+                    imgEl.src = ''; 
+                    reject(new Error("Timeout: Image server is too busy."));
+                }, 20000);
+                
+                imgEl.onload = () => {
+                    clearTimeout(timer);
+                    resolve();
+                };
+                imgEl.onerror = () => {
+                    clearTimeout(timer);
+                    reject(new Error("Preview server rejected the prompt."));
+                };
                 imgEl.src = pollinationsUrl;
             });
         }
