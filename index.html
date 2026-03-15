@@ -2618,57 +2618,57 @@ async function generateInlineImage(promptText, container, btn) {
     
     toast(lang==='fr'?"Génération d'image en cours...":"Generating image...");
     try {
+        const currentKey = getActiveKey();
+        // L'API est obligatoire pour la version en ligne
+        if (!currentKey) {
+            throw new Error(lang==='fr' ? "Clé API requise. Cliquez sur 🔑 pour l'ajouter." : "API Key required. Click 🔑 to add it.");
+        }
+
         let cleanPrompt = promptText.replace(/--[a-zA-Z0-9\-\s\.\:]+/g, '').replace(/\[ratio:\s*[0-9:]+\]/gi, '').substring(0, 800).trim();
         const isEdit = sel.isEditMode && uploads.length > 0;
         let finalImgSrc = '';
-        const currentKey = getActiveKey(); // Leave API key empty in settings to use the free canvas environment key!
+
+        // SOLUTION UNIFIÉE : On utilise Gemini 2.5 Flash Image Preview pour TOUT (Création et Édition)
+        // Ce modèle contourne le paywall d'Imagen 3/4 et fonctionne avec une clé Gemini gratuite !
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
+        let parts = [];
 
         if (isEdit) {
-            // Use Gemini 2.5 Flash Image Preview ONLY for Image-to-Image editing
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
-            const parts = [{ text: "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt }];
+            parts.push({ text: "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt });
             parts.push({ inlineData: { mimeType: uploads[0].mime, data: uploads[0].b64 } });
-
-            const payload = { 
-                contents: [{ parts: parts }], 
-                generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
-            };
-            
-            const response = await fetch(url, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload)
-            });
-            
-            if (!response.ok) {
-                const errData = await response.json().catch(()=>({}));
-                throw new Error(errData.error?.message || "API Error");
-            }
-            const data = await response.json();
-            const imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-            if (!imgB64) throw new Error("Aucune donnée d'image retournée.");
-            finalImgSrc = `data:image/png;base64,${imgB64}`;
-
         } else {
-            // STANDARD PREVIEWS ONLINE: Using 100% free Pollinations.ai API
-            // This bypasses Google's paid Imagen limitations for online hosted apps
-            const safePrompt = cleanPrompt.substring(0, 150).replace(/[^a-zA-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
-            const seed = Math.floor(Math.random() * 1000000);
-            const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(safePrompt)}?width=800&height=800&nologo=true&seed=${seed}`;
-            
-            // Pre-load the image to ensure it's ready and doesn't hang
-            await new Promise((resolve, reject) => {
-                const tempImg = new Image();
-                const timer = setTimeout(() => reject(new Error(lang==='fr'?"Le serveur d'images gratuit prend trop de temps.":"Free image server timeout.")), 25000);
-                tempImg.onload = () => { clearTimeout(timer); resolve(); };
-                tempImg.onerror = () => { clearTimeout(timer); reject(new Error(lang==='fr'?"Le serveur d'images gratuit est surchargé.":"Free image server overloaded.")); };
-                tempImg.src = pollinationsUrl;
-            });
-            
-            finalImgSrc = pollinationsUrl;
+            parts.push({ text: "Generate a highly artistic, high-quality image for this prompt: " + cleanPrompt });
+        }
+
+        const payload = { 
+            contents: [{ parts: parts }], 
+            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
+        };
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        
+        const response = await fetch(url, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            const errData = await response.json().catch(()=>({}));
+            throw new Error(errData.error?.message || `HTTP ${response.status}`);
         }
         
-        // Open the pop-up modal with the generated image
+        const data = await response.json();
+        const imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+        
+        if (!imgB64) throw new Error("Aucune donnée d'image retournée par l'IA.");
+        finalImgSrc = `data:image/png;base64,${imgB64}`;
+        
+        // Affichage dans la Modale
         document.getElementById('preview-modal-img').src = finalImgSrc;
         document.getElementById('preview-modal').classList.add('on');
         
@@ -2683,10 +2683,11 @@ async function generateInlineImage(promptText, container, btn) {
         
         let errorMsg = e.message.replace(/Error:|Erreur:/gi, '').trim();
         
-        // Fallback for API errors when hosted online
-        if (errorMsg.includes("INVALID_API_KEY") || errorMsg.includes("not found") || errorMsg.includes("not supported")) {
+        if (errorMsg.includes("INVALID_API_KEY") || errorMsg.includes("API key not valid") || errorMsg.includes("API_KEY_INVALID")) {
             openSettingsModal();
-            toast(lang==='fr' ? "Erreur: L'aperçu en mode Édition requiert une clé Google Cloud payante." : "Error: Edit mode preview requires a paid Google API key.");
+            toast(lang==='fr' ? "Erreur: Clé API Gemini invalide." : "Error: Invalid Gemini API Key.");
+        } else if (e.name === 'AbortError') {
+            toast(lang==='fr' ? "Le serveur Google met trop de temps à répondre." : "Google server timeout.");
         } else {
             toast((lang==='fr' ? "Erreur: " : "Error: ") + errorMsg);
         }
