@@ -665,7 +665,7 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
         
         <div class="btn-ai-group">
             <button class="btn-ai-describe" id="btn-ai-describe" onclick="aiDescribeImages()"><i class="fa-solid fa-eye"></i><span id="ai-describe-lbl">AI Analyze Images</span></button>
-            <button class="btn-magic" id="btn-magic" onclick="autoFill()"><i class="fa-solid fa-wand-magic-sparkles"></i><span id="ai-magic-lbl">Magic Wand (Auto-Fill)</span></button>
+            <button class="btn-magic" id="btn-magic" onclick="triggerMagicWand()"><i class="fa-solid fa-wand-magic-sparkles"></i><span id="ai-magic-lbl">Magic Wand (Auto-Fill)</span></button>
         </div>
         <div class="img-size-notice" id="img-size-notice"><i class="fa-solid fa-bolt"></i><span id="img-opt-txt"> Images are automatically compressed and optimized</span></div>
         
@@ -1502,7 +1502,7 @@ async function refine(){
 }
 
 // ── AUTO-FILL (Baguette Magique) ──
-async function autoFill() {
+async function triggerMagicWand() {
   const subj = document.getElementById('inp-subj').value.trim();
   if(!subj){ toast(T[lang].eSubj); return; }
   
@@ -2597,20 +2597,22 @@ async function generateInlineImage(promptText, container, btn) {
     
     toast(lang==='fr'?"Génération d'image en cours...":"Generating image...");
     try {
-        const currentKey = getActiveKey();
-        let imgB64 = null;
-        
-        // Clean up specific AI parameters so the preview API doesn't get confused
         let cleanPrompt = promptText.replace(/--[a-zA-Z0-9\-\s\.\:]+/g, '').replace(/\[ratio:\s*[0-9:]+\]/gi, '').substring(0, 800).trim();
-        
         const isEdit = sel.isEditMode && uploads.length > 0;
 
+        const imgEl = document.createElement('img');
+        imgEl.style.width = '100%';
+        imgEl.style.borderRadius = '16px';
+        imgEl.style.marginTop = '14px';
+        imgEl.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+
         if (isEdit) {
-            // Use Gemini 2.5 Flash Image Preview for Image-to-Image editing ONLY
+            // Use Gemini 2.5 Flash Image Preview ONLY for Image-to-Image editing
+            const currentKey = getActiveKey();
+            if (!currentKey) throw new Error(lang==='fr' ? "Clé API requise pour l'édition (Img2Img)." : "API Key required for image editing.");
+
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
             const parts = [{ text: "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt }];
-            
-            // Inject the original image into the payload
             parts.push({ inlineData: { mimeType: uploads[0].mime, data: uploads[0].b64 } });
 
             const payload = { 
@@ -2623,30 +2625,22 @@ async function generateInlineImage(promptText, container, btn) {
                 throw new Error(errData.error?.message || "API Error");
             }
             const data = await response.json();
-            imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+            const imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+            if (!imgB64) throw new Error("Aucune donnée d'image retournée.");
+            imgEl.src = `data:image/png;base64,${imgB64}`;
+
         } else {
-            // Use standard Imagen 4.0 model for normal Text-to-Image previews
-            const model = 'imagen-4.0-generate-001';
-            const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + cleanPrompt;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict?key=${currentKey}`;
-            const payload = { instances: { prompt: enhancedPrompt }, parameters: { sampleCount: 1 } };
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) {
-                const errData = await response.json().catch(()=>({}));
-                throw new Error(errData.error?.message || "API Error");
-            }
-            const data = await response.json();
-            imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
+            // 100% FREE PREVIEWS for Standard Text-to-Image (No API Key needed!)
+            const seed = Math.floor(Math.random() * 1000000);
+            const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?seed=${seed}&nologo=true&enhance=false`;
+            
+            // Load via promise to handle the loading state correctly
+            await new Promise((resolve, reject) => {
+                imgEl.onload = resolve;
+                imgEl.onerror = () => reject(new Error("Preview rendering failed."));
+                imgEl.src = pollinationsUrl;
+            });
         }
-        
-        if (!imgB64) throw new Error("Aucune donnée d'image retournée.");
-        
-        const imgEl = document.createElement('img');
-        imgEl.src = `data:image/png;base64,${imgB64}`;
-        imgEl.style.width = '100%';
-        imgEl.style.borderRadius = '16px';
-        imgEl.style.marginTop = '14px';
-        imgEl.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
         
         if(btn) btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Image Générée':'Generated'}`;
         container.appendChild(imgEl);
