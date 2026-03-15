@@ -174,6 +174,7 @@ body.dark .pane::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2);
 textarea.tinp{min-height:96px;line-height:1.6;overflow-y:hidden}
 .frow{margin-bottom:20px}
 .swrap{position:relative}
+/* CRITICAL CSS FIX HERE: restored missing quotes in content */
 .swrap::after{content:'';position:absolute;right:16px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--s5);pointer-events:none}
 .sinp{padding-right:40px;cursor:pointer}
 
@@ -793,6 +794,7 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
 <div class="toast" id="toast"></div>
 
 <script>
+const envApiKey = ""; 
 let lang='en', step=1, isDark=false;
 let uploads=[], prompts=null, scores=null, variations=null;
 const STEPS=6;
@@ -1172,7 +1174,6 @@ async function setLang(l){
 }
 
 // ══ GEMINI API INTEGRATION ══
-const envApiKey = ""; 
 
 function hasApiKey() {
   const k = localStorage.getItem('suetos_api_key');
@@ -1184,7 +1185,7 @@ function hasApiKey() {
 function getActiveKey() {
   const k = localStorage.getItem('suetos_api_key');
   if (k && k.trim() !== '') return k.trim();
-  return ""; 
+  return envApiKey; // MODIFIED: Fallback to the environment key if local storage is empty
 }
 
 function getGeminiModel() {
@@ -1193,14 +1194,6 @@ function getGeminiModel() {
       return 'gemini-2.5-flash';
   }
   return 'gemini-2.5-flash-preview-09-2025';
-}
-
-function getImagenModel() {
-  const k = localStorage.getItem('suetos_api_key');
-  if (k && k.trim() !== '') {
-      return 'imagen-4.0-generate-001';
-  }
-  return 'imagen-4.0-generate-001'; 
 }
 
 function openSettingsModal() {
@@ -2618,57 +2611,74 @@ async function generateInlineImage(promptText, container, btn) {
     
     toast(lang==='fr'?"Génération d'image en cours...":"Generating image...");
     try {
-        const currentKey = getActiveKey();
-        // L'API est obligatoire pour la version en ligne
-        if (!currentKey) {
-            throw new Error(lang==='fr' ? "Clé API requise. Cliquez sur 🔑 pour l'ajouter." : "API Key required. Click 🔑 to add it.");
-        }
-
         let cleanPrompt = promptText.replace(/--[a-zA-Z0-9\-\s\.\:]+/g, '').replace(/\[ratio:\s*[0-9:]+\]/gi, '').substring(0, 800).trim();
         const isEdit = sel.isEditMode && uploads.length > 0;
         let finalImgSrc = '';
+        let currentKey = getActiveKey(); 
+        
+        // Detect if we are testing locally in the Studio Canvas (key is empty string, handled by proxy)
+        const isCanvasEnv = (currentKey === ""); 
 
-        // SOLUTION UNIFIÉE : On utilise Gemini 2.5 Flash Image Preview pour TOUT (Création et Édition)
-        // Ce modèle contourne le paywall d'Imagen 3/4 et fonctionne avec une clé Gemini gratuite !
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
-        let parts = [];
+        if (isEdit || !isCanvasEnv) {
+            // ONLINE (GitHub Pages) or IMAGE-TO-IMAGE:
+            // Uses Gemini 2.5 Flash Image Preview to bypass the Imagen paywall with free keys!
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
+            let parts = [];
 
-        if (isEdit) {
-            parts.push({ text: "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt });
-            parts.push({ inlineData: { mimeType: uploads[0].mime, data: uploads[0].b64 } });
+            if (isEdit) {
+                parts.push({ text: "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt });
+                parts.push({ inlineData: { mimeType: uploads[0].mime, data: uploads[0].b64 } });
+            } else {
+                parts.push({ text: "Generate a high quality, stunning image based on this description: " + cleanPrompt });
+            }
+
+            const payload = { 
+                contents: [{ parts: parts }], 
+                generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
+            };
+            
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) {
+                if (response.status === 400 || response.status === 401 || response.status === 403) throw new Error("INVALID_API_KEY");
+                const errData = await response.json().catch(()=>({}));
+                throw new Error(errData.error?.message || "API Error");
+            }
+            const data = await response.json();
+            const imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+            if (!imgB64) throw new Error(lang==='fr'?"Aucune donnée d'image retournée.":"No image data returned.");
+            finalImgSrc = `data:image/png;base64,${imgB64}`;
+
         } else {
-            parts.push({ text: "Generate a highly artistic, high-quality image for this prompt: " + cleanPrompt });
-        }
+            // LOCAL TESTING (Studio Canvas Text-to-Image): Uses Imagen 4
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${currentKey}`;
+            const payload = {
+                instances: { prompt: cleanPrompt },
+                parameters: { sampleCount: 1 }
+            };
 
-        const payload = { 
-            contents: [{ parts: parts }], 
-            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
-        };
-        
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
-        
-        const response = await fetch(url, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(payload),
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-            const errData = await response.json().catch(()=>({}));
-            throw new Error(errData.error?.message || `HTTP ${response.status}`);
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                if (response.status === 400 || response.status === 401 || response.status === 403) throw new Error("INVALID_API_KEY");
+                const errData = await response.json().catch(()=>({}));
+                throw new Error(errData.error?.message || "API Error");
+            }
+            const data = await response.json();
+            const imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
+            if (!imgB64) throw new Error(lang==='fr'?"Aucune image générée.":"No image generated.");
+            finalImgSrc = `data:image/png;base64,${imgB64}`;
         }
         
-        const data = await response.json();
-        const imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-        
-        if (!imgB64) throw new Error("Aucune donnée d'image retournée par l'IA.");
-        finalImgSrc = `data:image/png;base64,${imgB64}`;
-        
-        // Affichage dans la Modale
+        // Open the pop-up modal with the generated image
         document.getElementById('preview-modal-img').src = finalImgSrc;
         document.getElementById('preview-modal').classList.add('on');
         
@@ -2683,13 +2693,12 @@ async function generateInlineImage(promptText, container, btn) {
         
         let errorMsg = e.message.replace(/Error:|Erreur:/gi, '').trim();
         
-        if (errorMsg.includes("INVALID_API_KEY") || errorMsg.includes("API key not valid") || errorMsg.includes("API_KEY_INVALID")) {
+        // Fallback for API errors when hosted online
+        if (errorMsg.includes("INVALID_API_KEY") || errorMsg.includes("API_KEY_INVALID") || errorMsg.includes("not found")) {
             openSettingsModal();
-            toast(lang==='fr' ? "Erreur: Clé API Gemini invalide." : "Error: Invalid Gemini API Key.");
-        } else if (e.name === 'AbortError') {
-            toast(lang==='fr' ? "Le serveur Google met trop de temps à répondre." : "Google server timeout.");
+            toast(lang==='fr' ? "Erreur: Une clé API Google gratuite est requise." : "Error: A free Google API key is required.");
         } else {
-            toast((lang==='fr' ? "Erreur: " : "Error: ") + errorMsg);
+            toast((lang==='fr' ? "Erreur: " : "Error: ") + errorMsg.substring(0, 50));
         }
     } finally {
         if(btn) btn.disabled = false;
