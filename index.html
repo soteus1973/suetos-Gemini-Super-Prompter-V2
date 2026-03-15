@@ -385,6 +385,14 @@ body.dark .reswrap::-webkit-scrollbar-thumb{background:rgba(255, 255, 255, 0.2)}
 .modal-btn.secondary{background:var(--s2);color:var(--blk); border:1px solid var(--s3);}
 .modal-btn.secondary:hover{background:var(--s3); transform:translateY(-2px);}
 
+/* ── PREVIEW MODAL ── */
+#preview-modal { z-index: 9999; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(0,0,0,0.6); }
+.preview-box { position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both; }
+.preview-img { max-width: 100%; max-height: 85vh; border-radius: 16px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); object-fit: contain; background: var(--bg); }
+body.dark .preview-img { background: var(--dk-bg); }
+.preview-close { position: absolute; top: -44px; right: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; font-size: 16px; }
+.preview-close:hover { background: #E63946; border-color: #E63946; transform: scale(1.1) rotate(90deg); }
+
 /* ── ACTION BUTTONS ── */
 .btnall{display:inline-flex;align-items:center;gap:8px;background:var(--s2);color:var(--blk);border:1px solid var(--s3);cursor:pointer;padding:10px 18px;border-radius:100px;font-size:11px;font-weight:700;transition:all .3s ease;font-family:var(--font);letter-spacing:.04em; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
 .btnall:hover{background:var(--blk);color:#fff; border-color:var(--blk); transform:translateY(-2px); box-shadow:var(--sh);}
@@ -580,6 +588,14 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
     <div class="modal-row">
       <button class="modal-btn secondary" onclick="closePresetsModal()">Close</button>
     </div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-overlay" id="preview-modal" onclick="closePreviewModal()">
+  <div class="preview-box" onclick="event.stopPropagation()">
+    <button class="preview-close" onclick="closePreviewModal()"><i class="fa-solid fa-xmark"></i></button>
+    <img id="preview-modal-img" class="preview-img" src="">
   </div>
 </div>
 
@@ -854,7 +870,7 @@ en:{
   sicons:['fa-ban','fa-dragon','fa-droplet','fa-building','fa-paintbrush','fa-clapperboard','fa-pencil','fa-bolt','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-street-view','fa-circle-half-stroke','fa-star','fa-camera-retro','fa-shapes','fa-eye'],
   styleDesc:['Aucun style imposé','Animation japonaise','Rendu architectural','Photographie noir et blanc classique','Lumière de film, profondeur de champ','Art conceptuel jeu/film','Futuriste néon SF','Peinture classique','Illustration numérique ou manuelle','Coups de pinceaux visibles','Très épuré, simple','Rendu 3D haute qualité','Photo très haute définition','Rendu hyper-réaliste','Style bande dessinée coloré','Photographie urbaine sur le vif','Image de rêve bizarre','Peinture douce et transparente'],
   lights:['Aucun','Bleu Moody','Brut','Clair-obscur','Dark Ciné','Golden Hour','Gothic','High-Key','Mystique','Mélancolique','Noir','Nuit Néon','Onirique','Pastel','Rayons Soleil','Rétro 50s','Rétro 60s','Rétro 70s-80s','Sci-Fi','Studio Doux','Studio Photo','Summertime','Vintage','Éthéré'],
-  licons:['fa-ban','fa-water','fa-hammer','fa-circle-half-stroke','fa-ghost','fa-sun','fa-skull','fa-sun','fa-wand-magic-sparkles','fa-cloud-rain','fa-film','fa-moon','fa-sparkles','fa-ice-cream','fa-sun-plant-wilt','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-camera-retro','fa-cloud'],
+  licons:['fa-ban','fa-water','fa-hammer','fa-circle-half-stroke','fa-ghost','fa-sparkles','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
   comps:['Aucun','Gros Plan','Plan Large','Vue Aérienne','Contre-plongée','Macro','Symétrie','Règle des Tiers','Plongée','Vue Profil','Point de Vue','Panoramique','Plan Incliné','Fisheye','Par-dessus Épaule','Plan Pied'],
   og:{Cinéma:['Arri Alexa LF — Panavision Primo','Red V-Raptor — Cooke S4/i T2','Panavision DXL2 — Anamorphique','Blackmagic URSA Mini Pro — Zeiss CP.3','Sony Venice 2 — Cooke Anamorphic/i','Alexa 35 — ARRI Signature Primes'],Photo:['Hasselblad H6D-100c — 80mm f/2.8','Leica M11 — Noctilux 50mm f/0.95','Phase One XT — Schneider 110mm f/2.8','Sony A7R V — 35mm f/1.4 GM','Canon EOS R5 — RF 85mm f/1.2L','Nikon Z9 — 58mm f/0.95 Noct','Fujifilm GFX 100S — 110mm f/2','Sigma 14mm f/1.8 Art (Grand Angle)','Canon EF 50mm f/1.0L (Ultra Bokeh)','Zeiss Otus 55mm f/1.4 (Précision)'],Portrait:['Sony A1 — 135mm f/1.8 GM','Canon R1 — 200mm f/2L (Éditorial)','Nikon Z8 — 85mm f/1.4','Fuji X-T5 — 56mm f/1.2 WR','Leica SL2 — 75mm f/2 Summicron'],Spécial:['Polaroid Spectra — Film Instantané Vintage','Kodak Portra 400 — Grain Film 35mm','Kodak Ektar 100 — Grand Format 8×10','Ilford HP5 Plus — Grain N&B 35mm','Holga 120N — Objectif Plastique Lo-fi','Lomography Petzval 58 — Bokeh Tournant','Caméra Infrarouge — Filtre 720nm','Caméra Thermique — Heatmap','Macro 1:1 — Détail Microscopique','Tilt-Shift 90mm — Effet Miniature','Drone + Cardan — Aérien Fluide','Sténopé — Exposition Onirique']}
 }};
@@ -2587,6 +2603,11 @@ function exportPDF() {
     toast(lang==='fr'?"Brief PDF téléchargé !":"Creative Brief downloaded!");
 }
 
+function closePreviewModal() {
+    document.getElementById('preview-modal').classList.remove('on');
+    setTimeout(() => { document.getElementById('preview-modal-img').src = ''; }, 300); // Clear image after fade out
+}
+
 async function generateInlineImage(promptText, container, btn) {
     let origHtml = '';
     if(btn) {
@@ -2599,18 +2620,11 @@ async function generateInlineImage(promptText, container, btn) {
     try {
         let cleanPrompt = promptText.replace(/--[a-zA-Z0-9\-\s\.\:]+/g, '').replace(/\[ratio:\s*[0-9:]+\]/gi, '').substring(0, 800).trim();
         const isEdit = sel.isEditMode && uploads.length > 0;
-
-        const imgEl = document.createElement('img');
-        imgEl.style.width = '100%';
-        imgEl.style.borderRadius = '16px';
-        imgEl.style.marginTop = '14px';
-        imgEl.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)';
+        let finalImgSrc = '';
+        const currentKey = getActiveKey(); // Leave API key empty in settings to use the free canvas environment key!
 
         if (isEdit) {
             // Use Gemini 2.5 Flash Image Preview ONLY for Image-to-Image editing
-            const currentKey = getActiveKey();
-            if (!currentKey) throw new Error(lang==='fr' ? "Clé API requise pour l'édition (Img2Img)." : "API Key required for image editing.");
-
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
             const parts = [{ text: "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt }];
             parts.push({ inlineData: { mimeType: uploads[0].mime, data: uploads[0].b64 } });
@@ -2619,7 +2633,13 @@ async function generateInlineImage(promptText, container, btn) {
                 contents: [{ parts: parts }], 
                 generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
             };
-            const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload)
+            });
+            
             if (!response.ok) {
                 const errData = await response.json().catch(()=>({}));
                 throw new Error(errData.error?.message || "API Error");
@@ -2627,46 +2647,48 @@ async function generateInlineImage(promptText, container, btn) {
             const data = await response.json();
             const imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
             if (!imgB64) throw new Error("Aucune donnée d'image retournée.");
-            imgEl.src = `data:image/png;base64,${imgB64}`;
+            finalImgSrc = `data:image/png;base64,${imgB64}`;
 
         } else {
-            // 100% FREE PREVIEWS (No API Key needed)
-            const seed = Math.floor(Math.random() * 1000000);
+            // STANDARD PREVIEWS: Using the built-in, highly reliable Google Imagen 4.0 model
+            const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + cleanPrompt;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${currentKey}`;
+            const payload = { instances: { prompt: enhancedPrompt }, parameters: { sampleCount: 1 } };
             
-            // Fix: Truncate and sanitize prompt to avoid "URI Too Long" Server Errors from Pollinations
-            const safePrompt = cleanPrompt.replace(/[^a-zA-Z0-9\s,]/g, '').substring(0, 300).trim();
-            const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(safePrompt)}?seed=${seed}&nologo=true&enhance=false`;
-            
-            await new Promise((resolve, reject) => {
-                // Prevent infinite "Thinking..." with a 20s timeout
-                const timer = setTimeout(() => {
-                    imgEl.src = ''; 
-                    reject(new Error("Timeout: Image server is too busy."));
-                }, 20000);
-                
-                imgEl.onload = () => {
-                    clearTimeout(timer);
-                    resolve();
-                };
-                imgEl.onerror = () => {
-                    clearTimeout(timer);
-                    reject(new Error("Preview server rejected the prompt."));
-                };
-                imgEl.src = pollinationsUrl;
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload)
             });
+            
+            if (!response.ok) {
+                const errData = await response.json().catch(()=>({}));
+                throw new Error(errData.error?.message || "API Error");
+            }
+            const data = await response.json();
+            const imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
+            if (!imgB64) throw new Error("Aucune donnée d'image retournée.");
+            finalImgSrc = `data:image/png;base64,${imgB64}`;
         }
         
-        if(btn) btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Image Générée':'Generated'}`;
-        container.appendChild(imgEl);
-        toast(lang==='fr'?"Image générée !":"Image generated!");
+        // Open the pop-up modal with the generated image
+        document.getElementById('preview-modal-img').src = finalImgSrc;
+        document.getElementById('preview-modal').classList.add('on');
+        
+        if(btn) {
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Aperçu Prêt':'Ready'}`;
+            setTimeout(() => { if(btn) btn.innerHTML = origHtml; }, 3000); // Reset button after 3s
+        }
+        toast(lang==='fr'?"Aperçu généré !":"Preview generated!");
     } catch(e) {
         console.error("Image generation error:", e);
         if(btn) btn.innerHTML = origHtml;
         if (e.message === "INVALID_API_KEY" || e.message.includes("INVALID_API_KEY") || e.message.includes("API key not valid")) {
             openSettingsModal();
-            toast(lang==='fr' ? "Erreur 401: Clé API invalide." : "Error 401: Invalid API Key.");
+            toast(lang==='fr' ? "Erreur: Veuillez effacer votre clé API dans les paramètres pour utiliser le mode gratuit." : "Error: Please clear your API Key in settings to use free mode.");
         } else {
-            toast(lang==='fr' ? "Erreur: " + e.message : "Error: " + e.message);
+            const errorMsg = e.message.replace(/Error:|Erreur:/gi, '').trim();
+            toast((lang==='fr' ? "Erreur: " : "Error: ") + errorMsg);
         }
     } finally {
         if(btn) btn.disabled = false;
