@@ -1182,7 +1182,7 @@ function getGeminiModel() {
 function getImagenModel() {
   const k = localStorage.getItem('suetos_api_key');
   if (k && k.trim() !== '') {
-      return 'imagen-3.0-generate-001';
+      return 'imagen-4.0-generate-001';
   }
   return 'imagen-4.0-generate-001'; 
 }
@@ -1505,6 +1505,8 @@ async function refine(){
 async function autoFill() {
   const subj = document.getElementById('inp-subj').value.trim();
   if(!subj){ toast(T[lang].eSubj); return; }
+  
+  sel.subj = subj; // QUICK FIX: Save the text to memory immediately
   
   const btn = document.getElementById('btn-magic');
   const origHtml = btn.innerHTML;
@@ -2043,6 +2045,12 @@ function renderResults(data){
         <div style="font-family:var(--mono); font-size:11px; color:#333; word-break:break-all; white-space:pre-wrap;">${escHtml(JSON.stringify(data, null, 2))}</div>
       </div>`;
   }
+  
+  // FIX: Force technical parameters to instantly append when results load
+  setTimeout(() => {
+      updateMJParams();
+      updateNBParams();
+  }, 50);
 }
 
 // ══ PROMPT LIBRARY ══
@@ -2590,7 +2598,6 @@ async function generateInlineImage(promptText, container, btn) {
     toast(lang==='fr'?"Génération d'image en cours...":"Generating image...");
     try {
         const currentKey = getActiveKey();
-        const hasCustomKey = currentKey !== "";
         let imgB64 = null;
         
         // Clean up specific AI parameters so the preview API doesn't get confused
@@ -2618,11 +2625,11 @@ async function generateInlineImage(promptText, container, btn) {
             const data = await response.json();
             imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
         } else {
-            // Use standard Imagen models for normal Text-to-Image previews
-            const model = hasCustomKey ? 'imagen-3.0-generate-001' : 'imagen-4.0-generate-001';
+            // Use standard Imagen 4.0 model for normal Text-to-Image previews
+            const model = 'imagen-4.0-generate-001';
             const enhancedPrompt = "Highly artistic, surreal photo aesthetic, award-winning composition. " + cleanPrompt;
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:predict?key=${currentKey}`;
-            const payload = { instances: [{ prompt: enhancedPrompt }], parameters: { sampleCount: 1 } };
+            const payload = { instances: { prompt: enhancedPrompt }, parameters: { sampleCount: 1 } };
             const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) {
                 const errData = await response.json().catch(()=>({}));
