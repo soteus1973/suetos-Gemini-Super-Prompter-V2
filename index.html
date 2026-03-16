@@ -174,7 +174,7 @@ body.dark .pane::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2);
 textarea.tinp{min-height:96px;line-height:1.6;overflow-y:hidden}
 .frow{margin-bottom:20px}
 .swrap{position:relative}
-/* CRITICAL CSS FIX HERE: restored missing quotes in content */
+/* CSS FIX APPLIED HERE */
 .swrap::after{content:'';position:absolute;right:16px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--s5);pointer-events:none}
 .sinp{padding-right:40px;cursor:pointer}
 
@@ -509,10 +509,8 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
 </head>
 <body>
 
-<!-- LIBRARY OVERLAY + PANEL -->
 <div class="lib-overlay" id="lib-overlay" onclick="closeLib()"></div>
 
-<!-- HISTORY PANEL -->
 <div class="hist-panel" id="hist-panel">
   <div class="lib-panel-hdr">
     <div class="lib-panel-title" id="hist-title">Generation History</div>
@@ -523,7 +521,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
 </div>
 <div class="lib-overlay" id="hist-overlay" onclick="closeHist()"></div>
 
-<!-- CUSTOM TOOLS MODAL & IMPORT/EXPORT -->
 <div class="modal-overlay" id="tools-modal">
   <div class="modal-box large">
     <div class="modal-title" id="tools-modal-title">Custom Tool Profiles</div>
@@ -546,7 +543,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
       <button class="modal-btn primary" onclick="addCustomTool()" id="tools-btn-add"><i class="fa-solid fa-plus"></i> <span id="tools-btn-add-lbl">Add Tool</span></button>
     </div>
     
-    <!-- DATA SYNC -->
     <div class="modal-title" style="font-size: 20px;" id="sync-title">Data Sync (Local Cloud)</div>
     <div class="modal-desc" id="sync-desc">Export or backup all your custom tools, history, and library.</div>
     <div style="display:flex; gap:16px; align-items:center;">
@@ -559,7 +555,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title" id="settings-title">Settings</div>
@@ -576,7 +571,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
   </div>
 </div>
 
-<!-- PRESETS MODAL -->
 <div class="modal-overlay" id="presets-modal">
   <div class="modal-box">
     <div class="modal-title" id="presets-title">Global Presets</div>
@@ -592,7 +586,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
   </div>
 </div>
 
-<!-- PREVIEW MODAL -->
 <div class="modal-overlay" id="preview-modal" onclick="closePreviewModal()">
   <div class="preview-box" onclick="event.stopPropagation()">
     <button class="preview-close" onclick="closePreviewModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -614,7 +607,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
   <div id="lib-list"></div>
 </div>
 
-<!-- MAIN APP -->
 <div class="shell">
   <div class="hdr">
     <div class="logo-g">
@@ -646,14 +638,12 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
       <div class="lsub" id="lsub">AI is crafting your prompts.</div>
     </div>
 
-    <!-- TIMELINE CLIQUABLE -->
     <div class="pgw">
       <div class="pgbs" id="pgbs"></div>
       <div class="pglbl" id="pglbl">Subject</div>
     </div>
 
     <div class="sbody">
-      <!-- STEP 1 -->
       <div class="pane on" id="p1">
         <div class="stitle" id="t1">Subject & <em>References</em></div>
         <div class="sdesc" id="d1">Describe your visual concept. Upload reference images to automatically extract details.</div>
@@ -668,7 +658,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
           <div class="fgrid" id="fgrid"></div>
         </div>
         
-        <!-- NEW: MODE SELECTION (EDIT VS REF) -->
         <div class="mode-wrap" id="mode-wrap">
            <label class="flbl" id="lbl-mode">Generation Mode</label>
            <div class="mode-btns">
@@ -704,7 +693,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
         </div>
       </div>
 
-      <!-- STEP 2 -->
       <div class="pane" id="p2">
         <div class="stitle" id="t2">Visual <em>Style</em></div>
         <div class="sdesc" id="d2">Pick an aesthetic direction for your image. Hover for info.</div>
@@ -712,7 +700,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
         <div class="frow"><label class="flbl" id="lsd">Refine Your Style</label><input type="text" class="tinp" id="inp-sd" placeholder="e.g. influenced by Moebius…"></div>
       </div>
 
-      <!-- STEP 3 -->
       <div class="pane" id="p3">
         <div class="stitle" id="t3">Lighting & <em>Atmosphere</em></div>
         <div class="sdesc" id="d3">Set the emotional tone and lighting quality.</div>
@@ -720,14 +707,12 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
         <div class="frow"><label class="flbl" id="lm">Additional Mood Notes</label><input type="text" class="tinp" id="inp-mood" placeholder="e.g. eerie silence, sense of wonder…"></div>
       </div>
 
-      <!-- STEP 4 -->
       <div class="pane" id="p4">
         <div class="stitle" id="t4">Framing & <em>Composition</em></div>
         <div class="sdesc" id="d4">Choose how the camera frames the scene.</div>
         <div class="cgrid" id="cgrid"></div>
       </div>
 
-      <!-- STEP 5 -->
       <div class="pane" id="p5">
         <div class="stitle" id="t5">Technical <em>Settings</em></div>
         <div class="sdesc" id="d5">Define aspect ratio and camera/lens profile.</div>
@@ -736,10 +721,8 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
         <div class="errbox" id="errbox"><i class="fa-solid fa-triangle-exclamation" style="margin-top:2px;flex-shrink:0;color:#E63946"></i><span id="errtxt">Generation failed.</span></div>
       </div>
 
-      <!-- STEP 6 RESULTS -->
       <div class="pane" id="p6">
         
-        <!-- FIXE : En-tête et Actions -->
         <div>
             <div class="res-top">
               <div class="stitle" id="t6" style="margin:0;">Your <em>Prompts</em></div>
@@ -764,11 +747,9 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
             </div>
         </div>
 
-        <!-- ZONE DE DEFILEMENT : Resultats -->
         <div class="reswrap">
             <div id="stack-view" style="display:block;">
               <div id="mj-sliders-panel"></div>
-              <!-- NOUVEAU PANNEAU NANO BANANA -->
               <div id="nb-sliders-panel"></div>
               <div id="rlist"></div>
             </div>
@@ -794,7 +775,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
 <div class="toast" id="toast"></div>
 
 <script>
-const envApiKey = ""; 
 let lang='en', step=1, isDark=false;
 let uploads=[], prompts=null, scores=null, variations=null;
 const STEPS=6;
@@ -1174,6 +1154,7 @@ async function setLang(l){
 }
 
 // ══ GEMINI API INTEGRATION ══
+const envApiKey = ""; 
 
 function hasApiKey() {
   const k = localStorage.getItem('suetos_api_key');
@@ -1185,7 +1166,7 @@ function hasApiKey() {
 function getActiveKey() {
   const k = localStorage.getItem('suetos_api_key');
   if (k && k.trim() !== '') return k.trim();
-  return envApiKey; // MODIFIED: Fallback to the environment key if local storage is empty
+  return envApiKey; 
 }
 
 function getGeminiModel() {
@@ -2609,97 +2590,47 @@ async function generateInlineImage(promptText, container, btn) {
         btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${lang==='fr'?'Création...':'Thinking...'}`;
     }
     
+    const isEdit = sel.isEditMode && uploads.length > 0;
+    
+    // IMAGE-TO-IMAGE REQUIRES A BACKEND/PAID API. WE HANDLE IT GRACEFULLY:
+    if (isEdit) {
+        toast(lang==='fr' 
+          ? "L'aperçu en mode Édition requiert l'outil final (Midjourney, Nano Banana...)." 
+          : "Image-to-Image preview requires your final external tool.");
+        if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+        return;
+    }
+
     toast(lang==='fr'?"Génération d'image en cours...":"Generating image...");
     try {
         let cleanPrompt = promptText.replace(/--[a-zA-Z0-9\-\s\.\:]+/g, '').replace(/\[ratio:\s*[0-9:]+\]/gi, '').substring(0, 800).trim();
-        const isEdit = sel.isEditMode && uploads.length > 0;
-        let finalImgSrc = '';
-        let currentKey = getActiveKey(); 
+        const safePrompt = encodeURIComponent(cleanPrompt);
+        const seed = Math.floor(Math.random() * 1000000);
         
-        // Detect if we are testing locally in the Studio Canvas (key is empty string, handled by proxy)
-        const isCanvasEnv = (currentKey === ""); 
+        // Fast Flux model via Pollinations (much more stable and faster than their default model)
+        let finalImgSrc = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=800&nologo=true&model=flux&seed=${seed}`;
 
-        if (isEdit || !isCanvasEnv) {
-            // ONLINE (GitHub Pages) or IMAGE-TO-IMAGE:
-            // Uses Gemini 2.5 Flash Image Preview to bypass the Imagen paywall with free keys!
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${currentKey}`;
-            let parts = [];
-
-            if (isEdit) {
-                parts.push({ text: "Modify this image precisely according to this description, maintaining the main structure and background unless specified otherwise: " + cleanPrompt });
-                parts.push({ inlineData: { mimeType: uploads[0].mime, data: uploads[0].b64 } });
-            } else {
-                parts.push({ text: "Generate a high quality, stunning image based on this description: " + cleanPrompt });
-            }
-
-            const payload = { 
-                contents: [{ parts: parts }], 
-                generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } 
-            };
-            
-            const response = await fetch(url, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload)
-            });
-            
-            if (!response.ok) {
-                if (response.status === 400 || response.status === 401 || response.status === 403) throw new Error("INVALID_API_KEY");
-                const errData = await response.json().catch(()=>({}));
-                throw new Error(errData.error?.message || "API Error");
-            }
-            const data = await response.json();
-            const imgB64 = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-            if (!imgB64) throw new Error(lang==='fr'?"Aucune donnée d'image retournée.":"No image data returned.");
-            finalImgSrc = `data:image/png;base64,${imgB64}`;
-
-        } else {
-            // LOCAL TESTING (Studio Canvas Text-to-Image): Uses Imagen 4
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${currentKey}`;
-            const payload = {
-                instances: { prompt: cleanPrompt },
-                parameters: { sampleCount: 1 }
-            };
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                if (response.status === 400 || response.status === 401 || response.status === 403) throw new Error("INVALID_API_KEY");
-                const errData = await response.json().catch(()=>({}));
-                throw new Error(errData.error?.message || "API Error");
-            }
-            const data = await response.json();
-            const imgB64 = data.predictions?.[0]?.bytesBase64Encoded;
-            if (!imgB64) throw new Error(lang==='fr'?"Aucune image générée.":"No image generated.");
-            finalImgSrc = `data:image/png;base64,${imgB64}`;
-        }
+        // Pre-load the image to catch errors gracefully and avoid empty modals
+        await new Promise((resolve, reject) => {
+            const tempImg = new Image();
+            const timer = setTimeout(() => reject(new Error("Timeout")), 15000);
+            tempImg.onload = () => { clearTimeout(timer); resolve(); };
+            tempImg.onerror = () => { clearTimeout(timer); reject(new Error("Server error")); };
+            tempImg.src = finalImgSrc;
+        });
         
-        // Open the pop-up modal with the generated image
         document.getElementById('preview-modal-img').src = finalImgSrc;
         document.getElementById('preview-modal').classList.add('on');
         
         if(btn) {
             btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Aperçu Prêt':'Ready'}`;
-            setTimeout(() => { if(btn) btn.innerHTML = origHtml; }, 3000); // Reset button after 3s
+            setTimeout(() => { if(btn) btn.innerHTML = origHtml; }, 3000); 
         }
         toast(lang==='fr'?"Aperçu généré !":"Preview generated!");
     } catch(e) {
         console.error("Image generation error:", e);
         if(btn) btn.innerHTML = origHtml;
-        
-        let errorMsg = e.message.replace(/Error:|Erreur:/gi, '').trim();
-        
-        // Fallback for API errors when hosted online
-        if (errorMsg.includes("INVALID_API_KEY") || errorMsg.includes("API_KEY_INVALID") || errorMsg.includes("not found")) {
-            openSettingsModal();
-            toast(lang==='fr' ? "Erreur: Une clé API Google gratuite est requise." : "Error: A free Google API key is required.");
-        } else {
-            toast((lang==='fr' ? "Erreur: " : "Error: ") + errorMsg.substring(0, 50));
-        }
+        toast(lang==='fr' ? "Erreur du serveur gratuit, veuillez réessayer." : "Free server error, please try again.");
     } finally {
         if(btn) btn.disabled = false;
     }
