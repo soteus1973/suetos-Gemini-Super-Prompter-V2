@@ -497,7 +497,7 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
 }
 </style>
 </head>
-<body>
+<body class="dark">
 
 <div class="lib-overlay" id="lib-overlay" onclick="closeLib()"></div>
 
@@ -761,7 +761,7 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
 <div class="toast" id="toast"></div>
 
 <script>
-let lang='en', step=1, isDark=false;
+let lang='en', step=1, isDark=true;
 let uploads=[], prompts=null, scores=null, variations=null;
 const STEPS=6;
 
@@ -875,8 +875,8 @@ function toggleDark(){
   isDark=!isDark;
   document.body.classList.toggle('dark',isDark);
   const icon=document.getElementById('dark-icon');
-  icon.className=isDark?'fa-solid fa-moon':'fa-solid fa-sun';
-  localStorage.setItem('suetos_dark',isDark?'1':'');
+  if(icon) icon.className=isDark?'fa-solid fa-moon':'fa-solid fa-sun';
+  localStorage.setItem('suetos_dark',isDark?'1':'0');
 }
 
 // ══ ESCAPE HTML ══
@@ -2626,6 +2626,14 @@ function exportPDF() {
 
 // ══ INIT LORS DU CHARGEMENT ══
 document.addEventListener("DOMContentLoaded", () => {
+    const storedDark = localStorage.getItem('suetos_dark');
+    isDark = (storedDark !== '0'); // Le mode sombre est activé par défaut
+    if(isDark) document.body.classList.add('dark');
+    else document.body.classList.remove('dark');
+    
+    const icon = document.getElementById('dark-icon');
+    if(icon) icon.className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+
     initDZ();
     buildPB();
     buildSG();
