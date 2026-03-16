@@ -100,7 +100,6 @@ body.dark{background-image:
 .hdr::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(72,202,228,.4),transparent)}
 body.dark .hdr{background:linear-gradient(135deg,#020B14 0%,#002236 40%,#004466 80%,#020B14 100%);}
 .logo-g{display:flex;align-items:center;gap:16px}
-/* HUE ROTATION TRICK: Orange to Turquoise! */
 .logo-img{width:54px;height:54px;border-radius:16px;object-fit:cover;box-shadow:0 6px 24px rgba(0,150,199,.4),0 0 0 1px rgba(255,255,255,.15); filter: hue-rotate(175deg) saturate(1.1);}
 .logo-fb{width:54px;height:54px;background:var(--blk);border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--acc);font-size:24px;display:none}
 .brand-n{font-size:24px;font-weight:800;letter-spacing:-.6px;line-height:1;color:#fff; z-index:1; position:relative;}
@@ -174,7 +173,6 @@ body.dark .pane::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2);
 textarea.tinp{min-height:96px;line-height:1.6;overflow-y:hidden}
 .frow{margin-bottom:20px}
 .swrap{position:relative}
-/* CSS FIX APPLIED HERE */
 .swrap::after{content:'';position:absolute;right:16px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--s5);pointer-events:none}
 .sinp{padding-right:40px;cursor:pointer}
 
@@ -386,14 +384,6 @@ body.dark .reswrap::-webkit-scrollbar-thumb{background:rgba(255, 255, 255, 0.2)}
 .modal-btn.secondary{background:var(--s2);color:var(--blk); border:1px solid var(--s3);}
 .modal-btn.secondary:hover{background:var(--s3); transform:translateY(-2px);}
 
-/* ── PREVIEW MODAL ── */
-#preview-modal { z-index: 9999; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(0,0,0,0.6); }
-.preview-box { position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both; }
-.preview-img { max-width: 100%; max-height: 85vh; border-radius: 16px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); object-fit: contain; background: var(--bg); }
-body.dark .preview-img { background: var(--dk-bg); }
-.preview-close { position: absolute; top: -44px; right: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; font-size: 16px; }
-.preview-close:hover { background: #E63946; border-color: #E63946; transform: scale(1.1) rotate(90deg); }
-
 /* ── ACTION BUTTONS ── */
 .btnall{display:inline-flex;align-items:center;gap:8px;background:var(--s2);color:var(--blk);border:1px solid var(--s3);cursor:pointer;padding:10px 18px;border-radius:100px;font-size:11px;font-weight:700;transition:all .3s ease;font-family:var(--font);letter-spacing:.04em; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
 .btnall:hover{background:var(--blk);color:#fff; border-color:var(--blk); transform:translateY(-2px); box-shadow:var(--sh);}
@@ -583,13 +573,6 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
     <div class="modal-row">
       <button class="modal-btn secondary" onclick="closePresetsModal()">Close</button>
     </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="preview-modal" onclick="closePreviewModal()">
-  <div class="preview-box" onclick="event.stopPropagation()">
-    <button class="preview-close" onclick="closePreviewModal()"><i class="fa-solid fa-xmark"></i></button>
-    <img id="preview-modal-img" class="preview-img" src="">
   </div>
 </div>
 
@@ -859,7 +842,7 @@ en:{
 
 const TOOLS=[
   {id:'midjourney',name:'Midjourney',badge:'V7 / Niji'},
-  {id:'gpt',name:'GPT Images',badge:'DALL·E 3'},
+  {id:'gpt',name:'GPT Images',badge:'GPT Image 1.5'},
   {id:'nanobanana',name:'Nano Banana',badge:'NB Pro'}
 ];
 
@@ -1259,7 +1242,7 @@ async function fetchGeminiWithBackoff(url, payload) {
   }
 }
 
-async function callGeminiText(prompt, systemInstruction, jsonMode = false) {
+async function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
   if (systemInstruction) {
@@ -1267,6 +1250,9 @@ async function callGeminiText(prompt, systemInstruction, jsonMode = false) {
   }
   if (jsonMode) {
     payload.generationConfig = { responseMimeType: "application/json" };
+    if (schema) {
+      payload.generationConfig.responseSchema = schema;
+    }
   }
   return fetchGeminiWithBackoff(url, payload);
 }
@@ -1401,19 +1387,22 @@ function getSys() {
       modeInstruction = "\n\nCRITICAL (IMAGE-TO-IMAGE MODE): The user wants to perform an IMAGE-TO-IMAGE edit. The prompts MUST describe the exact layout/subject of the original image, but strictly applying the requested changes (e.g. restoring, colorizing, changing weather). DO NOT describe a completely new random scene. Describe the transformed final state of the existing image.";
   }
 
-  return `You are an elite AI image generation prompt architect. Your objective is to create AESTHETICALLY STUNNING, HIGH-IMPACT prompts.${modeInstruction}
+  return `You are a world-class, elite AI image prompt engineer and art director. Your objective is to create JAW-DROPPING, MASTERPIECE-LEVEL prompts that push image generators (like Midjourney v6/v7, GPT Image 1.5) to their absolute maximum potential.${modeInstruction}
 
-CRITICAL PROMPT ENGINEERING RULES:
-1. AVOID WORD SALADS. Modern models perform badly with outdated terms.
-2. USE CONCISE, NATURAL LANGUAGE. Structure logically: [Subject Details] + [Environment/Setting] + [Lighting/Mood] + [Camera/Medium Details].
-3. Keep the 'detailed' prompt highly evocative but under 60 words.
+CRITICAL PROMPT ENGINEERING RULES FOR STUNNING RENDERS:
+1. EXTREME MEDIUM AUTHENTICITY: 
+   - If it's a PHOTO: It must look hyper-realistic. Specify film stock (e.g., Kodak Portra, Fujifilm, 35mm, polaroid), camera models, lens types (e.g., 85mm lens, macro), lighting setups (e.g., rim lighting, cinematic volumetric lighting, soft diffused studio light), and realistic textures (e.g., skin pores, film grain, depth of field).
+   - If it's an ILLUSTRATION or DRAWING: Make it look genuinely handmade or professionally crafted. Specify the exact medium (e.g., graphite sketch, watercolor wash, digital vector art, impasto oil painting, cel-shaded anime), paper/canvas texture, and line quality.
+   - If it's 3D/CGI: Specify the render engine and materials (e.g., Unreal Engine 5, Octane Render, ray tracing, subsurface scattering, glossy textures).
+2. USE EVOCATIVE, RICH LANGUAGE: Structure logically: [Subject Details] + [Environment/Setting] + [Lighting/Mood] + [Camera/Medium Details]. Avoid cliché "word salads" (like "masterpiece, trending on artstation"), instead use genuine professional art/photography terms.
+3. LENGTH & DETAIL: Keep the 'detailed' prompt rich, atmospheric, and highly descriptive (around 50-90 words) to give the image generator maximum creative material.
 4. Write ALL descriptive text in the requested output language.
-5. Evaluate a "score" (0-100) based on how professional the prompt is.
+5. Evaluate a "score" (0-100) based on how professional and highly-tuned the prompt is.
 
 Tool-specific rules:
-- midjourney: Masterful composition and precise terminology. End EXACTLY with the provided parameters.
-- gpt: Literal, highly descriptive, coherent physical space.
-- nanobanana: Highly poetic, surreal, focusing on rich textures and award-winning cinematography. End EXACTLY with: ${getNBParamsStr()}
+- midjourney: Focus heavily on photographic/artistic mediums, textures, and lighting. Do not use conversational filler. End EXACTLY with the provided parameters.
+- gpt: Optimized for GPT Image 1.5. Highly descriptive, literal, focusing on the physical coherence of the scene, spatial relationships, and clear action. Use natural language but be extremely precise about details.
+- nanobanana: Highly poetic, surreal, focusing on rich atmospheric textures, award-winning cinematography, and avant-garde aesthetics. End EXACTLY with: ${getNBParamsStr()}
 
 RETURN ONLY VALID JSON, no markdown, no extra text:
 {"midjourney":{"detailed":"...","short":"...","negative":"...","score":98},"gpt":{"detailed":"...","short":"...","negative":"...","score":95},"nanobanana":{"detailed":"...","short":"...","negative":"...","score":90}}`;
@@ -1496,7 +1485,7 @@ async function triggerMagicWand() {
   const subj = document.getElementById('inp-subj').value.trim();
   if(!subj){ toast(T[lang].eSubj); return; }
   
-  sel.subj = subj; // QUICK FIX: Save the text to memory immediately
+  sel.subj = subj; 
   
   const btn = document.getElementById('btn-magic');
   const origHtml = btn.innerHTML;
@@ -1504,18 +1493,29 @@ async function triggerMagicWand() {
   btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${lang==='fr'?'Magie en cours...':'Magic Loading...'}`;
   
   try {
-      const sys = `Given the visual subject, pick the MOST aesthetically pleasing and fitting index for style, lighting, and composition. Return ONLY valid JSON: {"styleIdx": int, "lightIdx": int, "compIdx": int, "ar": "string"}.
-      Styles (0-17): ${T.en.styles.join(', ')}.
-      Lights (0-23): ${T.en.lights.join(', ')}.
-      Comps (0-15): ${T.en.comps.join(', ')}.
-      AR options: 1:1, 16:9, 9:16, 2:3, 3:2, 4:5, 5:4, 21:9.`;
+      const sys = `Analyze the visual subject and select the most aesthetically pleasing indices.
+      Styles (0 to ${T.en.styles.length-1}): ${T.en.styles.join(', ')}
+      Lights (0 to ${T.en.lights.length-1}): ${T.en.lights.join(', ')}
+      Comps (0 to ${T.en.comps.length-1}): ${T.en.comps.join(', ')}
+      AR options: 1:1, 16:9, 9:16, 2:3, 3:2, 4:5, 5:4, 21:9`;
+
+      // SCHÉMA JSON STRICT POUR ÉVITER TOUT DÉFAUT DE PARSING :
+      const magicSchema = {
+          type: "OBJECT",
+          properties: {
+              styleIdx: { type: "INTEGER" },
+              lightIdx: { type: "INTEGER" },
+              compIdx: { type: "INTEGER" },
+              ar: { type: "STRING" }
+          }
+      };
       
-      const raw = await callGeminiText(`Subject: ${subj}`, sys, true);
+      const raw = await callGeminiText(`Subject: ${subj}`, sys, true, magicSchema);
       const res = parseJSON(raw);
       
-      if(res.styleIdx !== undefined) sel.siIdx = res.styleIdx;
-      if(res.lightIdx !== undefined) sel.liIdx = res.lightIdx;
-      if(res.compIdx !== undefined) sel.ciIdx = res.compIdx;
+      if(res.styleIdx !== undefined) sel.siIdx = parseInt(res.styleIdx) || 0;
+      if(res.lightIdx !== undefined) sel.liIdx = parseInt(res.lightIdx) || 0;
+      if(res.compIdx !== undefined) sel.ciIdx = parseInt(res.compIdx) || 0;
       if(res.ar) sel.ar = res.ar;
       
       buildSG(); buildLG(); buildCG(); buildAR();
@@ -1529,6 +1529,7 @@ async function triggerMagicWand() {
       console.error(e);
       toast(lang==='fr'?'Erreur de baguette magique.':'Magic fill failed.');
       btn.innerHTML = origHtml;
+  } finally {
       btn.classList.remove('loading');
   }
 }
@@ -1987,14 +1988,6 @@ function renderResults(data){
     const actionsDiv = document.createElement('div');
     actionsDiv.style.display = 'flex';
     actionsDiv.style.gap = '8px';
-    
-    const genImgBtn = document.createElement('button');
-    genImgBtn.className = 'cpybtn';
-    genImgBtn.style.background = 'linear-gradient(135deg, #0096C7, #48CAE4)';
-    genImgBtn.style.boxShadow = '0 4px 12px rgba(0,150,199,0.3)';
-    genImgBtn.innerHTML = `<i class="fa-solid fa-image"></i> Preview`;
-    genImgBtn.onclick = () => generateInlineImage(d.detailed, body, genImgBtn);
-    actionsDiv.appendChild(genImgBtn);
 
     const detCb=document.createElement('button');detCb.className='cpybtn';
     detCb.innerHTML=`<i class="fa-regular fa-copy"></i> ${t.lcpy}`;
@@ -2575,65 +2568,6 @@ function exportPDF() {
 
     doc.save("SUETOS_Creative_Brief.pdf");
     toast(lang==='fr'?"Brief PDF téléchargé !":"Creative Brief downloaded!");
-}
-
-function closePreviewModal() {
-    document.getElementById('preview-modal').classList.remove('on');
-    setTimeout(() => { document.getElementById('preview-modal-img').src = ''; }, 300); // Clear image after fade out
-}
-
-async function generateInlineImage(promptText, container, btn) {
-    let origHtml = '';
-    if(btn) {
-        origHtml = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${lang==='fr'?'Création...':'Thinking...'}`;
-    }
-    
-    const isEdit = sel.isEditMode && uploads.length > 0;
-    
-    // IMAGE-TO-IMAGE REQUIRES A BACKEND/PAID API. WE HANDLE IT GRACEFULLY:
-    if (isEdit) {
-        toast(lang==='fr' 
-          ? "L'aperçu en mode Édition requiert l'outil final (Midjourney, Nano Banana...)." 
-          : "Image-to-Image preview requires your final external tool.");
-        if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
-        return;
-    }
-
-    toast(lang==='fr'?"Génération d'image en cours...":"Generating image...");
-    try {
-        let cleanPrompt = promptText.replace(/--[a-zA-Z0-9\-\s\.\:]+/g, '').replace(/\[ratio:\s*[0-9:]+\]/gi, '').substring(0, 800).trim();
-        const safePrompt = encodeURIComponent(cleanPrompt);
-        const seed = Math.floor(Math.random() * 1000000);
-        
-        // Fast Flux model via Pollinations (much more stable and faster than their default model)
-        let finalImgSrc = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=800&nologo=true&model=flux&seed=${seed}`;
-
-        // Pre-load the image to catch errors gracefully and avoid empty modals
-        await new Promise((resolve, reject) => {
-            const tempImg = new Image();
-            const timer = setTimeout(() => reject(new Error("Timeout")), 15000);
-            tempImg.onload = () => { clearTimeout(timer); resolve(); };
-            tempImg.onerror = () => { clearTimeout(timer); reject(new Error("Server error")); };
-            tempImg.src = finalImgSrc;
-        });
-        
-        document.getElementById('preview-modal-img').src = finalImgSrc;
-        document.getElementById('preview-modal').classList.add('on');
-        
-        if(btn) {
-            btn.innerHTML = `<i class="fa-solid fa-check"></i> ${lang==='fr'?'Aperçu Prêt':'Ready'}`;
-            setTimeout(() => { if(btn) btn.innerHTML = origHtml; }, 3000); 
-        }
-        toast(lang==='fr'?"Aperçu généré !":"Preview generated!");
-    } catch(e) {
-        console.error("Image generation error:", e);
-        if(btn) btn.innerHTML = origHtml;
-        toast(lang==='fr' ? "Erreur du serveur gratuit, veuillez réessayer." : "Free server error, please try again.");
-    } finally {
-        if(btn) btn.disabled = false;
-    }
 }
 
 // ══ INIT LORS DU CHARGEMENT ══
