@@ -3490,4 +3490,412 @@ function renderPresets() {
         return;
     }
     list.innerHTML = presets.map((p, i) => `
-        <div style="background:var(--s2); padding:14px 18px; border-radius:14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; border:1px solid var
+        <div style="background:var(--s2); padding:14px 18px; border-radius:14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; border:1px solid var(--s3);" onclick="loadPreset(${i})">
+            <div>
+              <strong style="font-size:13px; color:var(--blk);">${escHtml(p.name)}</strong>
+              <div style="font-size:10px; color:var(--s4); margin-top:6px;">Style: ${T['en'].styles[p.s]} | Light: ${T['en'].lights[p.l]}</div>
+            </div>
+            <button onclick="deletePreset(${i}, event)" style="background:none; border:none; color:#E63946; cursor:pointer; padding:8px;"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function savePreset() {
+    const name = document.getElementById('preset-name').value.trim();
+    if(!name) return toast("Name required");
+    const presets = JSON.parse(localStorage.getItem('suetos_presets')||'[]');
+    presets.push({ name, s: sel.siIdx, sd: sel.sd, l: sel.liIdx, m: sel.mood, c: sel.ciIdx, ar: sel.ar, op: sel.op });
+    localStorage.setItem('suetos_presets', JSON.stringify(presets));
+    document.getElementById('preset-name').value = '';
+    renderPresets();
+    toast("Preset saved!");
+}
+
+function loadPreset(index) {
+    const presets = JSON.parse(localStorage.getItem('suetos_presets')||'[]');
+    if(presets[index]) {
+        const p = presets[index];
+        sel.siIdx = p.s; sel.sd = p.sd; sel.liIdx = p.l; sel.mood = p.m; sel.ciIdx = p.c; sel.ar = p.ar; sel.op = p.op;
+        buildSG(); buildLG(); buildCG(); buildAR(); buildOP();
+        closePresetsModal();
+        toast("Preset applied!");
+    }
+}
+
+function deletePreset(index, e) {
+    e.stopPropagation();
+    const presets = JSON.parse(localStorage.getItem('suetos_presets')||'[]');
+    presets.splice(index, 1);
+    localStorage.setItem('suetos_presets', JSON.stringify(presets));
+    renderPresets();
+}
+
+function exportData() {
+    const data = {
+        hist: localStorage.getItem('suetos_hist'),
+        lib: localStorage.getItem('suetos_lib'),
+        tools: localStorage.getItem('suetos_custom_tools'),
+        presets: localStorage.getItem('suetos_presets')
+    };
+    const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; 
+    a.download = 'suetos_backup.json'; 
+    a.click();
+    toast(lang==='fr'?'Données exportées':'Data exported');
+}
+
+function importData(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const data = JSON.parse(event.target.result);
+            if(data.hist) localStorage.setItem('suetos_hist', data.hist);
+            if(data.lib) localStorage.setItem('suetos_lib', data.lib);
+            if(data.tools) localStorage.setItem('suetos_custom_tools', data.tools);
+            if(data.presets) localStorage.setItem('suetos_presets', data.presets);
+            toast(lang==='fr'?'Données restaurées !':'Data imported successfully!');
+            renderCustomTools();
+        } catch(err) {
+            toast(lang==='fr'?'Fichier invalide':'Invalid file');
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; 
+}
+
+function getCustomTools() { return JSON.parse(localStorage.getItem('suetos_custom_tools')||'[]'); }
+function saveCustomTools(tools) { localStorage.setItem('suetos_custom_tools', JSON.stringify(tools)); }
+
+function openToolsModal() {
+    renderCustomTools();
+    document.getElementById('tools-modal').classList.add('on');
+}
+
+function closeToolsModal() { document.getElementById('tools-modal').classList.remove('on'); }
+
+function renderCustomTools() {
+    const list = document.getElementById('custom-tool-list');
+    if (!list) return;
+    const tools = getCustomTools();
+    list.innerHTML = tools.map((t, i) => `
+        <div style="background:var(--s2); padding:14px 18px; border-radius:14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--s3);">
+            <div>
+              <strong style="font-size:13px; color:var(--blk);">${escHtml(t.name)}</strong> 
+              <span style="font-size:10px; background:var(--blk); color:#fff; padding:4px 10px; border-radius:100px; margin-left:8px;">${escHtml(t.badge)}</span>
+            </div>
+            <button onclick="deleteCustomTool(${i})" style="background:none; border:none; color:#E63946; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    `).join('');
+}
+
+function addCustomTool() {
+    const name = document.getElementById('ct-name').value.trim();
+    const badge = document.getElementById('ct-badge').value.trim() || 'Custom';
+    const rules = document.getElementById('ct-rules').value.trim();
+    if (!name || !rules) return toast(lang==='fr'?"Nom et règles requis":"Name and rules required");
+    const tools = getCustomTools();
+    tools.push({ id: 'ct_' + Date.now(), name, badge, rules });
+    saveCustomTools(tools);
+    document.getElementById('ct-name').value = '';
+    document.getElementById('ct-badge').value = '';
+    document.getElementById('ct-rules').value = '';
+    renderCustomTools();
+    toast(lang==='fr'?"Outil ajouté !":"Tool added!");
+}
+
+function deleteCustomTool(index) {
+    const tools = getCustomTools();
+    tools.splice(index, 1);
+    saveCustomTools(tools);
+    renderCustomTools();
+}
+
+function setView(viewMode) { 
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('on'));
+  if(viewMode === 'stack') {
+    document.getElementById('vbtn-stack').classList.add('on');
+    document.getElementById('stack-view').style.display = 'block';
+    document.getElementById('compare-view').style.display = 'none';
+  } else {
+    document.getElementById('vbtn-compare').classList.add('on');
+    document.getElementById('stack-view').style.display = 'none';
+    document.getElementById('compare-view').style.display = 'block';
+  }
+}
+
+function getDiffHtml(baseText, compareText) {
+    if(!baseText || !compareText) return escHtml(compareText);
+    const bWords = new Set(baseText.toLowerCase().match(/\b(\w+)\b/g) || []);
+    let result = '';
+    const tokens = compareText.split(/(\b\w+\b)/);
+    tokens.forEach(tok => {
+        if(/\w+/.test(tok) && !bWords.has(tok.toLowerCase())) {
+            result += `<span class="diff-add">${escHtml(tok)}</span>`;
+        } else {
+            result += escHtml(tok);
+        }
+    });
+    return result;
+}
+
+function renderCompareView(data) {
+    const grid = document.getElementById('compare-grid');
+    grid.innerHTML = '';
+    const allTools=[...TOOLS,...getCustomTools()];
+    grid.style.gridTemplateColumns = `repeat(${allTools.length}, 1fr)`;
+    
+    let mjData = data.midjourney;
+    if(typeof mjData === 'string') mjData = {detailed: mjData};
+    const basePrompt = mjData ? mjData.detailed : '';
+
+    allTools.forEach(tool=>{
+        let toolKey = Object.keys(data).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
+        let d = toolKey ? data[toolKey] : data[tool.id];
+        if(!d)return;
+        if(typeof d === 'string') d = { detailed: d, short: d, negative: "" };
+        
+        let scoreHTML = '';
+        if (d.score) {
+            let scClass = d.score > 85 ? 'high' : (d.score > 65 ? 'med' : 'low');
+            scoreHTML = `<span class="tscore ${scClass}">${d.score}%</span>`;
+        }
+
+        let promptHtml = (tool.id !== 'midjourney') ? getDiffHtml(basePrompt, d.detailed) : escHtml(d.detailed || '');
+
+        grid.innerHTML += `
+            <div class="compare-col">
+                <div class="compare-col-hdr">
+                    ${escHtml(tool.name)} 
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        ${scoreHTML}
+                        <span class="tbadge">${escHtml(tool.badge)}</span>
+                    </div>
+                </div>
+                <div class="compare-col-body">
+                    <div class="compare-lbl">${T[lang].ldet}</div>
+                    <div class="compare-prompt">${promptHtml}</div>
+                    ${d.short ? `<div class="compare-lbl">${T[lang].lshort}</div><div class="compare-prompt" style="opacity:0.8">${escHtml(d.short)}</div>` : ''}
+                </div>
+            </div>
+        `;
+    });
+}
+
+function copyAll() {
+    if (!prompts) return;
+    let text = '';
+    const allTools=[...TOOLS,...getCustomTools()];
+    allTools.forEach(tool => {
+        let toolKey = Object.keys(prompts).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
+        let d = toolKey ? prompts[toolKey] : prompts[tool.id];
+        if(!d)return;
+        if(typeof d === 'string') d = { detailed: d };
+        text += `=== ${tool.name} ===\n${d.detailed}\n\n`;
+    });
+    navigator.clipboard.writeText(text).then(() => toast(T[lang].eCopy)).catch(()=>{
+        const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+        toast(T[lang].eCopy);
+    });
+}
+
+function exportPDF() {
+    if (!prompts) return toast(lang==='fr'?"Aucun prompt à exporter.":"No prompts to export.");
+    toast(lang==='fr'?"Génération du PDF en cours...":"Generating PDF...");
+    
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 0;
+    const margin = 20;
+    const maxW = 170; 
+
+    /* TURQUOISE COLOR UPDATED IN PDF */
+    doc.setFillColor(0, 150, 199);
+    doc.rect(0, 0, 210, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("SUETOS Creative Brief", margin, 20);
+
+    y = 40;
+
+    if (uploads.length > 0) {
+        try {
+            doc.setFillColor(240, 240, 240);
+            doc.roundedRect(margin, y, 40, 40, 3, 3, 'F');
+            doc.addImage(uploads[0].dataUrl, 'JPEG', margin, y, 40, 40);
+            
+            doc.setTextColor(30, 30, 30);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.text("CONCEPT:", margin + 45, y + 5);
+            
+            doc.setFont("helvetica", "normal");
+            const cLines = doc.splitTextToSize(sel.subj, maxW - 45);
+            doc.text(cLines, margin + 45, y + 10);
+            
+            y = Math.max(y + 45, y + 10 + (cLines.length * 4) + 5);
+        } catch(e) {
+            console.error("PDF Image Error", e);
+            y = 40;
+        }
+    } else {
+        doc.setTextColor(30, 30, 30);
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text("CONCEPT:", margin, y);
+        doc.setFont("helvetica", "normal");
+        const cLines = doc.splitTextToSize(sel.subj, maxW);
+        doc.text(cLines, margin, y + 5);
+        y += 5 + (cLines.length * 4) + 5;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.text("STYLE:", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text((T[lang].styles[sel.siIdx] || 'None') + (sel.sd ? ' ('+sel.sd+')' : ''), margin + 15, y);
+    y += 12;
+
+    const addText = (txt, size, isBold, color) => {
+        doc.setFont("helvetica", isBold ? "bold" : "normal");
+        doc.setFontSize(size);
+        doc.setTextColor(color[0], color[1], color[2]);
+        const lines = doc.splitTextToSize(txt, maxW);
+        const lineHeight = size * 0.4;
+        
+        if (y + (lines.length * lineHeight) > 280) {
+            doc.addPage();
+            y = 20;
+        }
+        doc.text(lines, margin, y);
+        y += lines.length * lineHeight + 2; 
+    };
+
+    const allTools=[...TOOLS,...getCustomTools()];
+    allTools.forEach(tool => {
+        let toolKey = Object.keys(prompts).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
+        let d = toolKey ? prompts[toolKey] : prompts[tool.id];
+        if(!d) return;
+        if(typeof d === 'string') d = { detailed: d, short: '', negative: '', score: null };
+
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, y, 210 - margin, y);
+        y += 8;
+
+        let scoreTxt = d.score ? ` (${d.score}% Match)` : '';
+        addText(tool.name + scoreTxt, 14, true, [0, 0, 0]);
+        y += 2;
+
+        addText(T[lang].ldet.toUpperCase(), 9, true, [100, 100, 100]);
+        addText(d.detailed || '', 10, false, [40, 40, 40]);
+        y += 3;
+
+        if(d.short) {
+            addText(T[lang].lshort.toUpperCase(), 9, true, [100, 100, 100]);
+            addText(d.short, 10, false, [80, 80, 80]);
+            y += 3;
+        }
+        
+        if(d.negative) {
+            addText(T[lang].lneg.toUpperCase(), 9, true, [230, 57, 70]);
+            addText(d.negative, 10, false, [230, 57, 70]);
+            y += 3;
+        }
+        y += 5;
+    });
+
+    doc.save("SUETOS_Creative_Brief.pdf");
+    toast(lang==='fr'?"Brief PDF téléchargé !":"Creative Brief downloaded!");
+}
+
+// ── ART DIRECTOR LIVE PREVIEW ──
+function buildArtDirectorPreview() {
+  const card = document.getElementById('artdir-card');
+  const body = document.getElementById('artdir-body');
+  if (!card || !body) return;
+
+  const style = T['en'].styles[sel.siIdx] || 'none';
+  const light  = T['en'].lights[sel.liIdx]  || 'none';
+  const comp   = T['en'].comps[sel.ciIdx]   || 'none';
+  const op     = (sel.op && sel.op !== 'None') ? sel.op : null;
+  const subj   = sel.subj || '';
+
+  if (!subj) { card.classList.remove('on'); return; }
+  card.classList.add('on');
+
+  // Determine medium
+  const photoStyles   = ['B&W Photo','Cinematic','Photo Pro HD','Photorealism','Street Photo','Architecture'];
+  const illustStyles  = ['Anime','Illustration','Watercolor','Fine Art','Impressionism','Pop Art','Concept Art'];
+  const digitalStyles = ['Cyberpunk','Octane 3D','Minimalism','Surrealism'];
+  let medium = 'mixed', mediumLabel = '✦ Creative';
+  if (photoStyles.includes(style))    { medium = 'photo';        mediumLabel = '📷 Photography'; }
+  else if (illustStyles.includes(style)) { medium = 'illustration'; mediumLabel = '🎨 Illustration'; }
+  else if (digitalStyles.includes(style)) { medium = 'digital';     mediumLabel = '⚡ Digital/3D'; }
+
+  // MJ params summary
+  const mjSummary = [];
+  if (sel.mjVersion) mjSummary.push(sel.mjVersion);
+  if (sel.mjStylize) mjSummary.push('stylize ' + sel.mjStylize);
+  if (sel.mjChaos > 0) mjSummary.push('chaos ' + sel.mjChaos);
+  if (sel.mjWeird > 0) mjSummary.push('weird ' + sel.mjWeird);
+  if (sel.mjRaw) mjSummary.push('--style raw');
+
+  // Optics insight
+  let opticsInsight = '';
+  if (op) {
+    if (op.includes('Leica') || op.includes('Noctilux')) opticsInsight = 'Signature Leica micro-contrast, buttery smooth bokeh, 3D subject separation';
+    else if (op.includes('Hasselblad')) opticsInsight = 'Medium format rendering — extraordinary tonal depth and edge-to-edge sharpness';
+    else if (op.includes('Anamorphic') || op.includes('anamorphic')) opticsInsight = 'Oval bokeh, horizontal lens flares, cinematic widescreen rendering';
+    else if (op.includes('Macro')) opticsInsight = '1:1 magnification — microscopic textures, razor-thin depth of field, abstract scale';
+    else if (op.includes('Tilt-Shift')) opticsInsight = 'Miniature effect — selective focus plane, dreamy perspective compression';
+    else if (op.includes('Fisheye')) opticsInsight = 'Ultra-wide barrel distortion — immersive environmental compression';
+    else if (op.includes('Polaroid') || op.includes('Holga') || op.includes('Lomography')) opticsInsight = 'Lo-fi analog rendering — vignette, color shift, soft halation';
+    else if (op.includes('Infrared')) opticsInsight = 'False color rendering — foliage glows white, skies turn black, ethereal atmosphere';
+    else if (op.includes('f/0.95') || op.includes('f/1.0') || op.includes('f/1.2')) opticsInsight = 'Ultra-fast lens — extreme subject isolation, luminous low-light rendering';
+    else opticsInsight = 'Camera-specific optical signature will be embedded in all prompts';
+  }
+
+  const fr = lang === 'fr';
+  body.innerHTML = `
+    <div class="artdir-row">
+      <div class="artdir-key">${fr?'Mode artistique':'Artistic mode'}</div>
+      <span class="artdir-tag">${mediumLabel}</span>
+      ${style !== 'none' ? '<span class="artdir-tag">'+style+'</span>' : ''}
+      ${light !== 'none' ? '<span class="artdir-tag">'+light+'</span>' : ''}
+      ${comp  !== 'none' ? '<span class="artdir-tag">'+comp+'</span>' : ''}
+    </div>
+    ${op ? `<div class="artdir-row"><div class="artdir-key">${fr?'Signature optique':'Optics signature'}</div><div style="font-size:11.5px;color:var(--silver);">${opticsInsight}</div></div>` : ''}
+    <div class="artdir-row">
+      <div class="artdir-key">Midjourney params</div>
+      ${mjSummary.map(p => '<span class="artdir-tag">'+p+'</span>').join('')}
+    </div>
+  `;
+}
+
+// ══ INIT LORS DU CHARGEMENT ══
+document.addEventListener("DOMContentLoaded", () => {
+    // MAISON NOIR: dark is default — body.light = light mode opt-in
+    const savedDark = localStorage.getItem('suetos_dark');
+    if (savedDark === '0') { isDark = false; document.body.classList.add('light'); }
+    else { isDark = true; } // dark by default (no class needed)
+    document.getElementById('dark-icon').className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+    initDZ();
+    buildPB();
+    buildSG();
+    buildLG();
+    buildCG();
+    buildAR();
+    buildOP();
+    ui(true);
+    
+    document.querySelectorAll('textarea.tinp').forEach(ta => {
+        ta.addEventListener('input', function() { autoResize(this); });
+    });
+});
+
+</script>
+</body>
+</html>
