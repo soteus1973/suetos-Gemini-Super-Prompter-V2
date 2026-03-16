@@ -506,7 +506,10 @@ body.dark .file-btn:hover { background: var(--dk-s3); }
     <div class="lib-panel-title" id="hist-title">Generation History</div>
     <button class="lib-close" onclick="closeHist()"><i class="fa-solid fa-xmark"></i></button>
   </div>
-  <div style="font-size:12px;color:var(--s4);margin-bottom:24px;line-height:1.6" id="hist-desc">Every generation is automatically saved here. Nothing is ever lost.</div>
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 36px; gap: 12px;">
+    <div style="font-size:13.5px;color:var(--s4);line-height:1.7" id="hist-desc">Every generation is automatically saved here. Nothing is ever lost.</div>
+    <button id="btn-clear-hist" onclick="clearAllHist()" class="cpybtn" style="background:rgba(230,57,70,0.1); color:#E63946; border:1px solid rgba(230,57,70,0.2); box-shadow:none; flex-shrink:0; display:none;"><i class="fa-solid fa-trash-can"></i> <span id="lbl-clear-hist">Clear All</span></button>
+  </div>
   <div id="hist-list"></div>
 </div>
 <div class="lib-overlay" id="hist-overlay" onclick="closeHist()"></div>
@@ -1041,7 +1044,7 @@ function syncLangUI() {
    se('hist-title',fr?'Historique des Générations':'Generation History');
    se('hist-desc',fr?'Chaque génération est sauvegardée automatiquement. Rien n\'est jamais perdu.':'Every generation is automatically saved here. Nothing is ever lost.');
    se('tools-modal-title',fr?'Profils d\'Outils Personnalisés':'Custom Tool Profiles');
-   se('tools-modal-desc',fr?'Ajoutez votre propre outil IA avec des règles de syntaxe.':'Add your own AI image tool with custom syntax rules.');
+   se('tools-modal-desc',fr?'Ajoutez votre propre outil IA avec des règles de syntaxe.':'Add your own AI image tool avec custom syntax rules.');
    se('tools-lbl-name',fr?'Nom de l\'Outil':'Tool Name');
    se('tools-lbl-badge',fr?'Badge Court':'Short Badge');
    se('tools-lbl-rules',fr?'Règles de Syntaxe':'Syntax Rules');
@@ -1058,6 +1061,7 @@ function syncLangUI() {
 
    se('lbl-hist',fr?'Historique':'History');
    se('lbl-tools',fr?'Outils':'Tools');
+   se('lbl-clear-hist',fr?'Tout Effacer':'Clear All');
    se('lbl-sug-hdr',fr?'Variations Créatives':'Creative Variations');
    se('lbl-stacked',fr?'Empilé':'Stacked');
    se('lbl-compare',fr?'Comparer':'Compare');
@@ -1320,7 +1324,8 @@ function getMJParamsStr() {
 }
 
 function getNBParamsStr() {
-  return ` --strength ${sel.nbDenoising.toFixed(2)}`;
+  const ar = sel.ar && sel.ar !== 'Auto' ? sel.ar : '1:1';
+  return ` [ratio: ${ar}] --strength ${sel.nbDenoising.toFixed(2)}`;
 }
 
 function autoAdaptMJParams() {
@@ -1386,6 +1391,8 @@ function getSys() {
   if (sel.isEditMode && uploads.length > 0) {
       modeInstruction = "\n\nCRITICAL (IMAGE-TO-IMAGE MODE): The user wants to perform an IMAGE-TO-IMAGE edit. The prompts MUST describe the exact layout/subject of the original image, but strictly applying the requested changes (e.g. restoring, colorizing, changing weather). DO NOT describe a completely new random scene. Describe the transformed final state of the existing image.";
   }
+  
+  const currentAR = sel.ar && sel.ar !== 'Auto' ? sel.ar : '1:1';
 
   return `You are a world-class, elite AI image prompt engineer and art director. Your objective is to create JAW-DROPPING, MASTERPIECE-LEVEL prompts that push image generators (like Midjourney v6/v7, GPT Image 1.5) to their absolute maximum potential.${modeInstruction}
 
@@ -1401,7 +1408,7 @@ CRITICAL PROMPT ENGINEERING RULES FOR STUNNING RENDERS:
 
 Tool-specific rules:
 - midjourney: Focus heavily on photographic/artistic mediums, textures, and lighting. Do not use conversational filler. End EXACTLY with the provided parameters.
-- gpt: Optimized for GPT Image 1.5. Highly descriptive, literal, focusing on the physical coherence of the scene, spatial relationships, and clear action. Use natural language but be extremely precise about details.
+- gpt: Optimized for GPT Image 1.5. Highly descriptive, literal, focusing on the physical coherence of the scene, spatial relationships, and clear action. Use natural language but be extremely precise about details. ALWAYS end the detailed prompt EXACTLY with the text: "[Aspect ratio: ${currentAR}]".
 - nanobanana: Highly poetic, surreal, focusing on rich atmospheric textures, award-winning cinematography, and avant-garde aesthetics. End EXACTLY with: ${getNBParamsStr()}
 
 RETURN ONLY VALID JSON, no markdown, no extra text:
@@ -1853,7 +1860,7 @@ function updateNBParams(){
   if(nbTxt && prompts && prompts.nanobanana){
     let p = prompts.nanobanana.detailed;
     if(p) {
-        p = p.replace(/\s*--strength\s+[0-9\.]+/g, '');
+        p = p.replace(/\s*\[ratio:\s*[0-9:]+\]/g, '').replace(/\s*--strength\s+[0-9\.]+/g, '');
         prompts.nanobanana.detailed = p.trim() + getNBParamsStr();
         nbTxt.textContent = prompts.nanobanana.detailed;
     }
@@ -1951,6 +1958,12 @@ function renderResults(data){
   
   if (Array.isArray(data)) data = data[0] || {};
   if (data && data.prompts) data = data.prompts;
+
+  // Force l'ajout du format d'image pour GPT par sécurité
+  const currentAR = sel.ar && sel.ar !== 'Auto' ? sel.ar : '1:1';
+  if (data.gpt && data.gpt.detailed && !data.gpt.detailed.toLowerCase().includes('aspect ratio')) {
+      data.gpt.detailed = data.gpt.detailed.trim() + ` [Aspect ratio: ${currentAR}]`;
+  }
 
   try{renderCompareView(data);}catch(e){}
   
@@ -2203,17 +2216,23 @@ function openHist() {
     document.getElementById('hist-panel').classList.add('open');
     document.getElementById('hist-overlay').classList.add('on');
     const list = document.getElementById('hist-list');
+    const btnClear = document.getElementById('btn-clear-hist');
     const h = JSON.parse(localStorage.getItem('suetos_hist')||'[]');
     if(h.length === 0) {
         list.innerHTML = `<div class="lib-empty">${lang==='fr'?'Aucun historique.':'No history yet.'}</div>`;
+        if(btnClear) btnClear.style.display = 'none';
         return;
     }
+    if(btnClear) btnClear.style.display = 'inline-flex';
     list.innerHTML = h.slice().reverse().map((item, i) => {
         const realIndex = h.length - 1 - i;
         return `
         <div class="lib-item" onclick="loadHist(${realIndex})">
             <div class="lib-item-title">${escHtml(item.subj || 'Untitled')}</div>
-            <div class="lib-item-meta">${new Date(item.date).toLocaleString()}</div>
+            <div class="lib-item-meta">
+                <span>${new Date(item.date).toLocaleString()}</span>
+                <button class="lib-item-del" onclick="delHistItem(${realIndex}, event)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            </div>
         </div>`;
     }).join('');
 }
@@ -2221,6 +2240,41 @@ function openHist() {
 function closeHist() {
     document.getElementById('hist-panel').classList.remove('open');
     document.getElementById('hist-overlay').classList.remove('on');
+    const btn = document.getElementById('btn-clear-hist');
+    if(btn) {
+        btn.classList.remove('confirming');
+        document.getElementById('lbl-clear-hist').textContent = lang==='fr' ? 'Tout Effacer' : 'Clear All';
+    }
+}
+
+let histClearTimeout;
+function clearAllHist() {
+    const btn = document.getElementById('btn-clear-hist');
+    const lbl = document.getElementById('lbl-clear-hist');
+    if(!btn.classList.contains('confirming')) {
+        btn.classList.add('confirming');
+        lbl.textContent = lang==='fr' ? 'Sûr ?' : 'Sure?';
+        histClearTimeout = setTimeout(() => {
+            btn.classList.remove('confirming');
+            lbl.textContent = lang==='fr' ? 'Tout Effacer' : 'Clear All';
+        }, 3000);
+    } else {
+        clearTimeout(histClearTimeout);
+        btn.classList.remove('confirming');
+        lbl.textContent = lang==='fr' ? 'Tout Effacer' : 'Clear All';
+        localStorage.setItem('suetos_hist', '[]');
+        openHist();
+        toast(lang==='fr'?'Historique effacé.':'History cleared.');
+    }
+}
+
+function delHistItem(index, e) {
+    e.stopPropagation();
+    const h = JSON.parse(localStorage.getItem('suetos_hist')||'[]');
+    h.splice(index, 1);
+    localStorage.setItem('suetos_hist', JSON.stringify(h));
+    openHist();
+    toast(lang==='fr'?'Supprimé.':'Deleted.');
 }
 
 function loadHist(index) {
