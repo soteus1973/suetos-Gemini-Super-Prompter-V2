@@ -2036,7 +2036,7 @@ function ui(isForward = true){
   document.getElementById('ai-describe-lbl').textContent=lang==='fr'?'AI Analyse Images':'AI Analyze Images';
   const aiMagicLbl = document.getElementById('ai-magic-lbl');
   if (aiMagicLbl) aiMagicLbl.textContent=lang==='fr'?'Baguette Magique (Auto-fill)':'Magic Wand (Auto-fill)';
-  const szn=document.getElementById('img-opt-txt');if(szn)szn.textContent=' '+(lang==='fr'?'Images automatiquement compressées et optimisées':'Images are automatically compressed and optimized');
+  const szn=document.getElementById('img-opt-txt');if(szn)szn.textContent=' '+(lang==='fr'?'Images ultra-compressées pour économiser votre quota':'Images are ultra-compressed to save API quota');
   
   const map={'brand-s':t.bs,'t1':t.t1,'d1':t.d1,'t2':t.t2,'d2':t.d2,'t3':t.t3,'d3':t.d3,'t4':t.t4,'d4':t.d4,'t5':t.t5,'d5':t.d5,'t6':t.t6,'d6':t.d6,'lc':t.lc,'lsd':t.lsd,'lm':t.lm,'lar':t.lar,'lop':t.lop,'lbl-reset':t.lrst,'fnt':t.fnt,'lrf':t.lrf,'hint-lbl':t.hintLbl,'dzp':t.dzp,'dzs':t.dzs, 'lbl-mode':t.modeLbl, 'lbl-mode-ref':t.modeRef, 'lbl-mode-edit':t.modeEdit};
   Object.entries(map).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
@@ -2195,11 +2195,10 @@ function getActiveKey() {
 }
 
 function getGeminiModel() {
-  // Automatically read user's chosen model from localStorage
-  if (!hasApiKey()) return 'gemini-2.5-flash-preview-09-2025'; // Only used in Canvas environment
+  if (!hasApiKey()) return 'gemini-2.5-flash-preview-09-2025'; // Canvas environment
   const saved = localStorage.getItem('suetos_api_model');
   if (saved) return saved;
-  return 'gemini-2.0-flash'; // Very robust default for regular users
+  return 'gemini-2.0-flash'; // Safe default
 }
 
 function openSettingsModal() {
@@ -2276,7 +2275,10 @@ async function fetchGeminiWithBackoff(url, payload) {
           const msg = extractErrorMessage(errData, response.status);
           console.error("Gemini API Error:", response.status, msg, errData);
 
-          // Detect typical API key or Model mismatch errors strictly
+          if (response.status === 429) {
+              throw new Error("QUOTA_EXCEEDED");
+          }
+
           if (response.status === 401 || response.status === 403 || msg.toLowerCase().includes('api key')) {
               const err = new Error("INVALID_API_KEY: " + msg);
               err.status = response.status;
@@ -2300,7 +2302,7 @@ async function fetchGeminiWithBackoff(url, payload) {
   }
 }
 
-async function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
+function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
   if (systemInstruction) {
@@ -2315,7 +2317,7 @@ async function callGeminiText(prompt, systemInstruction, jsonMode = false, schem
   return fetchGeminiWithBackoff(url, payload);
 }
 
-async function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
+function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const parts = [{ text: prompt }];
   images.forEach(img => {
@@ -2398,51 +2400,39 @@ function autoAdaptMJParams() {
   const subj  = sel.subj.toLowerCase();
 
   // ── MEDIUM PRESETS ──
-  // Pure photography → raw, high realism
   if (['B&W Photo','Photorealism','Street Photo','Photo Pro HD'].includes(style)) {
     sel.mjRaw = true; sel.mjStylize = 80; sel.mjChaos = 0; sel.mjWeird = 0;
   }
-  // Cinematic → slightly stylized realism
   else if (style === 'Cinematic') {
     sel.mjRaw = true; sel.mjStylize = 120; sel.mjChaos = 3;
   }
-  // Architecture → precision, no chaos
   else if (style === 'Architecture') {
     sel.mjRaw = true; sel.mjStylize = 60; sel.mjChaos = 0;
   }
-  // Anime / Niji
   else if (style === 'Anime') {
     sel.mjVersion = '--niji 7'; sel.mjStylize = 300; sel.mjChaos = 0;
   }
-  // Illustration styles
   else if (['Illustration','Watercolor','Fine Art'].includes(style)) {
     sel.mjStylize = 280; sel.mjChaos = 5;
   }
-  // Impressionism — painterly, some chaos
   else if (style === 'Impressionism') {
     sel.mjStylize = 350; sel.mjChaos = 15; sel.mjWeird = 100;
   }
-  // Concept Art
   else if (style === 'Concept Art') {
     sel.mjStylize = 320; sel.mjChaos = 8;
   }
-  // Cyberpunk — high stylize + weird
   else if (style === 'Cyberpunk') {
     sel.mjStylize = 400; sel.mjChaos = 12; sel.mjWeird = 200;
   }
-  // Octane 3D — rich, high stylize
   else if (style === 'Octane 3D') {
     sel.mjStylize = 350; sel.mjChaos = 0;
   }
-  // Surrealism — max weird
   else if (style === 'Surrealism') {
     sel.mjStylize = 300; sel.mjChaos = 20; sel.mjWeird = 500;
   }
-  // Pop Art — punchy, some chaos
   else if (style === 'Pop Art') {
     sel.mjStylize = 250; sel.mjChaos = 15; sel.mjWeird = 150;
   }
-  // Minimalism — very low stylize
   else if (style === 'Minimalism') {
     sel.mjStylize = 40; sel.mjChaos = 0; sel.mjWeird = 0;
   }
@@ -2465,8 +2455,6 @@ function autoAdaptMJParams() {
   sel.mjWeird   = Math.min(3000, Math.max(0,   sel.mjWeird));
 }
 
-
-
 function brief(){
   const t=T[lang];
   const style=(sel.siIdx>0&&t.styles[sel.siIdx])||'none';
@@ -2478,7 +2466,6 @@ function brief(){
   const ar=(sel.ar&&sel.ar!=='Auto')?sel.ar:'free';
   const op=(sel.op&&sel.op!=='None')?sel.op:'unspecified';
 
-  // Infer subject category for art direction hints
   const subj = sel.subj.toLowerCase();
   let subjectHint = '';
   if (/portrait|person|model|woman|man|face|girl|boy|human/.test(subj)) subjectHint = 'SUBJECT CATEGORY: Portrait/Human — prioritize skin, expression, gaze, hair, garment';
@@ -2538,6 +2525,7 @@ function getSys() {
 
   const mjParams = getMJParamsStr();
   const nbParams = getNBParamsStr();
+  const arParam = (sel.ar && sel.ar !== 'Auto') ? sel.ar : '1:1';
 
   return personas[medium] + modeInstruction
     + '\n\nYOUR MISSION: Write prompts so technically precise and artistically intelligent that image generators produce their absolute best output.\n\n'
@@ -2554,13 +2542,13 @@ function getSys() {
     + '\nSCORING: 0-100 on technical precision + artistic vision + likely output quality.\n'
     + '\nTool syntax:\n'
     + '- midjourney: Dense comma-separated professional descriptors. End EXACTLY with: ' + mjParams + '\n'
-    + '- gpt: Natural language narrative. Hyper-literal physical description. Describe light falling on specific surfaces. Think cinematographer notes.\n'
-    + '- nanobanana: Poetic-technical fusion. Emotional core first, layer in precision. End EXACTLY with: ' + nbParams + '\n'
+    + '- gpt: Natural language narrative. Hyper-literal physical description. ALWAYS append the aspect ratio (e.g. "Aspect ratio: ' + arParam + '") at the end.\n'
+    + '- nanobanana: Poetic-technical fusion. ALWAYS append the aspect ratio right before the --strength parameter (e.g. "Aspect ratio: ' + arParam + ' ' + nbParams + '"). End EXACTLY with: ' + nbParams + '\n'
     + '\nRETURN ONLY VALID JSON, NO MARKDOWN, NO LINE BREAKS IN STRINGS:\n'
     + '{"midjourney":{"detailed":"...","short":"...","negative":"...","score":95},"gpt":{"detailed":"...","short":"...","negative":"...","score":92},"nanobanana":{"detailed":"...","short":"...","negative":"...","score":88}}';
 }
 
-async function buildSysWithCustomTools(){
+function buildSysWithCustomTools(){
   const ct=getCustomTools();
   if(!ct.length)return getSys();
   let extra = ct.map(t => `- ${t.name} (id: ${t.id}, badge: ${t.badge}): ${t.rules}`).join('\n');
@@ -2574,9 +2562,9 @@ async function generate(){
     let raw;
     if(uploads.length > 0) {
         const promptText = brief() + "\n\nReference images provided. " + (sel.isEditMode ? "EDIT the structure." : "Incorporate their aesthetic strongly.");
-        raw = await callGeminiVision(promptText, uploads, buildSysWithCustomTools(), false);
+        raw = await callGeminiVision(promptText, uploads, buildSysWithCustomTools(), true);
     } else {
-        raw = await callGeminiText(brief(), buildSysWithCustomTools(), false);
+        raw = await callGeminiText(brief(), buildSysWithCustomTools(), true);
     }
 
     prompts = parseJSON(raw);
@@ -2590,7 +2578,9 @@ async function generate(){
     console.error("Generate Error:", e);
     let errorMsg = String(e.message || e).toLowerCase();
     
-    if (errorMsg.includes("invalid_api_key")) {
+    if (errorMsg.includes("quota_exceeded")) {
+        toast(lang==='fr'?'Quota API dépassé pour aujourd\'hui.':'API Quota exceeded for today.');
+    } else if (errorMsg.includes("invalid_api_key")) {
         openSettingsModal();
         toast(lang==='fr'?'Clé API Google Gemini invalide ou requise.':'Google Gemini API Key invalid or required.');
     } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
@@ -2614,9 +2604,9 @@ async function refine(){
     
     let raw;
     if (uploads.length > 0) {
-        raw = await callGeminiVision(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, uploads, sys, false);
+        raw = await callGeminiVision(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, uploads, sys, true);
     } else {
-        raw = await callGeminiText(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, sys, false);
+        raw = await callGeminiText(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, sys, true);
     }
 
     prompts=parseJSON(raw);
@@ -2625,7 +2615,9 @@ async function refine(){
   }catch(e){
       console.error(e);
       let errorMsg = String(e.message || e).toLowerCase();
-      if (errorMsg.includes("invalid_api_key")) {
+      if (errorMsg.includes("quota_exceeded")) {
+          toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
+      } else if (errorMsg.includes("invalid_api_key")) {
           openSettingsModal();
           toast(lang==='fr'?'Clé API Google Gemini requise.':'Google Gemini API Key required.');
       } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
@@ -2685,7 +2677,9 @@ async function triggerMagicWand() {
   } catch(e) {
       console.error(e);
       let errorMsg = String(e.message || e).toLowerCase();
-      if (errorMsg.includes("invalid_api_key")) {
+      if (errorMsg.includes("quota_exceeded")) {
+          toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
+      } else if (errorMsg.includes("invalid_api_key")) {
           openSettingsModal();
           toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
       } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
@@ -2711,7 +2705,7 @@ async function translatePrompts(targetLang) {
     3. DO NOT translate or modify ANY technical parameters: "--ar 16:9", "--v 7", "--style raw", "--strength 0.50" etc.
     4. Return ONLY a valid JSON object with the exact same structure. No markdown. NO LINE BREAKS inside JSON string values.`;
     
-    const raw = await callGeminiText(JSON.stringify(prompts), sys, false);
+    const raw = await callGeminiText(JSON.stringify(prompts), sys, true);
     const newPrompts = parseJSON(raw);
     if (newPrompts && Object.keys(newPrompts).length > 0) {
       prompts = newPrompts;
@@ -2721,7 +2715,9 @@ async function translatePrompts(targetLang) {
   } catch (e) {
     console.error('Translation failed:', e);
     let errorMsg = String(e.message || e).toLowerCase();
-    if (errorMsg.includes("invalid_api_key")) {
+    if (errorMsg.includes("quota_exceeded")) {
+        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
+    } else if (errorMsg.includes("invalid_api_key")) {
         openSettingsModal();
         toast(lang==='fr'?'Clé API requise pour la traduction.':'API Key required for translation.');
     } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
@@ -2741,22 +2737,18 @@ function initDZ(){
   const dz = document.getElementById('dz');
   const fi = document.getElementById('fi');
 
-  // Block browser default for drag-drop on the whole window
   window.addEventListener('dragover', e => e.preventDefault(), false);
   window.addEventListener('drop',     e => e.preventDefault(), false);
 
-  // Click: open file picker unless clicking the remove button
   dz.addEventListener('click', (e) => {
     if (e.target.closest('.rmbtn')) return;
     fi.click();
   });
 
-  // Drag visual feedback
   dz.addEventListener('dragenter', (e) => { e.preventDefault(); dz.classList.add('over'); });
   dz.addEventListener('dragover',  (e) => { e.preventDefault(); dz.classList.add('over'); });
   dz.addEventListener('dragleave', (e) => { e.preventDefault(); dz.classList.remove('over'); });
 
-  // Drop: add files
   dz.addEventListener('drop', (e) => {
     e.preventDefault();
     dz.classList.remove('over');
@@ -2765,7 +2757,6 @@ function initDZ(){
     }
   });
 
-  // File input change
   fi.addEventListener('change', e => {
     if (e.target.files && e.target.files.length > 0) addFiles(e.target.files);
     fi.value = '';
@@ -2827,7 +2818,7 @@ function addFiles(files){
       img.onload = () => {
         const canvas = document.createElement('canvas');
         let w = img.width, h = img.height;
-        const maxDim = 800; 
+        const maxDim = 512; // ULTRA COMPRESSION TO SAVE API QUOTAS
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
           else { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -2835,9 +2826,9 @@ function addFiles(files){
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        // Explicitly format as PNG to guarantee format compatibility with Gemini 2.5 vision
-        const compUrl = canvas.toDataURL('image/png');
-        uploads.push({name: f.name, dataUrl: compUrl, b64: compUrl.split(',')[1], mime: 'image/png'});
+        // Explicitly compress image to JPEG 60% to save MASSIVE API tokens
+        const compUrl = canvas.toDataURL('image/jpeg', 0.6);
+        uploads.push({name: f.name, dataUrl: compUrl, b64: compUrl.split(',')[1], mime: 'image/jpeg'});
         
         loadedCount++;
         if(loadedCount === validFiles.length) {
@@ -2896,7 +2887,10 @@ async function aiDescribeImages(){
     console.error("AI Describe Failed", e);
     let errorMsg = String(e.message || e).toLowerCase();
     
-    if (errorMsg.includes("invalid_api_key")) {
+    if (errorMsg.includes("quota_exceeded")) {
+        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
+        lbl.textContent=lang==='fr'?'Quota dépassé':'Quota Exceeded';
+    } else if (errorMsg.includes("invalid_api_key")) {
         openSettingsModal();
         toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
         lbl.textContent=lang==='fr'?'Clé manquante':'Key missing';
@@ -2930,7 +2924,7 @@ async function analyseImageHints(){
       "composition": "<composition type, e.g. Wide Shot, Close Up...>"
     }`;
     
-    const raw = await callGeminiVision(prompt, uploads, null, false);
+    const raw = await callGeminiVision(prompt, uploads, null, true);
     const detected = parseJSON(raw);
     hideLoad();
     showHints(detected);
@@ -2938,7 +2932,9 @@ async function analyseImageHints(){
     hideLoad();
     console.error("Hints failed", e);
     let errorMsg = String(e.message || e).toLowerCase();
-    if (errorMsg.includes("invalid_api_key")) {
+    if (errorMsg.includes("quota_exceeded")) {
+        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
+    } else if (errorMsg.includes("invalid_api_key")) {
         openSettingsModal();
         toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
     } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
@@ -3295,7 +3291,8 @@ async function getSuggestions(){
     const sys=`You are an elite creative director and art director. Given a concept, return ONLY a valid JSON array of 3 creative variations. Each variation should: (1) reinterpret the concept from a different artistic/emotional angle, (2) include a specific visual mood and lighting direction, (3) be 40-60 words. Make each variation genuinely distinct — different style, angle, and emotional register. Return ONLY the JSON array, no markdown: ["variation 1","variation 2","variation 3"].`;
     const prompt = `Give me 3 creative variations of: "${subj}"\nOutput language: ${lang==='fr'?'French':'English'}`;
     
-    const raw = await callGeminiText(prompt, sys, false);
+    const schema = { type: "ARRAY", items: { type: "STRING" } };
+    const raw = await callGeminiText(prompt, sys, true, schema);
     let suggestions=parseJSON(raw);
     
     if (suggestions && !Array.isArray(suggestions) && typeof suggestions === 'object') {
@@ -3315,7 +3312,9 @@ async function getSuggestions(){
   }catch(e){
     console.error(e);
     let errorMsg = String(e.message || e).toLowerCase();
-    if (errorMsg.includes("invalid_api_key")) {
+    if (errorMsg.includes("quota_exceeded")) {
+        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
+    } else if (errorMsg.includes("invalid_api_key")) {
         openSettingsModal();
         toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
     } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
