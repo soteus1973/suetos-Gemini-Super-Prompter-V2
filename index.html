@@ -1582,11 +1582,9 @@ select.sinp { -webkit-appearance: none; appearance: none; }
     <div style="margin-bottom:24px;">
       <label class="modal-label" id="settings-lbl-model">AI Model (If using API key)</label>
       <select class="modal-inp" id="st-model" style="margin-bottom:0; cursor:pointer;">
+        <option value="gemini-2.0-flash">Gemini 2.0 Flash (Recommended)</option>
         <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
         <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
       </select>
     </div>
 
@@ -2197,7 +2195,8 @@ function getActiveKey() {
 function getGeminiModel() {
   if (!hasApiKey()) return 'gemini-2.5-flash-preview-09-2025'; // Canvas environment
   const saved = localStorage.getItem('suetos_api_model');
-  if (saved) return saved;
+  // Force fallback to flash if a pro model was previously saved
+  if (saved && !saved.includes('pro')) return saved;
   return 'gemini-2.0-flash'; // Safe default
 }
 
