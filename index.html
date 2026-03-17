@@ -3302,7 +3302,12 @@ async function getSuggestions(){
   btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';
   btn.disabled=true;
   try{
-    const sys=`You are an elite creative director and art director. Given a concept, return ONLY a valid JSON array of 3 creative variations. Each variation should: (1) reinterpret the concept from a different artistic/emotional angle, (2) include a specific visual mood and lighting direction, (3) be 40-60 words. Make each variation genuinely distinct — different style, angle, and emotional register. Return ONLY the JSON array, no markdown: ["variation 1","variation 2","variation 3"].`;
+    const sys=`You are an elite creative director and art director. Given a concept, return ONLY a valid JSON array of 3 creative variations.
+    CRITICAL RULES:
+    1. STRICTLY PRESERVE the core physical subject. Do NOT mutate, deform, or change the fundamental nature/shape of the object or person.
+    2. Focus the variations purely on different CINEMATOGRAPHY, LIGHTING, ENVIRONMENTS, and MOODS (e.g., change the background, time of day, studio setup, color grading, or lighting style).
+    3. Keep each variation highly descriptive, realistic, professional, and between 30-60 words.
+    Return ONLY the JSON array, no markdown: ["variation 1","variation 2","variation 3"].`;
     const prompt = `Give me 3 creative variations of: "${subj}"\nOutput language: ${lang==='fr'?'French':'English'}`;
     
     const schema = { type: "ARRAY", items: { type: "STRING" } };
