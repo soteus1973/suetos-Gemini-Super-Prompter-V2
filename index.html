@@ -2399,39 +2399,51 @@ function autoAdaptMJParams() {
   const subj  = sel.subj.toLowerCase();
 
   // ── MEDIUM PRESETS ──
+  // Pure photography → raw, high realism
   if (['B&W Photo','Photorealism','Street Photo','Photo Pro HD'].includes(style)) {
     sel.mjRaw = true; sel.mjStylize = 80; sel.mjChaos = 0; sel.mjWeird = 0;
   }
+  // Cinematic → slightly stylized realism
   else if (style === 'Cinematic') {
     sel.mjRaw = true; sel.mjStylize = 120; sel.mjChaos = 3;
   }
+  // Architecture → precision, no chaos
   else if (style === 'Architecture') {
     sel.mjRaw = true; sel.mjStylize = 60; sel.mjChaos = 0;
   }
+  // Anime / Niji
   else if (style === 'Anime') {
     sel.mjVersion = '--niji 7'; sel.mjStylize = 300; sel.mjChaos = 0;
   }
+  // Illustration styles
   else if (['Illustration','Watercolor','Fine Art'].includes(style)) {
     sel.mjStylize = 280; sel.mjChaos = 5;
   }
+  // Impressionism — painterly, some chaos
   else if (style === 'Impressionism') {
     sel.mjStylize = 350; sel.mjChaos = 15; sel.mjWeird = 100;
   }
+  // Concept Art
   else if (style === 'Concept Art') {
     sel.mjStylize = 320; sel.mjChaos = 8;
   }
+  // Cyberpunk — high stylize + weird
   else if (style === 'Cyberpunk') {
     sel.mjStylize = 400; sel.mjChaos = 12; sel.mjWeird = 200;
   }
+  // Octane 3D — rich, high stylize
   else if (style === 'Octane 3D') {
     sel.mjStylize = 350; sel.mjChaos = 0;
   }
+  // Surrealism — max weird
   else if (style === 'Surrealism') {
     sel.mjStylize = 300; sel.mjChaos = 20; sel.mjWeird = 500;
   }
+  // Pop Art — punchy, some chaos
   else if (style === 'Pop Art') {
     sel.mjStylize = 250; sel.mjChaos = 15; sel.mjWeird = 150;
   }
+  // Minimalism — very low stylize
   else if (style === 'Minimalism') {
     sel.mjStylize = 40; sel.mjChaos = 0; sel.mjWeird = 0;
   }
@@ -2454,6 +2466,8 @@ function autoAdaptMJParams() {
   sel.mjWeird   = Math.min(3000, Math.max(0,   sel.mjWeird));
 }
 
+
+
 function brief(){
   const t=T[lang];
   const style=(sel.siIdx>0&&t.styles[sel.siIdx])||'none';
@@ -2465,6 +2479,7 @@ function brief(){
   const ar=(sel.ar&&sel.ar!=='Auto')?sel.ar:'free';
   const op=(sel.op&&sel.op!=='None')?sel.op:'unspecified';
 
+  // Infer subject category for art direction hints
   const subj = sel.subj.toLowerCase();
   let subjectHint = '';
   if (/portrait|person|model|woman|man|face|girl|boy|human/.test(subj)) subjectHint = 'SUBJECT CATEGORY: Portrait/Human — prioritize skin, expression, gaze, hair, garment';
@@ -2555,6 +2570,7 @@ function buildSysWithCustomTools(){
 }
 
 async function generate(){
+  if(!requireApiKey())return;
   autoAdaptMJParams();
   showLoad(T[lang].ltxt,T[lang].lsub);
   try{
@@ -2631,6 +2647,7 @@ async function refine(){
 
 // ── AUTO-FILL (Baguette Magique) ──
 async function triggerMagicWand() {
+  if(!requireApiKey())return;
   const subj = document.getElementById('inp-subj').value.trim();
   if(!subj){ toast(T[lang].eSubj); return; }
   
@@ -2858,6 +2875,7 @@ function rmFile(i, e){
 // ══ AI DESCRIBE ══
 async function aiDescribeImages(){
   if(!uploads.length)return;
+  if(!requireApiKey())return;
   const btn=document.getElementById('btn-ai-describe');
   const lbl=document.getElementById('ai-describe-lbl');
   btn.classList.add('loading');
@@ -2912,6 +2930,7 @@ async function aiDescribeImages(){
 // ══ REFERENCE IMAGE HINTS ══
 async function analyseImageHints(){
   if(!uploads.length)return;
+  if(!requireApiKey())return;
   showLoad(T[lang].htxt,T[lang].hsub);
   try{
     const prompt = `Analyze ${uploads.length > 1 ? 'these images' : 'this image'} and return a JSON object with detected visual characteristics. Return ONLY valid JSON, no markdown formatting. No line breaks inside string values.
@@ -3280,6 +3299,7 @@ let toastT;
 function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),3000);}
 
 async function getSuggestions(){
+  if(!requireApiKey())return;
   const subj=document.getElementById('inp-subj').value.trim();
   if(!subj){toast(T[lang].eSubj);return;}
   const btn=document.getElementById('btn-sug');
