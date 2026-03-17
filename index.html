@@ -2285,23 +2285,23 @@ async function fetchGeminiWithBackoff(url, payload) {
           }
           
           const err = new Error(msg);
-          err.status = response.status;
-          throw err;
-      }
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    } catch (e) {
-      if (e.status >= 400 && e.status < 500 && e.status !== 429) {
-          throw e; 
-      }
-      if (i === retries - 1) throw e;
-      await new Promise(r => setTimeout(r, delay));
-      delay *= 2;
+      err.status = response.status;
+      throw err;
     }
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  } catch (e) {
+    if (e.status >= 400 && e.status < 500 && e.status !== 429) {
+        throw e; 
+    }
+    if (i === retries - 1) throw e;
+    await new Promise(r => setTimeout(r, delay));
+    delay *= 2;
   }
 }
+}
 
-function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
+async function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
   if (systemInstruction) {
@@ -2316,7 +2316,7 @@ function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = nu
   return fetchGeminiWithBackoff(url, payload);
 }
 
-function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
+async function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const parts = [{ text: prompt }];
   images.forEach(img => {
@@ -2570,7 +2570,6 @@ function buildSysWithCustomTools(){
 }
 
 async function generate(){
-  if(!requireApiKey())return;
   autoAdaptMJParams();
   showLoad(T[lang].ltxt,T[lang].lsub);
   try{
@@ -2647,7 +2646,6 @@ async function refine(){
 
 // ── AUTO-FILL (Baguette Magique) ──
 async function triggerMagicWand() {
-  if(!requireApiKey())return;
   const subj = document.getElementById('inp-subj').value.trim();
   if(!subj){ toast(T[lang].eSubj); return; }
   
@@ -2875,7 +2873,6 @@ function rmFile(i, e){
 // ══ AI DESCRIBE ══
 async function aiDescribeImages(){
   if(!uploads.length)return;
-  if(!requireApiKey())return;
   const btn=document.getElementById('btn-ai-describe');
   const lbl=document.getElementById('ai-describe-lbl');
   btn.classList.add('loading');
@@ -2930,7 +2927,6 @@ async function aiDescribeImages(){
 // ══ REFERENCE IMAGE HINTS ══
 async function analyseImageHints(){
   if(!uploads.length)return;
-  if(!requireApiKey())return;
   showLoad(T[lang].htxt,T[lang].hsub);
   try{
     const prompt = `Analyze ${uploads.length > 1 ? 'these images' : 'this image'} and return a JSON object with detected visual characteristics. Return ONLY valid JSON, no markdown formatting. No line breaks inside string values.
@@ -3299,7 +3295,6 @@ let toastT;
 function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),3000);}
 
 async function getSuggestions(){
-  if(!requireApiKey())return;
   const subj=document.getElementById('inp-subj').value.trim();
   if(!subj){toast(T[lang].eSubj);return;}
   const btn=document.getElementById('btn-sug');
