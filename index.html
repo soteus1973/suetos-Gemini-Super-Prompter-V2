@@ -2167,48 +2167,116 @@ async function testApiConnection() {
     btn.disabled = true;
 
     const container = document.getElementById('detected-models');
-    container.innerHTML = `<span style="font-size:11px; color:var(--ghost);">${lang==='fr'?'Recherche des modèles...':'Detecting models...'}</span>`;
+    container.innerHTML = `<span style="font-size:11px; color:var(--ghost);">${lang==='fr'?'Recherche et test des modèles...':'Detecting and testing models...'}</span>`;
 
     try {
+        // 1. Fetch available models
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
         if (!res.ok) throw new Error("Invalid Key or Network Error");
         const data = await res.json();
 
-        // Filter valid gemini models that support generation
+        // 2. Filter for Flash/Lite models
         const models = data.models.filter(m =>
             m.name.includes('gemini') &&
+            (m.name.includes('flash') || m.name.includes('lite')) &&
+            !m.name.includes('vision') && // ignore old vision-only models
             m.supportedGenerationMethods &&
             m.supportedGenerationMethods.includes('generateContent')
         );
 
         if (models.length === 0) {
-            container.innerHTML = `<span style="color:var(--rose-lt); font-size:11px;">${lang==='fr'?'Aucun modèle génératif trouvé.':'No generative models found.'}</span>`;
+            container.innerHTML = `<span style="color:var(--rose-lt); font-size:11px;">${lang==='fr'?'Aucun modèle Flash trouvé.':'No Flash models found.'}</span>`;
             return;
         }
 
-        container.innerHTML = '';
-        models.forEach(m => {
+        // Limit to 5 models to avoid rate limiting during the test
+        const modelsToTest = models.slice(0, 5);
+        container.innerHTML = `<span style="font-size:11px; color:var(--ghost);">${lang==='fr'?`Test en direct de ${modelsToTest.length} modèles...`:`Live testing ${modelsToTest.length} models...`}</span>`;
+
+        // 3. Perform a LIVE FIRE test on each model concurrently
+        const testResults = await Promise.all(modelsToTest.map(async (m) => {
             const shortName = m.name.replace('models/', '');
+            try {
+                const testRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${shortName}:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: "user", parts: [{ text: "Hi" }] }],
+                        generationConfig: { maxOutputTokens: 5 } // Micro payload
+                    })
+                });
+                if (testRes.ok) {
+                    return { name: shortName, working: true };
+                } else {
+                    const err = await testRes.json();
+                    return { name: shortName, working: false, reason: err.error?.message || `HTTP ${testRes.status}` };
+                }
+            } catch(e) {
+                return { name: shortName, working: false, reason: 'Network/CORS' };
+            }
+        }));
+
+        // 4. Render results
+        container.innerHTML = '';
+        let selected = false;
+
+        testResults.forEach(r => {
             const badge = document.createElement('div');
             badge.className = 'tbadge';
-            badge.style.cursor = 'pointer';
-            badge.style.border = '1px solid rgba(255,255,255,0.1)';
-            badge.style.background = 'var(--lift)';
-            badge.style.color = 'var(--silver)';
+            badge.style.cursor = r.working ? 'pointer' : 'not-allowed';
             badge.style.marginBottom = '4px';
-            badge.textContent = shortName;
-            badge.onclick = () => {
-                document.getElementById('st-model').value = shortName;
-                Array.from(container.children).forEach(c => {
-                    c.style.borderColor = 'rgba(255,255,255,0.1)';
-                    c.style.color = 'var(--silver)';
-                });
-                badge.style.borderColor = 'var(--gold)';
-                badge.style.color = 'var(--gold-lt)';
-            };
+            badge.style.display = 'flex';
+            badge.style.alignItems = 'center';
+            badge.style.gap = '4px';
+            badge.title = r.working ? 'Working!' : r.reason;
+
+            if (r.working) {
+                // Working model style (Green/Gold)
+                badge.style.border = '1px solid rgba(48,160,112,0.3)';
+                badge.style.background = 'rgba(48,160,112,0.1)';
+                badge.style.color = 'var(--jade)';
+                badge.innerHTML = `<i class="fa-solid fa-check"></i> ${r.name}`;
+                
+                // Auto-select the first working model
+                if (!selected) {
+                    document.getElementById('st-model').value = r.name;
+                    badge.style.borderColor = 'var(--gold)';
+                    badge.style.color = 'var(--gold-lt)';
+                    badge.style.background = 'rgba(201,160,64,0.15)';
+                    selected = true;
+                }
+
+                badge.onclick = () => {
+                    document.getElementById('st-model').value = r.name;
+                    // Reset all other working badges to green, set clicked to gold
+                    Array.from(container.children).forEach(c => {
+                        if(c.dataset.working === 'true') {
+                            c.style.border = '1px solid rgba(48,160,112,0.3)';
+                            c.style.color = 'var(--jade)';
+                            c.style.background = 'rgba(48,160,112,0.1)';
+                        }
+                    });
+                    badge.style.border = '1px solid var(--gold)';
+                    badge.style.color = 'var(--gold-lt)';
+                    badge.style.background = 'rgba(201,160,64,0.15)';
+                };
+            } else {
+                // Failed model style (Greyed out)
+                badge.style.border = '1px solid rgba(255,255,255,0.05)';
+                badge.style.background = 'rgba(0,0,0,0.2)';
+                badge.style.color = 'var(--ghost)';
+                badge.innerHTML = `<i class="fa-solid fa-xmark"></i> <span style="text-decoration:line-through">${r.name}</span>`;
+            }
+            badge.dataset.working = r.working;
             container.appendChild(badge);
         });
-        toast(lang==='fr' ? 'Connexion réussie !' : 'Connection successful!');
+
+        if (selected) {
+            toast(lang==='fr' ? 'Modèles testés avec succès !' : 'Models tested successfully!');
+        } else {
+            toast(lang==='fr' ? 'Aucun modèle fonctionnel trouvé.' : 'No working models found.');
+        }
+
     } catch (e) {
         container.innerHTML = `<span style="color:var(--rose-lt); font-size:11px;"><i class="fa-solid fa-triangle-exclamation"></i> ${lang==='fr'?'Erreur de connexion. Vérifiez la clé.':'Connection failed. Check key.'}</span>`;
     } finally {
