@@ -1582,9 +1582,9 @@ select.sinp { -webkit-appearance: none; appearance: none; }
     <div style="margin-bottom:24px;">
       <label class="modal-label" id="settings-lbl-model">AI Model (If using API key)</label>
       <select class="modal-inp" id="st-model" style="margin-bottom:0; cursor:pointer;">
-        <option value="gemini-2.0-flash">Gemini 2.0 Flash (Recommended)</option>
-        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Global & Stable)</option>
+        <option value="gemini-2.0-flash">Gemini 2.0 Flash (New)</option>
+        <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash-8B (Fastest)</option>
       </select>
     </div>
 
@@ -2194,9 +2194,16 @@ function getActiveKey() {
 
 function getGeminiModel() {
   if (!hasApiKey()) return 'gemini-2.5-flash-preview-09-2025'; // Canvas environment
-  const saved = localStorage.getItem('suetos_api_model');
-  // Force fallback to flash if a pro model was previously saved
-  if (saved && !saved.includes('pro')) return saved;
+  let saved = localStorage.getItem('suetos_api_model');
+  if (saved) {
+      saved = saved.trim();
+      // Purge invalid/fake models from previous buggy versions
+      if (saved === 'gemini-2.5-flash' || saved === 'gemini-2.5-pro' || saved.includes('pro')) {
+          saved = 'gemini-1.5-flash';
+          localStorage.setItem('suetos_api_model', saved);
+      }
+      return saved;
+  }
   return 'gemini-1.5-flash'; // Safe default
 }
 
@@ -2276,7 +2283,7 @@ async function fetchGeminiWithBackoff(url, payload) {
           if (response.status === 400) throw new Error(`HTTP 400 Bad Request: ${msg}`);
           if (response.status === 403) throw new Error(`HTTP 403: Check API Key, ensure 'Generative Language API' is enabled, and remove website restrictions.`);
           if (response.status === 401) throw new Error(`INVALID_API_KEY: ${msg}`);
-          if (response.status === 404) throw new Error(`HTTP 404: Model not found. Select a different model in settings.`);
+          if (response.status === 404) throw new Error(`HTTP 404: Model not found. Ensure key is from aistudio.google.com and switch models.`);
           
           throw new Error(`HTTP ${response.status}: ${msg}`);
       }
@@ -2315,7 +2322,7 @@ function handleApiError(e, customMsg = '') {
         toast(lang==='fr' ? 'Vérifiez votre clé API et activez l\'API.' : 'Check API Key and enable API access.');
     } else if (msg.includes("404")) {
         openSettingsModal();
-        toast(lang==='fr' ? 'Modèle IA introuvable. Changez-le (🔑).' : 'Model not found. Change it (🔑).');
+        toast(lang==='fr' ? 'Modèle IA introuvable (Vérifiez la clé sur aistudio.google.com).' : 'Model not found (Ensure key is from aistudio.google.com).');
     } else if (msg.includes("Safety")) {
         toast(lang==='fr' ? 'Image bloquée par les filtres de sécurité IA.' : 'Blocked by AI safety filters.');
     } else {
