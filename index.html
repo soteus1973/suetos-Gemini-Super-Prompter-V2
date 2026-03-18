@@ -3575,12 +3575,15 @@ function setView(viewMode) {
   if(viewMode === 'stack') {
     document.getElementById('vbtn-stack').classList.add('on');
     document.getElementById('stack-view').style.display = 'block';
-    document.getElementById('compare-view').style.display = 'none';
   } else {
     document.getElementById('vbtn-compare').classList.add('on');
-    document.getElementById('stack-view').style.display = 'none';
-    document.getElementById('compare-view').style.display = 'block';
+    document.getElementById('compare-modal').classList.add('on');
   }
+}
+
+function closeCompareModal() {
+    document.getElementById('compare-modal').classList.remove('on');
+    setView('stack'); // Automatically switches back to the "Stacked" view
 }
 
 function getDiffHtml(baseText, compareText) {
@@ -3596,6 +3599,36 @@ function getDiffHtml(baseText, compareText) {
         }
     });
     return result;
+}
+
+function openPromptModal(el) {
+    const tool = el.getAttribute('data-tool');
+    const badge = el.getAttribute('data-badge');
+    const prompt = el.getAttribute('data-prompt');
+    
+    document.getElementById('prompt-modal-title').textContent = tool;
+    document.getElementById('prompt-modal-badge').textContent = badge;
+    document.getElementById('prompt-modal-text').textContent = prompt;
+    document.getElementById('prompt-modal').classList.add('on');
+}
+
+function closePromptModal() {
+    document.getElementById('prompt-modal').classList.remove('on');
+}
+
+function copyFromPromptModal() {
+    const text = document.getElementById('prompt-modal-text').textContent;
+    const btn = document.getElementById('prompt-btn-copy');
+    navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> ${T[lang].lokd}`;
+        btn.classList.add('ok');
+        setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('ok'); }, 2000);
+        toast(T[lang].eCopy);
+    }).catch(() => {
+        const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        toast(T[lang].eCopy);
+    });
 }
 
 function renderCompareView(data) {
@@ -3633,7 +3666,10 @@ function renderCompareView(data) {
                 </div>
                 <div class="compare-col-body">
                     <div class="compare-lbl">${T[lang].ldet}</div>
-                    <div class="compare-prompt">${promptHtml}</div>
+                    <div class="compare-prompt clickable" style="cursor:zoom-in; position:relative;" onclick="openPromptModal(this)" data-tool="${escHtml(tool.name)}" data-badge="${escHtml(tool.badge)}" data-prompt="${escHtml(d.detailed || '')}">
+                        <div class="expand-icon" style="position:absolute; top:12px; right:14px; opacity:0.4; font-size:13px; transition:var(--trans);"><i class="fa-solid fa-expand"></i></div>
+                        ${promptHtml}
+                    </div>
                     ${d.short ? `<div class="compare-lbl">${T[lang].lshort}</div><div class="compare-prompt" style="opacity:0.8">${escHtml(d.short)}</div>` : ''}
                 </div>
             </div>
