@@ -1691,7 +1691,7 @@ select.sinp { -webkit-appearance: none; appearance: none; }
             <button class="btn-ai-describe" id="btn-ai-describe" onclick="aiDescribeImages()"><i class="fa-solid fa-eye"></i><span id="ai-describe-lbl">AI Analyze Images</span></button>
             <button class="btn-magic" id="btn-magic" onclick="triggerMagicWand()"><i class="fa-solid fa-wand-magic-sparkles"></i><span id="ai-magic-lbl">Magic Wand (Auto-Fill)</span></button>
         </div>
-        <div class="img-size-notice" id="img-size-notice"><i class="fa-solid fa-bolt"></i><span id="img-opt-txt"> Images are automatically compressed and optimized</span></div>
+        <div class="img-size-notice" id="img-size-notice"><i class="fa-solid fa-bolt"></i><span id="img-opt-txt"> Images are ultra-compressed to save API quota</span></div>
         
         <div class="hint-box" id="hint-box">
           <div class="hint-box-hdr"><i class="fa-solid fa-wand-magic-sparkles"></i><span id="hint-lbl">Detected tags — click to apply</span></div>
@@ -2197,7 +2197,7 @@ function getGeminiModel() {
   const saved = localStorage.getItem('suetos_api_model');
   // Force fallback to flash if a pro model was previously saved
   if (saved && !saved.includes('pro')) return saved;
-  return 'gemini-2.0-flash'; // Safe default
+  return 'gemini-1.5-flash'; // Safe default
 }
 
 function openSettingsModal() {
@@ -2206,7 +2206,7 @@ function openSettingsModal() {
   document.getElementById('st-eye-icon').className = 'fa-regular fa-eye';
   
   const mod = document.getElementById('st-model');
-  if(mod) mod.value = localStorage.getItem('suetos_api_model') || 'gemini-2.0-flash';
+  if(mod) mod.value = localStorage.getItem('suetos_api_model') || 'gemini-1.5-flash';
 
   document.getElementById('settings-desc').textContent = lang==='fr'?'Entrez votre propre clé API Gemini (laissez vide pour utiliser l\'IA intégrée gratuite).':'Enter your own Gemini API key (leave empty to use the free built-in AI).';
   document.getElementById('settings-modal').classList.add('on');
@@ -2256,7 +2256,7 @@ function extractErrorMessage(errData, status) {
 }
 
 async function fetchGeminiWithBackoff(url, payload) {
-  let retries = 5;
+  let retries = 3;
   let delay = 1000;
   for (let i = 0; i < retries; i++) {
     try {
@@ -2270,38 +2270,60 @@ async function fetchGeminiWithBackoff(url, payload) {
       if (!response.ok) {
           let errData;
           try { errData = await response.json(); } catch(e) {}
-          
           const msg = extractErrorMessage(errData, response.status);
-          console.error("Gemini API Error:", response.status, msg, errData);
-
-          if (response.status === 429) {
-              throw new Error("QUOTA_EXCEEDED");
-          }
-
-          if (response.status === 401 || response.status === 403 || msg.toLowerCase().includes('api key')) {
-              const err = new Error("INVALID_API_KEY: " + msg);
-              err.status = response.status;
-              throw err;
-          }
           
-          const err = new Error(msg);
-      err.status = response.status;
-      throw err;
+          if (response.status === 429) throw new Error("QUOTA_EXCEEDED");
+          if (response.status === 400) throw new Error(`HTTP 400 Bad Request: ${msg}`);
+          if (response.status === 403) throw new Error(`HTTP 403: Check API Key, ensure 'Generative Language API' is enabled, and remove website restrictions.`);
+          if (response.status === 401) throw new Error(`INVALID_API_KEY: ${msg}`);
+          if (response.status === 404) throw new Error(`HTTP 404: Model not found. Select a different model in settings.`);
+          
+          throw new Error(`HTTP ${response.status}: ${msg}`);
+      }
+      
+      const data = await response.json();
+      
+      // Safety block detection
+      if (data.promptFeedback && data.promptFeedback.blockReason) {
+          throw new Error(`Blocked by AI Safety: ${data.promptFeedback.blockReason}`);
+      }
+      if (data.candidates && data.candidates.length > 0 && data.candidates[0].finishReason === 'SAFETY') {
+          throw new Error("Blocked by AI Safety Filters");
+      }
+      
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    } catch (e) {
+      if (e.message.includes('403') || e.message.includes('401') || e.message.includes('404') || e.message.includes('400') || e.message.includes('Safety') || e.message.toLowerCase().includes('failed to fetch')) {
+          throw e; 
+      }
+      if (i === retries - 1) throw e;
+      await new Promise(r => setTimeout(r, delay));
+      delay *= 2;
     }
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  } catch (e) {
-    if (e.status >= 400 && e.status < 500 && e.status !== 429) {
-        throw e; 
-    }
-    if (i === retries - 1) throw e;
-    await new Promise(r => setTimeout(r, delay));
-    delay *= 2;
   }
 }
+
+function handleApiError(e, customMsg = '') {
+    console.error("API Error:", e);
+    let msg = String(e.message || "Unknown error");
+    if (msg.toLowerCase().includes("failed to fetch")) {
+        toast(lang==='fr' ? 'Erreur réseau (CORS). Retirez les restrictions de votre clé API Google.' : 'Network Error (CORS). Remove restrictions from your Google API Key.');
+    } else if (msg.includes("QUOTA_EXCEEDED") || msg.includes("429")) {
+        toast(lang==='fr' ? 'Quota API dépassé (ou facturation requise en Europe).' : 'API Quota exceeded (or EU Free Tier blocked).');
+    } else if (msg.includes("INVALID_API_KEY") || msg.includes("401") || msg.includes("403")) {
+        openSettingsModal();
+        toast(lang==='fr' ? 'Vérifiez votre clé API et activez l\'API.' : 'Check API Key and enable API access.');
+    } else if (msg.includes("404")) {
+        openSettingsModal();
+        toast(lang==='fr' ? 'Modèle IA introuvable. Changez-le (🔑).' : 'Model not found. Change it (🔑).');
+    } else if (msg.includes("Safety")) {
+        toast(lang==='fr' ? 'Image bloquée par les filtres de sécurité IA.' : 'Blocked by AI safety filters.');
+    } else {
+        toast(customMsg ? customMsg : `API Error: ${msg.slice(0,50)}`);
+    }
 }
 
-async function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
+function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
   if (systemInstruction) {
@@ -2316,7 +2338,7 @@ async function callGeminiText(prompt, systemInstruction, jsonMode = false, schem
   return fetchGeminiWithBackoff(url, payload);
 }
 
-async function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
+function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const parts = [{ text: prompt }];
   images.forEach(img => {
@@ -2589,21 +2611,12 @@ async function generate(){
     renderResults(prompts);
   }catch(e){
     hideLoad();
-    console.error("Generate Error:", e);
-    let errorMsg = String(e.message || e).toLowerCase();
-    
-    if (errorMsg.includes("quota_exceeded")) {
-        toast(lang==='fr'?'Quota API dépassé pour aujourd\'hui.':'API Quota exceeded for today.');
-    } else if (errorMsg.includes("invalid_api_key")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Clé API Google Gemini invalide ou requise.':'Google Gemini API Key invalid or required.');
-    } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Modèle IA incompatible. Modifiez (🔑).':'Incompatible AI model. Change it (🔑).');
-    } else {
-        if(step!==STEPS){step=5;ui();}
-        document.getElementById('errtxt').textContent = "API Error: " + errorMsg.slice(0,100);
-        document.getElementById('errbox').classList.add('on');
+    if(step!==STEPS && !e.message.includes('401') && !e.message.includes('403') && !e.message.includes('404')){step=5;ui();}
+    handleApiError(e);
+    const errbox = document.getElementById('errbox');
+    if (errbox) {
+        document.getElementById('errtxt').textContent = "API Error: " + e.message.slice(0,100);
+        errbox.classList.add('on');
     }
   }
 }
@@ -2627,19 +2640,7 @@ async function refine(){
     renderResults(prompts);
     document.getElementById('rfinp').value='';
   }catch(e){
-      console.error(e);
-      let errorMsg = String(e.message || e).toLowerCase();
-      if (errorMsg.includes("quota_exceeded")) {
-          toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
-      } else if (errorMsg.includes("invalid_api_key")) {
-          openSettingsModal();
-          toast(lang==='fr'?'Clé API Google Gemini requise.':'Google Gemini API Key required.');
-      } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
-          openSettingsModal();
-          toast(lang==='fr'?'Modèle IA incompatible. Modifiez (🔑).':'Incompatible AI model. Change it (🔑).');
-      } else {
-          toast(T[lang].eApi);
-      }
+      handleApiError(e);
   }
   hideLoad();btn.disabled=false;
 }
@@ -2689,19 +2690,7 @@ async function triggerMagicWand() {
       }, 500);
 
   } catch(e) {
-      console.error(e);
-      let errorMsg = String(e.message || e).toLowerCase();
-      if (errorMsg.includes("quota_exceeded")) {
-          toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
-      } else if (errorMsg.includes("invalid_api_key")) {
-          openSettingsModal();
-          toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
-      } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
-          openSettingsModal();
-          toast(lang==='fr'?'Modèle IA incompatible. Modifiez (🔑).':'Incompatible AI model. Change it (🔑).');
-      } else {
-          toast(lang==='fr'?'Erreur de baguette magique.':'Magic fill failed.');
-      }
+      handleApiError(e);
       btn.innerHTML = origHtml;
   } finally {
       btn.classList.remove('loading');
@@ -2727,19 +2716,7 @@ async function translatePrompts(targetLang) {
       toast(targetLang === 'fr' ? 'Prompts traduits avec succès !' : 'Prompts successfully translated!');
     }
   } catch (e) {
-    console.error('Translation failed:', e);
-    let errorMsg = String(e.message || e).toLowerCase();
-    if (errorMsg.includes("quota_exceeded")) {
-        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
-    } else if (errorMsg.includes("invalid_api_key")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Clé API requise pour la traduction.':'API Key required for translation.');
-    } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Modèle IA incompatible. Modifiez (🔑).':'Incompatible AI model. Change it (🔑).');
-    } else {
-        toast(targetLang === 'fr' ? 'Erreur de traduction.' : 'Translation failed.');
-    }
+    handleApiError(e, targetLang === 'fr' ? 'Erreur de traduction.' : 'Translation failed.');
     renderResults(prompts);
   } finally {
     hideLoad();
@@ -2898,24 +2875,7 @@ async function aiDescribeImages(){
     },2500);
   }catch(e){
     btn.classList.remove('loading');
-    console.error("AI Describe Failed", e);
-    let errorMsg = String(e.message || e).toLowerCase();
-    
-    if (errorMsg.includes("quota_exceeded")) {
-        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
-        lbl.textContent=lang==='fr'?'Quota dépassé':'Quota Exceeded';
-    } else if (errorMsg.includes("invalid_api_key")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
-        lbl.textContent=lang==='fr'?'Clé manquante':'Key missing';
-    } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Modèle IA incompatible. Modifiez (🔑).':'Incompatible AI model. Change it (🔑).');
-        lbl.textContent=lang==='fr'?'Modèle invalide':'Invalid Model';
-    } else {
-        lbl.textContent=lang==='fr'?'Erreur d\'analyse':'Analysis Error';
-        toast(errorMsg.slice(0, 50));
-    }
+    handleApiError(e, lang==='fr'?'Erreur d\'analyse':'Analysis Error');
     btn.style.background='#E63946';
     setTimeout(()=>{
       lbl.textContent=lang==='fr'?'AI Analyse Images':'AI Analyze Images';
@@ -2944,19 +2904,7 @@ async function analyseImageHints(){
     showHints(detected);
   }catch(e){
     hideLoad();
-    console.error("Hints failed", e);
-    let errorMsg = String(e.message || e).toLowerCase();
-    if (errorMsg.includes("quota_exceeded")) {
-        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
-    } else if (errorMsg.includes("invalid_api_key")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
-    } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Modèle IA incompatible. Modifiez (🔑).':'Incompatible AI model. Change it (🔑).');
-    } else {
-        toast(lang==='fr'?'Erreur réseau — vérifiez votre connexion':'Network error — check your connection');
-    }
+    handleApiError(e);
   }
 }
 
@@ -3329,19 +3277,7 @@ async function getSuggestions(){
     if(!Array.isArray(suggestions)||suggestions.length===0)throw new Error('Empty array');
     showSuggestions(suggestions);
   }catch(e){
-    console.error(e);
-    let errorMsg = String(e.message || e).toLowerCase();
-    if (errorMsg.includes("quota_exceeded")) {
-        toast(lang==='fr'?'Quota API dépassé.':'API Quota exceeded.');
-    } else if (errorMsg.includes("invalid_api_key")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Clé API requise (Cliquez sur 🔑)':'API Key required (Click 🔑)');
-    } else if (errorMsg.includes("is not found") || errorMsg.includes("is not supported")) {
-        openSettingsModal();
-        toast(lang==='fr'?'Modèle IA incompatible. Modifiez (🔑).':'Incompatible AI model. Change it (🔑).');
-    } else {
-        toast(lang==='fr'?'Erreur API — '+errorMsg.slice(0,30) : 'API Error — '+errorMsg.slice(0,30));
-    }
+    handleApiError(e, lang==='fr'?'Erreur de suggestion.':'Suggest failed.');
   }finally{
     btn.innerHTML=orig;
     btn.disabled=false;
@@ -3759,155 +3695,3 @@ function exportPDF() {
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
         doc.text("CONCEPT:", margin, y);
-        doc.setFont("helvetica", "normal");
-        const cLines = doc.splitTextToSize(sel.subj, maxW);
-        doc.text(cLines, margin, y + 5);
-        y += 5 + (cLines.length * 4) + 5;
-    }
-
-    doc.setFont("helvetica", "bold");
-    doc.text("STYLE:", margin, y);
-    doc.setFont("helvetica", "normal");
-    doc.text((T[lang].styles[sel.siIdx] || 'None') + (sel.sd ? ' ('+sel.sd+')' : ''), margin + 15, y);
-    y += 12;
-
-    const addText = (txt, size, isBold, color) => {
-        doc.setFont("helvetica", isBold ? "bold" : "normal");
-        doc.setFontSize(size);
-        doc.setTextColor(color[0], color[1], color[2]);
-        const lines = doc.splitTextToSize(txt, maxW);
-        const lineHeight = size * 0.4;
-        
-        if (y + (lines.length * lineHeight) > 280) {
-            doc.addPage();
-            y = 20;
-        }
-        doc.text(lines, margin, y);
-        y += lines.length * lineHeight + 2; 
-    };
-
-    const allTools=[...TOOLS,...getCustomTools()];
-    allTools.forEach(tool => {
-        let toolKey = Object.keys(prompts).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
-        let d = toolKey ? prompts[toolKey] : prompts[tool.id];
-        if(!d) return;
-        if(typeof d === 'string') d = { detailed: d, short: '', negative: '', score: null };
-
-        doc.setDrawColor(200, 200, 200);
-        doc.line(margin, y, 210 - margin, y);
-        y += 8;
-
-        let scoreTxt = d.score ? ` (${d.score}% Match)` : '';
-        addText(tool.name + scoreTxt, 14, true, [0, 0, 0]);
-        y += 2;
-
-        addText(T[lang].ldet.toUpperCase(), 9, true, [100, 100, 100]);
-        addText(d.detailed || '', 10, false, [40, 40, 40]);
-        y += 3;
-
-        if(d.short) {
-            addText(T[lang].lshort.toUpperCase(), 9, true, [100, 100, 100]);
-            addText(d.short, 10, false, [80, 80, 80]);
-            y += 3;
-        }
-        
-        if(d.negative) {
-            addText(T[lang].lneg.toUpperCase(), 9, true, [230, 57, 70]);
-            addText(d.negative, 10, false, [230, 57, 70]);
-            y += 3;
-        }
-        y += 5;
-    });
-
-    doc.save("SUETOS_Creative_Brief.pdf");
-    toast(lang==='fr'?"Brief PDF téléchargé !":"Creative Brief downloaded!");
-}
-
-// ── ART DIRECTOR LIVE PREVIEW ──
-function buildArtDirectorPreview() {
-  const card = document.getElementById('artdir-card');
-  const body = document.getElementById('artdir-body');
-  if (!card || !body) return;
-
-  const style = T['en'].styles[sel.siIdx] || 'none';
-  const light  = T['en'].lights[sel.liIdx]  || 'none';
-  const comp   = T['en'].comps[sel.ciIdx]   || 'none';
-  const op     = (sel.op && sel.op !== 'None') ? sel.op : null;
-  const subj   = sel.subj || '';
-
-  if (!subj) { card.classList.remove('on'); return; }
-  card.classList.add('on');
-
-  // Determine medium
-  const photoStyles   = ['B&W Photo','Cinematic','Photo Pro HD','Photorealism','Street Photo','Architecture'];
-  const illustStyles  = ['Anime','Illustration','Watercolor','Fine Art','Impressionism','Pop Art','Concept Art'];
-  const digitalStyles = ['Cyberpunk','Octane 3D','Minimalism','Surrealism'];
-  let medium = 'mixed', mediumLabel = '✦ Creative';
-  if (photoStyles.includes(style))    { medium = 'photo';        mediumLabel = '📷 Photography'; }
-  else if (illustStyles.includes(style)) { medium = 'illustration'; mediumLabel = '🎨 Illustration'; }
-  else if (digitalStyles.includes(style)) { medium = 'digital';     mediumLabel = '⚡ Digital/3D'; }
-
-  // MJ params summary
-  const mjSummary = [];
-  if (sel.mjVersion) mjSummary.push(sel.mjVersion);
-  if (sel.mjStylize) mjSummary.push('stylize ' + sel.mjStylize);
-  if (sel.mjChaos > 0) mjSummary.push('chaos ' + sel.mjChaos);
-  if (sel.mjWeird > 0) mjSummary.push('weird ' + sel.mjWeird);
-  if (sel.mjRaw) mjSummary.push('--style raw');
-
-  // Optics insight
-  let opticsInsight = '';
-  if (op) {
-    if (op.includes('Leica') || op.includes('Noctilux')) opticsInsight = 'Signature Leica micro-contrast, buttery smooth bokeh, 3D subject separation';
-    else if (op.includes('Hasselblad')) opticsInsight = 'Medium format rendering — extraordinary tonal depth and edge-to-edge sharpness';
-    else if (op.includes('Anamorphic') || op.includes('anamorphic')) opticsInsight = 'Oval bokeh, horizontal lens flares, cinematic widescreen rendering';
-    else if (op.includes('Macro')) opticsInsight = '1:1 magnification — microscopic textures, razor-thin depth of field, abstract scale';
-    else if (op.includes('Tilt-Shift')) opticsInsight = 'Miniature effect — selective focus plane, dreamy perspective compression';
-    else if (op.includes('Fisheye')) opticsInsight = 'Ultra-wide barrel distortion — immersive environmental compression';
-    else if (op.includes('Polaroid') || op.includes('Holga') || op.includes('Lomography')) opticsInsight = 'Lo-fi analog rendering — vignette, color shift, soft halation';
-    else if (op.includes('Infrared')) opticsInsight = 'False color rendering — foliage glows white, skies turn black, ethereal atmosphere';
-    else if (op.includes('f/0.95') || op.includes('f/1.0') || op.includes('f/1.2')) opticsInsight = 'Ultra-fast lens — extreme subject isolation, luminous low-light rendering';
-    else opticsInsight = 'Camera-specific optical signature will be embedded in all prompts';
-  }
-
-  const fr = lang === 'fr';
-  body.innerHTML = `
-    <div class="artdir-row">
-      <div class="artdir-key">${fr?'Mode artistique':'Artistic mode'}</div>
-      <span class="artdir-tag">${mediumLabel}</span>
-      ${style !== 'none' ? '<span class="artdir-tag">'+style+'</span>' : ''}
-      ${light !== 'none' ? '<span class="artdir-tag">'+light+'</span>' : ''}
-      ${comp  !== 'none' ? '<span class="artdir-tag">'+comp+'</span>' : ''}
-    </div>
-    ${op ? `<div class="artdir-row"><div class="artdir-key">${fr?'Signature optique':'Optics signature'}</div><div style="font-size:11.5px;color:var(--silver);">${opticsInsight}</div></div>` : ''}
-    <div class="artdir-row">
-      <div class="artdir-key">Midjourney params</div>
-      ${mjSummary.map(p => '<span class="artdir-tag">'+p+'</span>').join('')}
-    </div>
-  `;
-}
-
-// ══ INIT LORS DU CHARGEMENT ══
-document.addEventListener("DOMContentLoaded", () => {
-    // MAISON NOIR: dark is default — body.light = light mode opt-in
-    const savedDark = localStorage.getItem('suetos_dark');
-    if (savedDark === '0') { isDark = false; document.body.classList.add('light'); }
-    else { isDark = true; } // dark by default (no class needed)
-    document.getElementById('dark-icon').className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
-    initDZ();
-    buildPB();
-    buildSG();
-    buildLG();
-    buildCG();
-    buildAR();
-    buildOP();
-    ui(true);
-    
-    document.querySelectorAll('textarea.tinp').forEach(ta => {
-        ta.addEventListener('input', function() { autoResize(this); });
-    });
-});
-
-</script>
-</body>
-</html>
