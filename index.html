@@ -13,7 +13,6 @@
 <style>
 
 :root {
-  /* === MAISON NOIR — DARK BY DEFAULT === */
   --ink:    #0A0A0C;
   --void:   #060608;
   --deep:   #0E0E16;
@@ -27,49 +26,39 @@
   --snow:   #E8E8F0;
   --white:  #F5F5FA;
 
-  /* === CHAMPAGNE GOLD === */
   --gold:    #C9A040;
   --gold-lt: #E8C86A;
   --gold-dk: #A07820;
   --gold-glow: rgba(201,160,64,0.18);
   --gold-rgb: 201,160,64;
 
-  /* === ACCENT CRIMSON for negatives === */
   --rose:    #C04060;
   --rose-lt: #E06080;
-
-  /* === EMERALD for success === */
   --jade:    #30A070;
 
-  /* === TYPOGRAPHY === */
   --serif: 'Cormorant Garamond', 'Palatino Linotype', Palatino, Georgia, serif;
   --sans:  'DM Sans', system-ui, sans-serif;
   --mono:  'DM Mono', 'Fira Mono', monospace;
 
-  /* === SPATIAL === */
   --r-sm:   10px;
   --r-md:   16px;
   --r-lg:   24px;
   --r-xl:   32px;
 
-  /* === SHADOWS (dark) === */
   --sh-sm:   0 2px 8px rgba(0,0,0,0.4);
   --sh-md:   0 8px 24px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
   --sh-lg:   0 20px 60px rgba(0,0,0,0.7), 0 4px 16px rgba(0,0,0,0.4);
   --sh-gold: 0 0 24px rgba(201,160,64,0.15), 0 4px 16px rgba(0,0,0,0.5);
 
-  /* === BORDERS (dark) === */
   --b-dim:   1px solid rgba(255,255,255,0.05);
   --b-mid:   1px solid rgba(255,255,255,0.09);
   --b-lit:   1px solid rgba(255,255,255,0.15);
   --b-gold:  1px solid rgba(201,160,64,0.3);
 
-  /* === TRANSITIONS === */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --trans: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* LIGHT MODE override */
 body.light {
   --ink:    #1A1A2E;
   --void:   #F4F1EC;
@@ -102,13 +91,11 @@ body.light {
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── SCROLLBARS ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--mist); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--ghost); }
 
-/* ── BODY ── */
 body {
   font-family: var(--sans);
   background: var(--void);
@@ -131,7 +118,6 @@ body:not(.light) {
     radial-gradient(ellipse 50% 50% at 85% 100%, rgba(100,80,160,0.05) 0%, transparent 55%);
 }
 
-/* ── ANIMATIONS ── */
 @keyframes fadeUp    { from { opacity:0; transform:translateY(24px) scale(0.98); } to { opacity:1; transform:translateY(0) scale(1); } }
 @keyframes slideRight{ from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
 @keyframes slideLeft { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
@@ -142,7 +128,6 @@ body:not(.light) {
 @keyframes shimmer   { 0%{background-position:200% 50%} 100%{background-position:-200% 50%} }
 @keyframes goldBeat  { 0%,100%{box-shadow:0 0 0 0 rgba(201,160,64,0)} 50%{box-shadow:0 0 0 6px rgba(201,160,64,0.08)} }
 
-/* ── SHELL ── */
 .shell {
   width: 100%;
   max-width: 1040px;
@@ -154,7 +139,6 @@ body:not(.light) {
   gap: 12px;
 }
 
-/* ── HEADER ── */
 .hdr {
   display: flex;
   align-items: center;
@@ -223,7 +207,6 @@ body:not(.light) {
 
 .hdr-right { display: flex; align-items: center; gap: 6px; position: relative; z-index: 1; }
 
-/* ── ICON BUTTONS ── */
 .icon-btn, .btnhist, .lib-btn {
   background: transparent;
   border: none;
@@ -247,7 +230,6 @@ body:not(.light) {
   transform: translateY(-1px);
 }
 
-/* Language buttons */
 .lbtn {
   font-size: 10px;
   font-weight: 600;
@@ -264,7 +246,6 @@ body:not(.light) {
 .lbtn.on { color: var(--gold); background: rgba(201,160,64,0.08); border-color: rgba(201,160,64,0.25); }
 .lbtn:hover:not(.on) { color: var(--silver); background: rgba(255,255,255,0.04); }
 
-/* ── TOOLTIPS ── */
 [data-tooltip] { position: relative; }
 [data-tooltip]::before {
   content: attr(data-tooltip);
@@ -289,10 +270,8 @@ body:not(.light) {
 }
 [data-tooltip]:hover::before { opacity: 1; }
 
-/* ── DIFF HIGHLIGHT ── */
 .diff-add { background: rgba(201,160,64,0.15); color: var(--gold-lt); border-radius: 3px; padding: 0 3px; font-weight: 500; }
 
-/* ── MAIN CARD ── */
 .card {
   background: var(--surface);
   border-radius: var(--r-xl);
@@ -313,7 +292,6 @@ body:not(.light) {
   background: linear-gradient(90deg, transparent, rgba(201,160,64,0.2), transparent);
 }
 
-/* ── PROGRESS TIMELINE ── */
 .pgw {
   padding: 20px 40px 16px;
   display: flex;
@@ -358,7 +336,6 @@ body:not(.light) {
   font-family: var(--sans);
 }
 
-/* ── STEP BODY ── */
 .sbody {
   padding: 28px 40px 0;
   flex: 1;
@@ -380,7 +357,6 @@ body:not(.light) {
 .pane.on { display: flex; flex-direction: column; animation: slideRight 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 .pane.on-reverse { display: flex; flex-direction: column; animation: slideLeft 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
-/* ── STEP TITLES ── */
 .stitle {
   font-family: var(--serif);
   font-size: 36px;
@@ -393,7 +369,6 @@ body:not(.light) {
 .stitle em { color: var(--gold); font-style: italic; font-weight: 300; }
 .sdesc { font-size: 12px; color: var(--ash); margin-bottom: 28px; line-height: 1.6; font-weight: 400; letter-spacing: 0.01em; }
 
-/* ── FIELD LABELS ── */
 .flbl {
   font-size: 9px;
   font-weight: 600;
@@ -404,7 +379,6 @@ body:not(.light) {
   display: block;
 }
 
-/* ── INPUTS ── */
 .tinp, .sinp {
   width: 100%;
   background: var(--lift);
@@ -442,7 +416,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .sinp { padding-right: 36px; cursor: pointer; }
 
-/* ── VISUAL CARD GRIDS ── */
 .vgrid { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; margin-bottom: 20px; }
 .vcrd {
   border: var(--b-dim);
@@ -484,7 +457,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .vcrd span { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; color: var(--silver); }
 .vcrd.on span { color: var(--white); }
 
-/* ── COMPOSITION GRID ── */
 .cgrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 20px; }
 .ccrd {
   border: var(--b-dim);
@@ -510,12 +482,10 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .ccrd span { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--silver); }
 .ccrd.on span { color: var(--white); }
 
-/* Fix SVG colors for dark mode */
 .ccrd svg .sf { stroke: var(--mist); }
 .ccrd svg .so { stroke: var(--mist); }
 .ccrd svg .acc { fill: var(--gold); stroke: var(--gold); }
 
-/* ── AR GRID ── */
 .argrid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 .arcrd {
   border: var(--b-dim);
@@ -537,7 +507,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .arcrd span { font-size: 9.5px; font-weight: 600; letter-spacing: 0.04em; color: var(--silver); white-space: nowrap; }
 .arcrd.on span { color: var(--white); }
 
-/* ── DROPZONE ── */
 .dz {
   border: 1px dashed var(--mist);
   border-radius: var(--r-lg);
@@ -610,7 +579,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .fnotice.on { display: flex; }
 
-/* ── MODE SELECTION ── */
 .mode-wrap { display: none; margin-bottom: 14px; animation: fadeIn 0.4s ease; }
 .mode-wrap.on { display: block; }
 .mode-btns {
@@ -639,7 +607,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .mode-btn.on { background: var(--veil); color: var(--snow); box-shadow: var(--sh-sm); }
 
-/* ── AI BUTTONS ── */
 .btn-ai-group { display: flex; gap: 8px; margin-bottom: 14px; }
 .btn-ai-describe, .btn-magic {
   display: none;
@@ -681,7 +648,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .img-size-notice.on { display: flex; }
 
-/* ── HINT & SUGGESTION BOXES ── */
 .hint-box, .sug-box {
   background: var(--lift);
   border: var(--b-dim);
@@ -733,7 +699,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .sug-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
 .sug-lbl { font-size: 9.5px; color: var(--ghost); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; }
 
-/* ── NAV ── */
 .nav {
   display: flex;
   align-items: center;
@@ -807,7 +772,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .btnnext.gen:hover { box-shadow: 0 10px 32px rgba(201,160,64,0.45); }
 
-/* ── RESULTS ── */
 .res-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .reswrap { flex: 1; overflow-y: auto; padding-right: 12px; margin-right: -12px; }
 
@@ -845,7 +809,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .btnrf:hover { background: var(--gold); color: var(--ink); box-shadow: 0 4px 16px rgba(201,160,64,0.3); transform: translateY(-1px); }
 .btnrf:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-/* ── TOOL CARDS (RESULTS) ── */
 .tcrd {
   border: var(--b-dim);
   border-radius: var(--r-lg);
@@ -926,7 +889,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .errbox.on { display: flex; }
 
-/* ── COPY BUTTON ── */
 .cpybtn {
   display: inline-flex;
   align-items: center;
@@ -950,13 +912,11 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .cpybtn:hover { background: rgba(201,160,64,0.15); color: var(--gold-lt); border-color: rgba(201,160,64,0.3); transform: translateY(-1px); }
 .cpybtn.ok { background: rgba(48,160,112,0.15); color: var(--jade); border-color: rgba(48,160,112,0.3); }
 
-/* ── SCORE BADGES ── */
 .tscore { font-size: 9.5px; padding: 4px 9px; border-radius: 100px; font-weight: 700; letter-spacing: 0.05em; display: flex; align-items: center; gap: 5px; text-transform: uppercase; }
 .tscore.high { background: rgba(48,160,112,0.1); color: var(--jade); border: 1px solid rgba(48,160,112,0.2); }
 .tscore.med  { background: rgba(201,160,64,0.1); color: var(--gold); border: var(--b-gold); }
 .tscore.low  { background: rgba(192,64,96,0.1); color: var(--rose-lt); border: 1px solid rgba(192,64,96,0.2); }
 
-/* ── SLIDERS ── */
 .sliders-inner { border-radius: var(--r-lg); padding: 18px 22px; margin-bottom: 20px; }
 .sliders-inner.mj { background: rgba(48,140,200,0.04); border: 1px solid rgba(48,140,200,0.15); }
 .sliders-inner.nb { background: rgba(120,60,200,0.04); border: 1px solid rgba(120,60,200,0.15); }
@@ -974,7 +934,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .slider-val.mj-val { color: #5AAAE0; }
 .slider-val.nb-val { color: #A080D8; }
 
-/* ── COMPARE VIEW ── */
 .compare-grid { display: grid; gap: 24px; min-width: max-content; padding: 4px; }
 .compare-col { width: 340px; border: var(--b-dim); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); }
 .compare-col-hdr { padding: 16px 20px; background: var(--lift); font-size: 13.5px; font-weight: 600; color: var(--snow); display: flex; align-items: center; justify-content: space-between; border-bottom: var(--b-dim); }
@@ -987,7 +946,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .view-btn { padding: 7px 16px; font-size: 10px; font-weight: 600; font-family: var(--sans); letter-spacing: 0.06em; text-transform: uppercase; border: none; cursor: pointer; background: transparent; color: var(--ghost); transition: var(--trans); border-radius: 100px; }
 .view-btn.on { background: var(--veil); color: var(--snow); }
 
-/* ── PANELS (Library / History) ── */
 .lib-overlay { position: fixed; inset: 0; z-index: 8887; background: rgba(0,0,0,0.6); display: none; -webkit-backdrop-filter: blur(8px);
  backdrop-filter: blur(8px); }
 .lib-overlay.on { display: block; animation: fadeIn 0.4s ease; }
@@ -1078,7 +1036,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .lib-save-btn:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); box-shadow: 0 4px 16px rgba(201,160,64,0.3); }
 .lib-divider { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ghost); margin: 20px 0 12px; }
 
-/* ── MODALS ── */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1143,7 +1100,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 .modal-btn.secondary { background: var(--lift); color: var(--silver); border: var(--b-dim); }
 .modal-btn.secondary:hover { background: var(--veil); color: var(--snow); }
 
-/* ── ACTION BUTTONS ── */
 .btnall {
   display: inline-flex; align-items: center; gap: 7px;
   background: var(--lift); color: var(--silver); border: var(--b-dim);
@@ -1180,7 +1136,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .file-btn:hover { background: var(--veil); color: var(--snow); }
 
-/* ── LOADING OVERLAY ── */
 .lov {
   position: absolute;
   inset: 0;
@@ -1223,7 +1178,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .lsub { font-size: 12.5px; color: var(--ash); max-width: 280px; text-align: center; line-height: 1.6; }
 
-/* ── TOAST ── */
 .toast {
   position: fixed;
   bottom: 36px;
@@ -1247,7 +1201,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .toast.on { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 
-/* ── CUSTOM TOOL CARDS ── */
 .custom-tool-list > div {
   background: var(--lift) !important;
   border: var(--b-dim) !important;
@@ -1255,15 +1208,12 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
 }
 .custom-tool-list strong { color: var(--snow) !important; }
 
-/* ── PRESETS ── */
 #presets-list > div { background: var(--lift) !important; border: var(--b-dim) !important; border-radius: var(--r-md) !important; }
 #presets-list strong { color: var(--snow) !important; }
 #presets-list div div { color: var(--ghost) !important; }
 
-/* ── LIGHT MODE OVERRIDES ── */
 body:not(.light) .card { background: linear-gradient(160deg, rgba(22,22,31,0.98) 0%, rgba(14,14,20,0.99) 100%); }
 body:not(.light) .hdr { background: linear-gradient(135deg, #0A0A14 0%, #12121E 50%, #0E0E18 100%); }
-/* Dark mode card/element overrides */
 body:not(.light) .vcrd, body:not(.light) .ccrd, body:not(.light) .arcrd { background: var(--lift); }
 body:not(.light) .vcrd.on { background: linear-gradient(135deg, var(--veil), var(--lift)); }
 body:not(.light) .tcrd { background: var(--surface); }
@@ -1273,7 +1223,6 @@ body:not(.light) .rfinp { background: var(--lift); color: var(--snow); }
 body:not(.light) .modal-inp { background: var(--lift); color: var(--snow); }
 body:not(.light) .lib-save-inp { background: var(--lift); color: var(--snow); }
 
-/* ── RESPONSIVE ── */
 @media(max-width:640px) {
   .sbody, .nav, .pgw { padding-left: 20px; padding-right: 20px; }
   .stitle { font-size: 28px; }
@@ -1284,15 +1233,9 @@ body:not(.light) .lib-save-inp { background: var(--lift); color: var(--snow); }
   .hist-panel.open { left: 0; right: 0; }
 }
 
-</style>
-
-<style>
-/* ADDITIONAL FIXES */
 select.sinp option { background: #16161F; color: #E8E8F0; }
 body.light select.sinp option { background: #FFFFFF; color: #1A1A2E; }
-/* Suggestion button position fix */
 .frow > div { position: relative; }
-/* Make sure ccrd SVGs look good */
 .ccrd svg line, .ccrd svg rect, .ccrd svg circle, .ccrd svg path, .ccrd svg polygon, .ccrd svg ellipse {
   stroke: #4A4A6A;
 }
@@ -1300,7 +1243,6 @@ body.light select.sinp option { background: #FFFFFF; color: #1A1A2E; }
   stroke: #7A7A9A;
 }
 .ccrd.on svg .acc { fill: #C9A040; stroke: #C9A040; }
-/* Live preview */
 .live-preview {
   background: rgba(22,22,31,0.9);
   border: 1px solid rgba(255,255,255,0.07);
@@ -1313,100 +1255,35 @@ body.light select.sinp option { background: #FFFFFF; color: #1A1A2E; }
   margin-top: 10px;
 }
 body.light .live-preview { background: rgba(250,247,241,0.9); color: #5A5248; }
-/* Inline CSS variable patches for elements that use old vars */
 .vcrd span { color: var(--ash) !important; }
 .vcrd.on span { color: var(--snow) !important; }
 .vcrd { color: var(--silver); }
-/* Fix modal inp placeholder */
 .modal-inp::placeholder { color: var(--ghost); opacity: 0.8; }
-/* Fix btn-dice spin */
 #btn-dice i.fa-spin { animation: spin 0.5s linear; }
-/* Refined scrollbar for panels */
 .lib-panel::-webkit-scrollbar, .hist-panel::-webkit-scrollbar, .modal-box::-webkit-scrollbar { width: 3px; }
 .lib-panel::-webkit-scrollbar-thumb, .hist-panel::-webkit-scrollbar-thumb { background: var(--mist); border-radius: 3px; }
-</style>
 
-<style>
-/* LEGACY VARIABLE BRIDGE — maps old var names used in JS-generated HTML to new palette */
-:root {
-  --s1: var(--surface);
-  --s2: var(--lift);
-  --s3: var(--mist);
-  --s4: var(--ash);
-  --s5: var(--silver);
-  --bg: var(--void);
-  --blk: var(--snow);
-  --acc: var(--gold);
-  --acc-hover: var(--gold-dk);
-  --acc-light: var(--gold-lt);
-  --acc-rgb: var(--gold-rgb);
-  --r: var(--r-lg);
-  --rsm: var(--r-md);
-  --sh: var(--sh-md);
-  --shlg: var(--sh-lg);
-  --glass-bg: rgba(255,253,250,0.92);
-  --glass-border: rgba(0,0,0,0.08);
-  --dk-s1: #0F0F18;
-  --dk-s2: #16161F;
-  --dk-s3: #252535;
-  --dk-s4: #7A7A9A;
-  --dk-s5: #E8E8F0;
-  --dk-bg: #060608;
-  --dk-glass-bg: rgba(10,10,16,0.85);
-  --dk-glass-border: rgba(255,255,255,0.05);
-  --font: var(--sans);
-  --mono: 'DM Mono', monospace;
-  --trans: all 0.35s cubic-bezier(0.22,1,0.36,1);
-}
-body.light {
-  --s1: var(--surface);
-  --s2: var(--lift);
-  --s3: var(--mist);
-  --s4: var(--ash);
-  --s5: var(--silver);
-  --bg: var(--void);
-  --blk: var(--snow);
-  --glass-bg: rgba(255,253,250,0.92);
-  --glass-border: rgba(0,0,0,0.08);
-}
-</style>
-
-<style>
-/* Override JS-generated MJ/NB panel colors to match gold palette */
 .sliders-inner.mj { background: rgba(90,170,224,0.04) !important; border: 1px solid rgba(90,170,224,0.12) !important; }
 .sliders-title.mj { color: #8AC4E8 !important; }
 .slider-val.mj-val { color: #8AC4E8 !important; }
 input[type=range].mj-range { accent-color: #8AC4E8 !important; }
-/* Style fixes for modal generated content */
 #presets-list > div, .custom-tool-list > div {
   background: var(--lift) !important;
   border: 1px solid rgba(255,255,255,0.07) !important;
   color: var(--silver) !important;
 }
-</style>
 
-<style>
-/* ── SAFARI GITHUB PAGES FIXES ── */
-/* Force panels off-screen (Safari sometimes ignores transform on fixed elements) */
 #lib-panel:not(.open) { right: -420px !important; }
 #hist-panel:not(.open) { left: -420px !important; }
-/* Safari flex fix */
 .shell { -webkit-flex-direction: column; flex-direction: column; }
 .card { -webkit-flex: 1; flex: 1; -webkit-flex-direction: column; flex-direction: column; }
 .pane.on { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
 .sbody { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
-/* Ensure body background renders */
 body { -webkit-text-size-adjust: 100%; }
-/* Fix select appearance on Safari */
 select.sinp { -webkit-appearance: none; appearance: none; }
-</style>
 
-<style>
 .dz.has-files #dzs-max { display: none; }
-</style>
 
-<style>
-/* ── HISTORY MANAGEMENT BUTTONS ── */
 .hist-clear-btn {
   display: none;
   align-items: center;
@@ -1464,10 +1341,7 @@ select.sinp { -webkit-appearance: none; appearance: none; }
   color: var(--rose-lt);
   transform: scale(1.1);
 }
-</style>
 
-<style>
-/* ── ART DIRECTOR PREVIEW CARD ── */
 .artdir-card {
   background: linear-gradient(135deg, rgba(201,160,64,0.05) 0%, rgba(201,160,64,0.02) 100%);
   border: 1px solid rgba(201,160,64,0.2);
@@ -1568,19 +1442,19 @@ select.sinp { -webkit-appearance: none; appearance: none; }
 <div class="modal-overlay" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title" id="settings-title">Settings</div>
-    <div class="modal-desc" id="settings-desc">API Key required for online use. (The Flash model is 100% free via Google Free Tier).</div>
+    <div class="modal-desc" id="settings-desc">API Key required for online use. Test connection to list your models.</div>
     
-    <div style="position:relative; margin-bottom:16px;">
+    <div style="position:relative; margin-bottom:12px;">
       <label class="modal-label" id="settings-lbl-key">Gemini API Key</label>
-      <input type="password" class="modal-inp" id="st-key" placeholder="AIzaSy..." style="padding-right:48px; margin-bottom:0; width:100%;">
+      <input type="password" class="modal-inp" id="st-key" placeholder="AIzaSy..." style="padding-right:48px; margin-bottom:8px; width:100%;">
       <button onclick="toggleStKeyVis()" style="position:absolute; right:16px; top:40px; background:none; border:none; cursor:pointer; color:var(--s4); font-size:16px;"><i class="fa-regular fa-eye" id="st-eye-icon"></i></button>
+      <button class="modal-btn secondary" id="btn-test-api" onclick="testApiConnection()" style="padding:8px 14px; font-size:11px; width:100%; border-color:var(--b-dim);"><i class="fa-solid fa-wifi"></i> <span id="lbl-test-btn">Test Connection & Detect Models</span></button>
     </div>
     
     <div style="margin-bottom:24px;">
-      <label class="modal-label" id="settings-lbl-model">AI Model</label>
-      <div class="modal-inp" style="background: var(--veil); color: var(--gold); font-weight: 600; cursor: default; pointer-events: none; border-color: rgba(201,160,64,0.3);">
-        <i class="fa-solid fa-bolt" style="margin-right: 8px;"></i> Gemini Flash (Fast & Free Tier)
-      </div>
+      <label class="modal-label" id="settings-lbl-model">AI Model Name</label>
+      <input type="text" class="modal-inp" id="st-model" placeholder="gemini-1.5-flash" value="gemini-1.5-flash" style="margin-bottom:8px;">
+      <div id="detected-models" style="display:flex; flex-wrap:wrap; gap:6px; max-height: 120px; overflow-y: auto;"></div>
     </div>
 
     <div class="modal-row">
@@ -1828,7 +1702,6 @@ const STEPS=6;
 
 const sel={subj:'',siIdx:0,sd:'',liIdx:0,mood:'',ciIdx:0,ar:'Auto',op:'None',mjVersion:'--v 7',mjStylize:250,mjChaos:0,mjWeird:0, mjRaw: false, isEditMode: false, nbDenoising: 0.55};
 
-// ══ TRANSLATIONS ══
 const T={
 en:{
   bs:'Professional AI Prompt Architect',
@@ -1853,7 +1726,7 @@ en:{
   eSubj:'Please describe your concept first.',eApi:'Generation failed.',eCopy:'Copied!',
   libTitle:'Prompt Library',libSaveLbl:'Save current prompts',libSaveTxt:'Save to Library',libSavedLbl:'Saved Prompts',libEmpty:'No saved prompts yet.\nGenerate prompts and click "Save to Library".',libNamePh:'Name this set…',libLoaded:'Prompts loaded!',libSaved:'Saved to library!',libDeleted:'Deleted.',
   phSD:'e.g. influenced by Moebius, neon accents…',phMood:'e.g. eerie silence, sense of wonder…',
-  set:'Settings', setDesc:'API Key required for online use. (The Flash model is 100% free via Google Free Tier).', setKey:'Gemini API Key', setSave:'Save',
+  set:'Settings', setDesc:'API Key required for online use. Test connection to list your models.', setKey:'Gemini API Key', setSave:'Save',
   modeLbl: 'Generation Mode',
   modeRef: 'Style Reference', modeEdit: 'Image-to-Image (Edit)',
   modeDescRef: 'Uses uploaded image as aesthetic inspiration for a new creation.',
@@ -1862,7 +1735,7 @@ en:{
   sicons:['fa-ban','fa-dragon','fa-building','fa-circle-half-stroke','fa-clapperboard','fa-pencil','fa-bolt','fa-paintbrush','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-star','fa-camera-retro','fa-shapes','fa-street-view','fa-eye','fa-droplet'],
   styleDesc:['No specific style','Japanese animation aesthetic','Architectural rendering','Black and white photography','Movie-like dramatic lighting','Video game/movie concept art','Neon futuristic sci-fi','Classic museum painting','Digital or traditional illustration','Visible brush strokes, light focus','Clean, sparse, simple','High-end 3D render','High resolution crisp photography','Hyper-realistic rendering','Vibrant comic-style art','Urban candid photography','Dreamlike bizarre imagery','Soft transparent paint'],
   lights:['None','Chiaroscuro','Dark Cinema','Dreamy','Ethereal','Golden Hour','Gothic','Gritty','High-Key','Melancholic','Moody Blue','Mystical','Neon Night','Noir','Pastel','Retro 50s','Retro 60s','Retro 70s-80s','Sci-Fi','Soft Studio','Studio Photo','Summertime','Sunrays','Vintage'],
-  licons:['fa-ban','fa-circle-half-stroke','fa-ghost','fa-sparkles','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
+  licons:['fa-ban','fa-circle-half-stroke','fa-ghost','fa-star','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
   comps:['None','Close Up','Wide Shot','Aerial View','Low Angle','Macro','Symmetry','Rule of Thirds',"Bird's Eye",'Side View','POV','Panoramic','Dutch Angle','Fisheye','Over Shoulder','Full Body'],
   og:{Cinema:['Arri Alexa LF — Panavision Primo','Red V-Raptor — Cooke S4/i T2','Panavision DXL2 — Anamorphique','Blackmagic URSA Mini Pro — Zeiss CP.3','Sony Venice 2 — Cooke Anamorphic/i','Alexa 35 — ARRI Signature Primes'],Photography:['Hasselblad H6D-100c — 80mm f/2.8','Leica M11 — Noctilux 50mm f/0.95','Phase One XT — Schneider 110mm f/2.8','Sony A7R V — 35mm f/1.4 GM','Canon EOS R5 — RF 85mm f/1.2L','Nikon Z9 — 58mm f/0.95 Noct','Fujifilm GFX 100S — 110mm f/2','Sigma 14mm f/1.8 Art (Extreme Wide)','Canon EF 50mm f/1.0L (Ultra Bokeh)','Zeiss Otus 55mm f/1.4 (Clinical Sharp)'],Portrait:['Sony A1 — 135mm f/1.8 GM','Canon R1 — 200mm f/2L (Editorial)','Nikon Z8 — 85mm f/1.4','Fuji X-T5 — 56mm f/1.2 WR','Leica SL2 — 75mm f/2 Summicron'],Special:['Polaroid Spectra — Vintage Instant Film','Kodak Portra 400 — Grain Film 35mm','Kodak Ektar 100 — Grand Format 8×10','Ilford HP5 Plus — B&W 35mm Grain','Holga 120N — Plastic Lens Lo-fi','Lomography Petzval 58 — Swirly Bokeh','Infrared Camera — 720nm Filter','Thermal Imaging — Heatmap Colors','Macro Lens 1:1 — Microscopic Detail','Tilt-Shift 90mm — Miniature Effect','Drone + Gimbal — Smooth Aerial','Pinhole Camera — Dreamlike Exposure']}
 }
@@ -1889,7 +1762,7 @@ en:{
   eSubj:'Veuillez décrire votre concept.',eApi:'Génération échouée.',eCopy:'Copié !',
   libTitle:'Bibliothèque',libSaveLbl:'Sauvegarder les prompts actuels',libSaveTxt:'Sauvegarder',libSavedLbl:'Prompts Sauvegardés',libEmpty:'Aucun prompt sauvegardé.\nGénérez des prompts et cliquez "Sauvegarder".',libNamePh:'Nommer ce jeu de prompts…',libLoaded:'Prompts chargés !',libSaved:'Sauvegardé !',libDeleted:'Supprimé.',
   phSD:'ex. inspiré de Moebius, accents néon…',phMood:'ex. silence inquiétant, émerveillement…',
-  set:'Paramètres', setDesc:'Clé API requise pour le web. (Le modèle Flash est 100% gratuit via le Free Tier Google).', setKey:'Clé API Gemini', setSave:'Enregistrer',
+  set:'Paramètres', setDesc:'Clé API requise pour le web. Testez la connexion pour lister vos modèles.', setKey:'Clé API Gemini', setSave:'Enregistrer',
   modeLbl: 'Mode de Génération',
   modeRef: 'Inspiration (Style)', modeEdit: 'Image-to-Image (Édition)',
   modeDescRef: 'Utilise l\'image uploadée comme inspiration esthétique pour créer une nouvelle image.',
@@ -1898,7 +1771,7 @@ en:{
   sicons:['fa-ban','fa-dragon','fa-droplet','fa-building','fa-paintbrush','fa-clapperboard','fa-pencil','fa-bolt','fa-pen-nib','fa-palette','fa-minus','fa-cube','fa-street-view','fa-circle-half-stroke','fa-star','fa-camera-retro','fa-shapes','fa-eye'],
   styleDesc:['Aucun style imposé','Animation japonaise','Rendu architectural','Photographie noir et blanc classique','Lumière de film, profondeur de champ','Art conceptuel jeu/film','Futuriste néon SF','Peinture classique','Illustration numérique ou manuelle','Coups de pinceaux visibles','Très épuré, simple','Rendu 3D haute qualité','Photo très haute définition','Rendu hyper-réaliste','Style bande dessinée coloré','Photographie urbaine sur le vif','Image de rêve bizarre','Peinture douce et transparente'],
   lights:['Aucun','Bleu Moody','Brut','Clair-obscur','Dark Ciné','Golden Hour','Gothic','High-Key','Mystique','Mélancolique','Noir','Nuit Néon','Onirique','Pastel','Rayons Soleil','Rétro 50s','Rétro 60s','Rétro 70s-80s','Sci-Fi','Studio Doux','Studio Photo','Summertime','Vintage','Éthéré'],
-  licons:['fa-ban','fa-water','fa-hammer','fa-circle-half-stroke','fa-ghost','fa-sparkles','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
+  licons:['fa-ban','fa-water','fa-hammer','fa-circle-half-stroke','fa-ghost','fa-star','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
   comps:['Aucun','Gros Plan','Plan Large','Vue Aérienne','Contre-plongée','Macro','Symétrie','Règle des Tiers','Plongée','Vue Profil','Point de Vue','Panoramique','Plan Incliné','Fisheye','Par-dessus Épaule','Plan Pied'],
   og:{Cinéma:['Arri Alexa LF — Panavision Primo','Red V-Raptor — Cooke S4/i T2','Panavision DXL2 — Anamorphique','Blackmagic URSA Mini Pro — Zeiss CP.3','Sony Venice 2 — Cooke Anamorphic/i','Alexa 35 — ARRI Signature Primes'],Photo:['Hasselblad H6D-100c — 80mm f/2.8','Leica M11 — Noctilux 50mm f/0.95','Phase One XT — Schneider 110mm f/2.8','Sony A7R V — 35mm f/1.4 GM','Canon EOS R5 — RF 85mm f/1.2L','Nikon Z9 — 58mm f/0.95 Noct','Fujifilm GFX 100S — 110mm f/2','Sigma 14mm f/1.8 Art (Grand Angle)','Canon EF 50mm f/1.0L (Ultra Bokeh)','Zeiss Otus 55mm f/1.4 (Précision)'],Portrait:['Sony A1 — 135mm f/1.8 GM','Canon R1 — 200mm f/2L (Éditorial)','Nikon Z8 — 85mm f/1.4','Fuji X-T5 — 56mm f/1.2 WR','Leica SL2 — 75mm f/2 Summicron'],Spécial:['Polaroid Spectra — Film Instantané Vintage','Kodak Portra 400 — Grain Film 35mm','Kodak Ektar 100 — Grand Format 8×10','Ilford HP5 Plus — Grain N&B 35mm','Holga 120N — Objectif Plastique Lo-fi','Lomography Petzval 58 — Bokeh Tournant','Caméra Infrarouge — Filtre 720nm','Caméra Thermique — Heatmap','Macro 1:1 — Détail Microscopique','Tilt-Shift 90mm — Effet Miniature','Drone + Cardan — Aérien Fluide','Sténopé — Exposition Onirique']}
 }};
@@ -1930,7 +1803,6 @@ const CSVG=[
 `<svg viewBox="0 0 42 34"><rect x="3" y="3" width="36" height="28" rx="3" class="sf" stroke="#333" stroke-width="1.5" fill="none"/><circle cx="21" cy="9" r="3.5" class="so" stroke="#333" stroke-width="1.5" fill="none"/><line x1="21" y1="12.5" x2="21" y2="23" class="so" stroke="#333" stroke-width="1.5"/><line x1="21" y1="16" x2="15" y2="21" class="so" stroke="#333" stroke-width="1.5"/><line x1="21" y1="16" x2="27" y2="21" class="so" stroke="#333" stroke-width="1.5"/><line x1="21" y1="23" x2="16" y2="31" class="so" stroke="#333" stroke-width="1.5"/><line x1="21" y1="23" x2="26" y2="31" class="so" stroke="#333" stroke-width="1.5"/></svg>`
 ];
 
-// ══ DARK MODE ══
 function toggleDark(){
   isDark=!isDark;
   document.body.classList.toggle('light',!isDark);
@@ -1939,20 +1811,17 @@ function toggleDark(){
   localStorage.setItem('suetos_dark',isDark?'1':'0');
 }
 
-// ══ ESCAPE HTML ══
 function escHtml(s) {
   if (!s) return '';
   return s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// ══ AUTO RESIZE TEXTAREA ══
 function autoResize(el) {
   if (!el) return;
   el.style.height = 'auto';
   el.style.height = el.scrollHeight + 'px';
 }
 
-// ══ RANDOMIZER ══
 function randomizeAll() {
   const t = T[lang];
   sel.siIdx = Math.floor(Math.random() * t.styles.length);
@@ -1967,7 +1836,6 @@ function randomizeAll() {
   toast(lang==='fr'?'Inspiration appliquée !':'Inspiration applied!');
 }
 
-// ══ GRID BUILDERS ══
 function buildVGrid(cid,items,icons,key){
   const c=document.getElementById(cid);c.innerHTML='';
   items.forEach((label,i)=>{
@@ -2027,7 +1895,6 @@ function buildPB(){
   }
 }
 
-// ══ UI ══
 function setImgMode(mode) {
   sel.isEditMode = (mode === 'edit');
   document.getElementById('btn-mode-ref').classList.toggle('on', mode === 'ref');
@@ -2132,9 +1999,12 @@ function syncLangUI() {
    se('lbl-copyall',fr?'Tout Copier':'Copy All');
    se('lbl-dice',fr?'Inspiration':'Inspire Me');
    se('settings-title',T[lang].set);
-   se('settings-desc',fr?'Clé API requise pour le web. (Le modèle Flash est 100% gratuit via le Free Tier Google).':'API Key required for online use. (The Flash model is 100% free via Google Free Tier).');
+   
+   se('settings-desc', fr ? 'Clé API requise pour le web. Testez la connexion pour lister vos modèles.' : 'API Key required for online use. Test connection to list your models.');
    se('settings-lbl-key',T[lang].setKey);
-   se('settings-lbl-model', fr ? 'Modèle IA (Verrouillé sur gratuit)' : 'AI Model (Locked to Free Tier)');
+   se('settings-lbl-model', fr ? 'Nom du Modèle IA' : 'AI Model Name');
+   se('lbl-test-btn', fr ? 'Tester' : 'Test');
+   
    se('settings-btn-cancel',fr?'Annuler':'Cancel');
    se('settings-btn-save-lbl',T[lang].setSave);
    se('compare-title',fr?'Comparer les Prompts':'Compare Prompts');
@@ -2220,11 +2090,9 @@ function getActiveKey() {
 }
 
 function getGeminiModel() {
-  // 100% FLASH ONLY. No Pro model.
-  // If we are in the AI sandbox (no key provided), use the sandbox preview model
   if (!hasApiKey() && envApiKey === "") return 'gemini-2.5-flash-preview-09-2025';
-  
-  // If hosted online with a real key, use the stable, free-tier Flash model
+  const saved = localStorage.getItem('suetos_api_model');
+  if (saved && saved.trim() !== '') return saved.trim();
   return 'gemini-1.5-flash'; 
 }
 
@@ -2233,9 +2101,20 @@ function openSettingsModal() {
   document.getElementById('st-key').type = 'password';
   document.getElementById('st-eye-icon').className = 'fa-regular fa-eye';
   
-  document.getElementById('settings-desc').textContent = lang==='fr'
-    ? 'Clé API requise pour le web. (Le modèle Flash est 100% gratuit via le Free Tier Google).'
-    : 'API Key required for online use. (The Flash model is 100% free via Google Free Tier).';
+  const mod = document.getElementById('st-model');
+  if(mod) {
+      let savedMod = localStorage.getItem('suetos_api_model') || 'gemini-1.5-flash';
+      mod.value = savedMod;
+  }
+  
+  document.getElementById('detected-models').innerHTML = '';
+  
+  const fr = lang === 'fr';
+  const descEl = document.getElementById('settings-desc');
+  descEl.innerHTML = fr 
+    ? 'Clé API requise pour le web. Testez la connexion pour lister vos modèles.' 
+    : 'API Key required for online use. Test connection to list your models.';
+  
   document.getElementById('settings-modal').classList.add('on');
 }
 
@@ -2268,8 +2147,74 @@ function saveSettings() {
   }
   localStorage.setItem('suetos_api_key', k);
   
+  const mod = document.getElementById('st-model');
+  if(mod) localStorage.setItem('suetos_api_model', mod.value.trim());
+  
   closeSettingsModal();
   toast(lang==='fr' ? 'Paramètres enregistrés !' : 'Settings saved!');
+}
+
+async function testApiConnection() {
+    const key = document.getElementById('st-key').value.trim();
+    if (!key) {
+        toast(lang === 'fr' ? 'Veuillez entrer une clé API d\'abord.' : 'Please enter an API key first.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-test-api');
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i>`;
+    btn.disabled = true;
+
+    const container = document.getElementById('detected-models');
+    container.innerHTML = `<span style="font-size:11px; color:var(--ghost);">${lang==='fr'?'Recherche des modèles...':'Detecting models...'}</span>`;
+
+    try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+        if (!res.ok) throw new Error("Invalid Key or Network Error");
+        const data = await res.json();
+
+        // Filter valid gemini models that support generation
+        const models = data.models.filter(m =>
+            m.name.includes('gemini') &&
+            m.supportedGenerationMethods &&
+            m.supportedGenerationMethods.includes('generateContent')
+        );
+
+        if (models.length === 0) {
+            container.innerHTML = `<span style="color:var(--rose-lt); font-size:11px;">${lang==='fr'?'Aucun modèle génératif trouvé.':'No generative models found.'}</span>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        models.forEach(m => {
+            const shortName = m.name.replace('models/', '');
+            const badge = document.createElement('div');
+            badge.className = 'tbadge';
+            badge.style.cursor = 'pointer';
+            badge.style.border = '1px solid rgba(255,255,255,0.1)';
+            badge.style.background = 'var(--lift)';
+            badge.style.color = 'var(--silver)';
+            badge.style.marginBottom = '4px';
+            badge.textContent = shortName;
+            badge.onclick = () => {
+                document.getElementById('st-model').value = shortName;
+                Array.from(container.children).forEach(c => {
+                    c.style.borderColor = 'rgba(255,255,255,0.1)';
+                    c.style.color = 'var(--silver)';
+                });
+                badge.style.borderColor = 'var(--gold)';
+                badge.style.color = 'var(--gold-lt)';
+            };
+            container.appendChild(badge);
+        });
+        toast(lang==='fr' ? 'Connexion réussie !' : 'Connection successful!');
+    } catch (e) {
+        container.innerHTML = `<span style="color:var(--rose-lt); font-size:11px;"><i class="fa-solid fa-triangle-exclamation"></i> ${lang==='fr'?'Erreur de connexion. Vérifiez la clé.':'Connection failed. Check key.'}</span>`;
+    } finally {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+    }
 }
 
 function extractErrorMessage(errData, status) {
@@ -2283,9 +2228,8 @@ async function fetchGeminiWithBackoff(url, payload) {
   let retries = 3;
   let delay = 1000;
   for (let i = 0; i < retries; i++) {
-    // ABORT CONTROLLER TO PREVENT INFINITE "TURNING" SPINNERS ON GITHUB
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // Force kill after 15 seconds
+    const timeoutId = setTimeout(() => controller.abort(), 15000); 
 
     try {
       const response = await fetch(url, {
@@ -2308,7 +2252,6 @@ async function fetchGeminiWithBackoff(url, payload) {
           if (response.status === 403) throw new Error(`HTTP 403: Check API Key, ensure 'Generative Language API' is enabled, and remove website restrictions.`);
           if (response.status === 401) throw new Error(`INVALID_API_KEY: ${msg}`);
           
-          // AUTO-REPAIR FOR 404
           if (response.status === 404) {
               localStorage.setItem('suetos_api_model', 'gemini-1.5-flash');
               throw new Error(`HTTP 404_AUTOREPAIR`);
@@ -2319,7 +2262,6 @@ async function fetchGeminiWithBackoff(url, payload) {
       
       const data = await response.json();
       
-      // Safety block detection
       if (data.promptFeedback && data.promptFeedback.blockReason) {
           throw new Error(`Blocked by AI Safety: ${data.promptFeedback.blockReason}`);
       }
@@ -2348,8 +2290,7 @@ async function fetchGeminiWithBackoff(url, payload) {
       }
       
       let lowerMsg = errMsg.toLowerCase();
-      // BREAK THE RETRY LOOP FOR FATAL ERRORS
-      if (lowerMsg.includes('403') || lowerMsg.includes('401') || lowerMsg.includes('400') || lowerMsg.includes('safety') || lowerMsg.includes('failed to fetch') || lowerMsg.includes('timeout') || lowerMsg.includes('invalid_api_key')) {
+      if (lowerMsg.includes('403') || lowerMsg.includes('401') || lowerMsg.includes('400') || lowerMsg.includes('safety') || lowerMsg.includes('failed to fetch') || lowerMsg.includes('timeout') || lowerMsg.includes('invalid_api_key') || lowerMsg.includes('abort')) {
           throw e; 
       }
       
@@ -2365,8 +2306,11 @@ function handleApiError(e, customMsg = '') {
     let msg = (e && e.message) ? String(e.message) : "Unknown error";
     let msgLower = msg.toLowerCase();
     
-    // Catch empty/invalid API key online requests instantly
-    if (msg.includes("INVALID_API_KEY") || msg.includes("401") || msg.includes("403") || msgLower.includes("api key not valid") || (msg.includes("400") && !hasApiKey() && envApiKey === "")) {
+    if (msgLower.includes("billing") || msgLower.includes("location is not supported") || msgLower.includes("unsupported location")) {
+        openSettingsModal();
+        toast(lang==='fr' ? 'Google bloque l\'API gratuite en Europe sans carte bancaire.' : 'Google blocks free API in the EU without billing enabled.');
+    }
+    else if (msg.includes("INVALID_API_KEY") || msg.includes("401") || msg.includes("403") || msgLower.includes("api key not valid") || (msg.includes("400") && !hasApiKey() && envApiKey === "")) {
         openSettingsModal();
         toast(lang==='fr' ? 'Clé API requise ou invalide. Vérifiez les paramètres.' : 'API Key required or invalid. Check settings.');
     } else if (msgLower.includes("failed to fetch") || msgLower.includes("timeout") || msgLower.includes("abort")) {
@@ -2419,13 +2363,9 @@ async function callGeminiVision(prompt, images, systemInstruction = null, jsonMo
   return await fetchGeminiWithBackoff(url, payload);
 }
 
-// ── EXTRACTEUR JSON ULTRA ROBUSTE (O(1) NO LOOP) ──
 function parseJSON(raw) {
     if (!raw) throw new Error("Empty API response.");
-    
     let s = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
-    
-    // Find the FIRST opening bracket
     let startObj = s.indexOf('{');
     let startArr = s.indexOf('[');
     let start = -1;
@@ -2436,7 +2376,6 @@ function parseJSON(raw) {
     if (start === -1) throw new Error("No JSON structure detected.");
     s = s.substring(start);
     
-    // Find the LAST closing bracket
     let endObj = s.lastIndexOf('}');
     let endArr = s.lastIndexOf(']');
     let end = -1;
@@ -2448,14 +2387,13 @@ function parseJSON(raw) {
     
     let candidate = s.substring(0, end + 1);
     
-    // Clean trailing commas and weird newlines safely
     candidate = candidate.replace(/,\s*([}\]])/g, '$1'); 
     candidate = candidate.replace(/[\r\n\t]+/g, ' '); 
     
     try {
         return JSON.parse(candidate);
     } catch (e) {
-        console.error("JSON parsing failed on clean string");
+        console.error("JSON parsing failed on clean string", candidate);
         throw new Error("Invalid JSON format from AI.");
     }
 }
@@ -2476,7 +2414,6 @@ function getNBParamsStr() {
 }
 
 function autoAdaptMJParams() {
-  // Smart defaults
   sel.mjVersion  = '--v 7';
   sel.mjStylize  = 200;
   sel.mjChaos    = 0;
@@ -2487,69 +2424,53 @@ function autoAdaptMJParams() {
   const light = T['en'].lights[sel.liIdx] || '';
   const subj  = sel.subj.toLowerCase();
 
-  // ── MEDIUM PRESETS ──
-  // Pure photography → raw, high realism
   if (['B&W Photo','Photorealism','Street Photo','Photo Pro HD'].includes(style)) {
     sel.mjRaw = true; sel.mjStylize = 80; sel.mjChaos = 0; sel.mjWeird = 0;
   }
-  // Cinematic → slightly stylized realism
   else if (style === 'Cinematic') {
     sel.mjRaw = true; sel.mjStylize = 120; sel.mjChaos = 3;
   }
-  // Architecture → precision, no chaos
   else if (style === 'Architecture') {
     sel.mjRaw = true; sel.mjStylize = 60; sel.mjChaos = 0;
   }
-  // Anime / Niji
   else if (style === 'Anime') {
     sel.mjVersion = '--niji 7'; sel.mjStylize = 300; sel.mjChaos = 0;
   }
-  // Illustration styles
   else if (['Illustration','Watercolor','Fine Art'].includes(style)) {
     sel.mjStylize = 280; sel.mjChaos = 5;
   }
-  // Impressionism — painterly, some chaos
   else if (style === 'Impressionism') {
     sel.mjStylize = 350; sel.mjChaos = 15; sel.mjWeird = 100;
   }
-  // Concept Art
   else if (style === 'Concept Art') {
     sel.mjStylize = 320; sel.mjChaos = 8;
   }
-  // Cyberpunk — high stylize + weird
   else if (style === 'Cyberpunk') {
     sel.mjStylize = 400; sel.mjChaos = 12; sel.mjWeird = 200;
   }
-  // Octane 3D — rich, high stylize
   else if (style === 'Octane 3D') {
     sel.mjStylize = 350; sel.mjChaos = 0;
   }
-  // Surrealism — max weird
   else if (style === 'Surrealism') {
     sel.mjStylize = 300; sel.mjChaos = 20; sel.mjWeird = 500;
   }
-  // Pop Art — punchy, some chaos
   else if (style === 'Pop Art') {
     sel.mjStylize = 250; sel.mjChaos = 15; sel.mjWeird = 150;
   }
-  // Minimalism — very low stylize
   else if (style === 'Minimalism') {
     sel.mjStylize = 40; sel.mjChaos = 0; sel.mjWeird = 0;
   }
 
-  // ── LIGHTING MODIFIERS ──
   if (['Ethereal','Mystical','Dreamy'].includes(light))       { sel.mjWeird += 80;  sel.mjStylize += 60; }
   if (['Surreal','Dark Cinema','Gothic'].includes(light))     { sel.mjChaos += 8;   sel.mjWeird  += 100; }
   if (['Neon Night','Sci-Fi'].includes(light))                { sel.mjStylize += 80; sel.mjWeird  += 150; }
   if (['Noir','Chiaroscuro'].includes(light))                 { sel.mjChaos += 5; }
   if (['Golden Hour','Pastel','Soft Studio'].includes(light)) { sel.mjStylize = Math.max(sel.mjStylize, 180); }
 
-  // ── SUBJECT MODIFIERS ──
   if (/portrait|model|person|face/.test(subj) && style === '') { sel.mjStylize = Math.min(sel.mjStylize, 150); }
   if (/abstract|concept|surreal/.test(subj))  { sel.mjWeird += 200; sel.mjChaos += 10; }
   if (/product|still.life|watch|jewelry/.test(subj)) { sel.mjStylize = Math.min(sel.mjStylize, 100); sel.mjRaw = true; }
 
-  // ── CLAMP VALUES ──
   sel.mjStylize = Math.min(1000, Math.max(0,   sel.mjStylize));
   sel.mjChaos   = Math.min(100,  Math.max(0,   sel.mjChaos));
   sel.mjWeird   = Math.min(3000, Math.max(0,   sel.mjWeird));
@@ -2558,15 +2479,11 @@ function autoAdaptMJParams() {
 function brief(){
   const t=T[lang];
   const style=(sel.siIdx>0&&t.styles[sel.siIdx])||'none';
-  const styleEn=(sel.siIdx>0&&T['en'].styles[sel.siIdx])||'none';
   const light=(sel.liIdx>0&&t.lights[sel.liIdx])||'none';
-  const lightEn=(sel.liIdx>0&&T['en'].lights[sel.liIdx])||'none';
   const comp=(sel.ciIdx>0&&t.comps[sel.ciIdx])||'none';
-  const compEn=(sel.ciIdx>0&&T['en'].comps[sel.ciIdx])||'none';
   const ar=(sel.ar&&sel.ar!=='Auto')?sel.ar:'free';
   const op=(sel.op&&sel.op!=='None')?sel.op:'unspecified';
 
-  // Infer subject category for art direction hints
   const subj = sel.subj.toLowerCase();
   let subjectHint = '';
   if (/portrait|person|model|woman|man|face|girl|boy|human/.test(subj)) subjectHint = 'SUBJECT CATEGORY: Portrait/Human — prioritize skin, expression, gaze, hair, garment';
@@ -2663,10 +2580,8 @@ async function generate(){
     let raw;
     if(uploads.length > 0) {
         const promptText = brief() + "\n\nReference images provided. " + (sel.isEditMode ? "EDIT the structure." : "Incorporate their aesthetic strongly.");
-        // Vision mode -> MUST BE FALSE for jsonMode to avoid API 400 Bad Request error
         raw = await callGeminiVision(promptText, uploads, buildSysWithCustomTools(), false);
     } else {
-        // Text mode -> MUST BE FALSE for jsonMode to stay consistent and robust
         raw = await callGeminiText(brief(), buildSysWithCustomTools(), false);
     }
 
@@ -2698,7 +2613,6 @@ async function refine(){
     
     let raw;
     if (uploads.length > 0) {
-        // False to avoid strict schema crash with images
         raw = await callGeminiVision(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, uploads, sys, false);
     } else {
         raw = await callGeminiText(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, sys, false);
@@ -2722,7 +2636,7 @@ async function triggerMagicWand() {
   sel.subj = subj; 
   
   const btn = document.getElementById('btn-magic');
-  if(btn.classList.contains('loading')) return; // Prevent double click
+  if(btn.classList.contains('loading')) return; 
   
   const origHtml = btn.innerHTML;
   btn.classList.add('loading');
@@ -2850,7 +2764,7 @@ function renderUploads() {
         dz.classList.remove('has-files');
         g.style.display = 'none'; 
         modeWrap.classList.remove('on');
-        sel.isEditMode = false; // Reset
+        sel.isEditMode = false;
         setImgMode('ref');
         document.getElementById('fn').classList.remove('on');
         document.getElementById('btn-ai-describe').classList.remove('on');
@@ -2880,7 +2794,7 @@ function addFiles(files){
       img.onload = () => {
         const canvas = document.createElement('canvas');
         let w = img.width, h = img.height;
-        const maxDim = 512; // ULTRA COMPRESSION TO SAVE API QUOTAS
+        const maxDim = 512; 
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
           else { w = Math.round((w * maxDim) / h); h = maxDim; }
@@ -3150,7 +3064,6 @@ function renderResults(data){
   const t=T[lang],list=document.getElementById('rlist');
   list.innerHTML='';
   
-  // Render Custom UI Panels
   renderMJSliders();
   renderNBSliders();
   
@@ -3234,14 +3147,12 @@ function renderResults(data){
       </div>`;
   }
   
-  // FIX: Force technical parameters to instantly append when results load
   setTimeout(() => {
       updateMJParams();
       updateNBParams();
   }, 50);
 }
 
-// ══ PROMPT LIBRARY ══
 function getLib(){try{return JSON.parse(localStorage.getItem('suetos_lib')||'[]');}catch{return [];}}
 function saveLib(arr){localStorage.setItem('suetos_lib',JSON.stringify(arr));}
 
@@ -3389,10 +3300,6 @@ function applySuggestion(text){
   toast(lang==='fr'?'Variation appliquée !':'Suggestion applied!');
 }
 
-/* * ==========================================
- * HISTORIQUE, OUTILS ET FONCTIONS UTILES
- * ========================================== */
-
 function autoSaveToHist(subject) {
     try {
         const h = JSON.parse(localStorage.getItem('suetos_hist')||'[]');
@@ -3414,7 +3321,6 @@ function openHist() {
 function renderHist() {
     const list = document.getElementById('hist-list');
     const h = JSON.parse(localStorage.getItem('suetos_hist')||'[]');
-    // Reset clear button state
     const clearBtn = document.getElementById('hist-clear-btn');
     const clearLbl = document.getElementById('hist-clear-lbl');
     if (clearBtn) { clearBtn.classList.remove('danger'); }
@@ -3462,7 +3368,6 @@ function clearAllHist() {
     const lbl = document.getElementById('hist-clear-lbl');
     if (!btn) return;
     if (btn.dataset.confirm === '1') {
-        // Second click — confirm delete
         localStorage.setItem('suetos_hist', '[]');
         btn.dataset.confirm = '0';
         btn.classList.remove('danger');
@@ -3471,7 +3376,6 @@ function clearAllHist() {
         renderHist();
         toast(lang==='fr' ? 'Historique effacé.' : 'History cleared.');
     } else {
-        // First click — ask for confirmation
         btn.dataset.confirm = '1';
         btn.classList.add('danger');
         lbl.textContent = lang==='fr' ? 'Sûr ?' : 'Sure?';
@@ -3871,7 +3775,6 @@ function exportPDF() {
     toast(lang==='fr'?"Brief PDF téléchargé !":"Creative Brief downloaded!");
 }
 
-// ── ART DIRECTOR LIVE PREVIEW ──
 function buildArtDirectorPreview() {
   const card = document.getElementById('artdir-card');
   const body = document.getElementById('artdir-body');
@@ -3886,7 +3789,6 @@ function buildArtDirectorPreview() {
   if (!subj) { card.classList.remove('on'); return; }
   card.classList.add('on');
 
-  // Determine medium
   const photoStyles   = ['B&W Photo','Cinematic','Photo Pro HD','Photorealism','Street Photo','Architecture'];
   const illustStyles  = ['Anime','Illustration','Watercolor','Fine Art','Impressionism','Pop Art','Concept Art'];
   const digitalStyles = ['Cyberpunk','Octane 3D','Minimalism','Surrealism'];
@@ -3895,7 +3797,6 @@ function buildArtDirectorPreview() {
   else if (illustStyles.includes(style)) { medium = 'illustration'; mediumLabel = '🎨 Illustration'; }
   else if (digitalStyles.includes(style)) { medium = 'digital';     mediumLabel = '⚡ Digital/3D'; }
 
-  // MJ params summary
   const mjSummary = [];
   if (sel.mjVersion) mjSummary.push(sel.mjVersion);
   if (sel.mjStylize) mjSummary.push('stylize ' + sel.mjStylize);
@@ -3903,7 +3804,6 @@ function buildArtDirectorPreview() {
   if (sel.mjWeird > 0) mjSummary.push('weird ' + sel.mjWeird);
   if (sel.mjRaw) mjSummary.push('--style raw');
 
-  // Optics insight
   let opticsInsight = '';
   if (op) {
     if (op.includes('Leica') || op.includes('Noctilux')) opticsInsight = 'Signature Leica micro-contrast, buttery smooth bokeh, 3D subject separation';
@@ -3935,12 +3835,10 @@ function buildArtDirectorPreview() {
   `;
 }
 
-// ══ INIT LORS DU CHARGEMENT ══
 document.addEventListener("DOMContentLoaded", () => {
-    // MAISON NOIR: dark is default — body.light = light mode opt-in
     const savedDark = localStorage.getItem('suetos_dark');
     if (savedDark === '0') { isDark = false; document.body.classList.add('light'); }
-    else { isDark = true; } // dark by default (no class needed)
+    else { isDark = true; } 
     document.getElementById('dark-icon').className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
     initDZ();
     buildPB();
