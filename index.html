@@ -944,8 +944,11 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
   font-family: var(--sans);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  background: rgba(201,160,64,0.08);
+  color: var(--gold);
+  border-color: rgba(201,160,64,0.2);
 }
-.cpybtn:hover { background: rgba(201,160,64,0.1); color: var(--gold-lt); border-color: rgba(201,160,64,0.25); transform: translateY(-1px); }
+.cpybtn:hover { background: rgba(201,160,64,0.15); color: var(--gold-lt); border-color: rgba(201,160,64,0.3); transform: translateY(-1px); }
 .cpybtn.ok { background: rgba(48,160,112,0.15); color: var(--jade); border-color: rgba(48,160,112,0.3); }
 
 /* ── SCORE BADGES ── */
@@ -1242,13 +1245,6 @@ textarea.tinp { min-height: 90px; line-height: 1.65; overflow-y: hidden; }
   font-family: var(--sans);
 }
 .toast.on { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-
-/* ── SUGGEST BUTTON ── */
-.cpybtn[onclick*="getSuggestions"], button.cpybtn[id="btn-sug"] {
-  background: rgba(201,160,64,0.08);
-  color: var(--gold);
-  border-color: rgba(201,160,64,0.2);
-}
 
 /* ── CUSTOM TOOL CARDS ── */
 .custom-tool-list > div {
@@ -1582,9 +1578,8 @@ select.sinp { -webkit-appearance: none; appearance: none; }
     <div style="margin-bottom:24px;">
       <label class="modal-label" id="settings-lbl-model">AI Model (If using API key)</label>
       <select class="modal-inp" id="st-model" style="margin-bottom:0; cursor:pointer;">
-        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Global & Stable)</option>
-        <option value="gemini-2.0-flash">Gemini 2.0 Flash (New)</option>
-        <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash-8B (Fastest)</option>
+        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Stable & Fast)</option>
+        <option value="gemini-1.5-pro">Gemini 1.5 Pro (High Quality)</option>
       </select>
     </div>
 
@@ -1841,7 +1836,7 @@ en:{
   lights:['None','Chiaroscuro','Dark Cinema','Dreamy','Ethereal','Golden Hour','Gothic','Gritty','High-Key','Melancholic','Moody Blue','Mystical','Neon Night','Noir','Pastel','Retro 50s','Retro 60s','Retro 70s-80s','Sci-Fi','Soft Studio','Studio Photo','Summertime','Sunrays','Vintage'],
   licons:['fa-ban','fa-circle-half-stroke','fa-ghost','fa-sparkles','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
   comps:['None','Close Up','Wide Shot','Aerial View','Low Angle','Macro','Symmetry','Rule of Thirds',"Bird's Eye",'Side View','POV','Panoramic','Dutch Angle','Fisheye','Over Shoulder','Full Body'],
-  og:{Cinema:['Arri Alexa LF — Panavision Primo','Red V-Raptor — Cooke S4/i T2','Panavision DXL2 — Anamorphique','Blackmagic URSA Mini Pro — Zeiss CP.3','Sony Venice 2 — Cooke Anamorphic/i','Alexa 35 — ARRI Signature Primes'],Photography:['Hasselblad H6D-100c — 80mm f/2.8','Leica M11 — Noctilux 50mm f/0.95','Phase One XT — Schneider 110mm f/2.8','Sony A7R V — 35mm f/1.4 GM','Canon EOS R5 — RF 85mm f/1.2L','Nikon Z9 — 58mm f/0.95 Noct','Fujifilm GFX 100S — 110mm f/2','Sigma 14mm f/1.8 Art (Extreme Wide)','Canon EF 50mm f/1.0L (Ultra Bokeh)','Zeiss Otus 55mm f/1.4 (Clinical Sharp)'],Portrait:['Sony A1 — 135mm f/1.8 GM','Canon R1 — 200mm f/2L (Editorial)','Nikon Z8 — 85mm f/1.4','Fuji X-T5 — 56mm f/1.2 WR','Leica SL2 — 75mm f/2 Summicron'],Special:['Polaroid Spectra — Vintage Instant Film','Kodak Portra 400 — 35mm Film Grain','Kodak Ektar 100 — Large Format 8×10','Ilford HP5 Plus — B&W 35mm Grain','Holga 120N — Plastic Lens Lo-fi','Lomography Petzval 58 — Swirly Bokeh','Infrared Camera — 720nm Filter','Thermal Imaging — Heatmap Colors','Macro Lens 1:1 — Microscopic Detail','Tilt-Shift 90mm — Miniature Effect','Drone + Gimbal — Smooth Aerial','Pinhole Camera — Dreamlike Exposure']}
+  og:{Cinema:['Arri Alexa LF — Panavision Primo','Red V-Raptor — Cooke S4/i T2','Panavision DXL2 — Anamorphique','Blackmagic URSA Mini Pro — Zeiss CP.3','Sony Venice 2 — Cooke Anamorphic/i','Alexa 35 — ARRI Signature Primes'],Photography:['Hasselblad H6D-100c — 80mm f/2.8','Leica M11 — Noctilux 50mm f/0.95','Phase One XT — Schneider 110mm f/2.8','Sony A7R V — 35mm f/1.4 GM','Canon EOS R5 — RF 85mm f/1.2L','Nikon Z9 — 58mm f/0.95 Noct','Fujifilm GFX 100S — 110mm f/2','Sigma 14mm f/1.8 Art (Extreme Wide)','Canon EF 50mm f/1.0L (Ultra Bokeh)','Zeiss Otus 55mm f/1.4 (Clinical Sharp)'],Portrait:['Sony A1 — 135mm f/1.8 GM','Canon R1 — 200mm f/2L (Editorial)','Nikon Z8 — 85mm f/1.4','Fuji X-T5 — 56mm f/1.2 WR','Leica SL2 — 75mm f/2 Summicron'],Special:['Polaroid Spectra — Vintage Instant Film','Kodak Portra 400 — Grain Film 35mm','Kodak Ektar 100 — Grand Format 8×10','Ilford HP5 Plus — B&W 35mm Grain','Holga 120N — Plastic Lens Lo-fi','Lomography Petzval 58 — Swirly Bokeh','Infrared Camera — 720nm Filter','Thermal Imaging — Heatmap Colors','Macro Lens 1:1 — Microscopic Detail','Tilt-Shift 90mm — Miniature Effect','Drone + Gimbal — Smooth Aerial','Pinhole Camera — Dreamlike Exposure']}
 }
 ,fr:{
   bs:'Architecte de Prompts IA Professionnel',
@@ -2195,14 +2190,8 @@ function getActiveKey() {
 function getGeminiModel() {
   if (!hasApiKey()) return 'gemini-2.5-flash-preview-09-2025'; // Canvas environment
   let saved = localStorage.getItem('suetos_api_model');
-  if (saved) {
-      saved = saved.trim();
-      // Purge invalid/fake models from previous buggy versions
-      if (saved === 'gemini-2.5-flash' || saved === 'gemini-2.5-pro' || saved.includes('pro')) {
-          saved = 'gemini-1.5-flash';
-          localStorage.setItem('suetos_api_model', saved);
-      }
-      return saved;
+  if (saved && saved.trim() !== '') {
+      return saved.trim();
   }
   return 'gemini-1.5-flash'; // Safe default
 }
@@ -2213,7 +2202,10 @@ function openSettingsModal() {
   document.getElementById('st-eye-icon').className = 'fa-regular fa-eye';
   
   const mod = document.getElementById('st-model');
-  if(mod) mod.value = localStorage.getItem('suetos_api_model') || 'gemini-1.5-flash';
+  if(mod) {
+      let savedMod = localStorage.getItem('suetos_api_model') || 'gemini-1.5-flash';
+      mod.value = savedMod;
+  }
 
   document.getElementById('settings-desc').textContent = lang==='fr'?'Entrez votre propre clé API Gemini (laissez vide pour utiliser l\'IA intégrée gratuite).':'Enter your own Gemini API key (leave empty to use the free built-in AI).';
   document.getElementById('settings-modal').classList.add('on');
@@ -2283,7 +2275,12 @@ async function fetchGeminiWithBackoff(url, payload) {
           if (response.status === 400) throw new Error(`HTTP 400 Bad Request: ${msg}`);
           if (response.status === 403) throw new Error(`HTTP 403: Check API Key, ensure 'Generative Language API' is enabled, and remove website restrictions.`);
           if (response.status === 401) throw new Error(`INVALID_API_KEY: ${msg}`);
-          if (response.status === 404) throw new Error(`HTTP 404: Model not found. Ensure key is from aistudio.google.com and switch models.`);
+          
+          // AUTO-REPAIR FOR 404
+          if (response.status === 404) {
+              localStorage.setItem('suetos_api_model', 'gemini-1.5-flash');
+              throw new Error(`HTTP 404_AUTOREPAIR`);
+          }
           
           throw new Error(`HTTP ${response.status}: ${msg}`);
       }
@@ -2300,7 +2297,16 @@ async function fetchGeminiWithBackoff(url, payload) {
       
       return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     } catch (e) {
-      if (e.message.includes('403') || e.message.includes('401') || e.message.includes('404') || e.message.includes('400') || e.message.includes('Safety') || e.message.toLowerCase().includes('failed to fetch')) {
+      if (e.message.includes('404_AUTOREPAIR')) {
+          // If we hit 404, we already forced it to gemini-1.5-flash. Retry immediately with the new model.
+          if (i < retries - 1) {
+              const newUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${getActiveKey()}`;
+              return await fetchGeminiWithBackoff(newUrl, payload);
+          } else {
+              throw new Error(`HTTP 404: Modèle non disponible. Passage forcé sur Gemini 1.5 Flash. Veuillez réessayer.`);
+          }
+      }
+      if (e.message.includes('403') || e.message.includes('401') || e.message.includes('400') || e.message.includes('Safety') || e.message.toLowerCase().includes('failed to fetch')) {
           throw e; 
       }
       if (i === retries - 1) throw e;
@@ -2321,8 +2327,7 @@ function handleApiError(e, customMsg = '') {
         openSettingsModal();
         toast(lang==='fr' ? 'Vérifiez votre clé API et activez l\'API.' : 'Check API Key and enable API access.');
     } else if (msg.includes("404")) {
-        openSettingsModal();
-        toast(lang==='fr' ? 'Modèle IA introuvable (Vérifiez la clé sur aistudio.google.com).' : 'Model not found (Ensure key is from aistudio.google.com).');
+        toast(lang==='fr' ? 'Modèle IA introuvable. Remise à zéro sur Gemini 1.5 Flash. Cliquez à nouveau sur Générer.' : 'Model not found. Resetting to 1.5 Flash. Click generate again.');
     } else if (msg.includes("Safety")) {
         toast(lang==='fr' ? 'Image bloquée par les filtres de sécurité IA.' : 'Blocked by AI safety filters.');
     } else {
@@ -3618,7 +3623,7 @@ function renderCompareView(data) {
         let scoreHTML = '';
         if (d.score) {
             let scClass = d.score > 85 ? 'high' : (d.score > 65 ? 'med' : 'low');
-            scoreHTML = `<span class="tscore ${scClass}"><i class="fa-solid fa-bullseye"></i> ${d.score}% Match</span>`;
+            scoreHTML = `<span class="tscore ${scClass}">${d.score}%</span>`;
         }
 
         let promptHtml = (tool.id !== 'midjourney') ? getDiffHtml(basePrompt, d.detailed) : escHtml(d.detailed || '');
