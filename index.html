@@ -1841,7 +1841,7 @@ en:{
   lights:['None','Chiaroscuro','Dark Cinema','Dreamy','Ethereal','Golden Hour','Gothic','Gritty','High-Key','Melancholic','Moody Blue','Mystical','Neon Night','Noir','Pastel','Retro 50s','Retro 60s','Retro 70s-80s','Sci-Fi','Soft Studio','Studio Photo','Summertime','Sunrays','Vintage'],
   licons:['fa-ban','fa-circle-half-stroke','fa-ghost','fa-sparkles','fa-cloud','fa-sun','fa-skull','fa-hammer','fa-sun','fa-cloud-rain','fa-water','fa-wand-magic-sparkles','fa-moon','fa-film','fa-ice-cream','fa-compact-disc','fa-record-vinyl','fa-record-vinyl','fa-robot','fa-umbrella','fa-camera','fa-sun','fa-sun-plant-wilt','fa-camera-retro'],
   comps:['None','Close Up','Wide Shot','Aerial View','Low Angle','Macro','Symmetry','Rule of Thirds',"Bird's Eye",'Side View','POV','Panoramic','Dutch Angle','Fisheye','Over Shoulder','Full Body'],
-  og:{Cinema:['Arri Alexa LF — Panavision Primo','Red V-Raptor — Cooke S4/i T2','Panavision DXL2 — Anamorphic','Blackmagic URSA Mini Pro — Zeiss CP.3','Sony Venice 2 — Cooke Anamorphic/i','Alexa 35 — ARRI Signature Primes'],Photography:['Hasselblad H6D-100c — 80mm f/2.8','Leica M11 — Noctilux 50mm f/0.95','Phase One XT — Schneider 110mm f/2.8','Sony A7R V — 35mm f/1.4 GM','Canon EOS R5 — RF 85mm f/1.2L','Nikon Z9 — 58mm f/0.95 Noct','Fujifilm GFX 100S — 110mm f/2','Sigma 14mm f/1.8 Art (Extreme Wide)','Canon EF 50mm f/1.0L (Ultra Bokeh)','Zeiss Otus 55mm f/1.4 (Clinical Sharp)'],Portrait:['Sony A1 — 135mm f/1.8 GM','Canon R1 — 200mm f/2L (Editorial)','Nikon Z8 — 85mm f/1.4','Fuji X-T5 — 56mm f/1.2 WR','Leica SL2 — 75mm f/2 Summicron'],Special:['Polaroid Spectra — Vintage Instant Film','Kodak Portra 400 — 35mm Film Grain','Kodak Ektar 100 — Large Format 8×10','Ilford HP5 Plus — B&W 35mm Grain','Holga 120N — Plastic Lens Lo-fi','Lomography Petzval 58 — Swirly Bokeh','Infrared Camera — 720nm Filter','Thermal Imaging — Heatmap Colors','Macro Lens 1:1 — Microscopic Detail','Tilt-Shift 90mm — Miniature Effect','Drone + Gimbal — Smooth Aerial','Pinhole Camera — Dreamlike Exposure']}
+  og:{Cinema:['Arri Alexa LF — Panavision Primo','Red V-Raptor — Cooke S4/i T2','Panavision DXL2 — Anamorphique','Blackmagic URSA Mini Pro — Zeiss CP.3','Sony Venice 2 — Cooke Anamorphic/i','Alexa 35 — ARRI Signature Primes'],Photography:['Hasselblad H6D-100c — 80mm f/2.8','Leica M11 — Noctilux 50mm f/0.95','Phase One XT — Schneider 110mm f/2.8','Sony A7R V — 35mm f/1.4 GM','Canon EOS R5 — RF 85mm f/1.2L','Nikon Z9 — 58mm f/0.95 Noct','Fujifilm GFX 100S — 110mm f/2','Sigma 14mm f/1.8 Art (Extreme Wide)','Canon EF 50mm f/1.0L (Ultra Bokeh)','Zeiss Otus 55mm f/1.4 (Clinical Sharp)'],Portrait:['Sony A1 — 135mm f/1.8 GM','Canon R1 — 200mm f/2L (Editorial)','Nikon Z8 — 85mm f/1.4','Fuji X-T5 — 56mm f/1.2 WR','Leica SL2 — 75mm f/2 Summicron'],Special:['Polaroid Spectra — Vintage Instant Film','Kodak Portra 400 — 35mm Film Grain','Kodak Ektar 100 — Large Format 8×10','Ilford HP5 Plus — B&W 35mm Grain','Holga 120N — Plastic Lens Lo-fi','Lomography Petzval 58 — Swirly Bokeh','Infrared Camera — 720nm Filter','Thermal Imaging — Heatmap Colors','Macro Lens 1:1 — Microscopic Detail','Tilt-Shift 90mm — Miniature Effect','Drone + Gimbal — Smooth Aerial','Pinhole Camera — Dreamlike Exposure']}
 }
 ,fr:{
   bs:'Architecte de Prompts IA Professionnel',
@@ -2323,7 +2323,7 @@ function handleApiError(e, customMsg = '') {
     }
 }
 
-function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
+async function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = null) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
   if (systemInstruction) {
@@ -2335,10 +2335,10 @@ function callGeminiText(prompt, systemInstruction, jsonMode = false, schema = nu
       payload.generationConfig.responseSchema = schema;
     }
   }
-  return fetchGeminiWithBackoff(url, payload);
+  return await fetchGeminiWithBackoff(url, payload);
 }
 
-function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
+async function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = false) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent?key=${getActiveKey()}`;
   const parts = [{ text: prompt }];
   images.forEach(img => {
@@ -2356,7 +2356,7 @@ function callGeminiVision(prompt, images, systemInstruction = null, jsonMode = f
   if (jsonMode) {
       payload.generationConfig = { responseMimeType: "application/json" };
   }
-  return fetchGeminiWithBackoff(url, payload);
+  return await fetchGeminiWithBackoff(url, payload);
 }
 
 // ── EXTRACTEUR JSON ULTRA ROBUSTE ──
@@ -2488,8 +2488,6 @@ function autoAdaptMJParams() {
   sel.mjWeird   = Math.min(3000, Math.max(0,   sel.mjWeird));
 }
 
-
-
 function brief(){
   const t=T[lang];
   const style=(sel.siIdx>0&&t.styles[sel.siIdx])||'none';
@@ -2598,9 +2596,11 @@ async function generate(){
     let raw;
     if(uploads.length > 0) {
         const promptText = brief() + "\n\nReference images provided. " + (sel.isEditMode ? "EDIT the structure." : "Incorporate their aesthetic strongly.");
-        raw = await callGeminiVision(promptText, uploads, buildSysWithCustomTools(), true);
+        // Vision mode -> MUST BE FALSE for jsonMode to avoid API 400 Bad Request error
+        raw = await callGeminiVision(promptText, uploads, buildSysWithCustomTools(), false);
     } else {
-        raw = await callGeminiText(brief(), buildSysWithCustomTools(), true);
+        // Text mode -> MUST BE FALSE for jsonMode to stay consistent and robust
+        raw = await callGeminiText(brief(), buildSysWithCustomTools(), false);
     }
 
     prompts = parseJSON(raw);
@@ -2611,7 +2611,7 @@ async function generate(){
     renderResults(prompts);
   }catch(e){
     hideLoad();
-    if(step!==STEPS && !e.message.includes('401') && !e.message.includes('403') && !e.message.includes('404')){step=5;ui();}
+    if(step!==STEPS && !e.message.includes('401') && !e.message.includes('403') && !e.message.includes('404') && !e.message.includes('400')){step=5;ui();}
     handleApiError(e);
     const errbox = document.getElementById('errbox');
     if (errbox) {
@@ -2631,9 +2631,10 @@ async function refine(){
     
     let raw;
     if (uploads.length > 0) {
-        raw = await callGeminiVision(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, uploads, sys, true);
+        // False to avoid strict schema crash with images
+        raw = await callGeminiVision(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, uploads, sys, false);
     } else {
-        raw = await callGeminiText(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, sys, true);
+        raw = await callGeminiText(`Existing:\n${JSON.stringify(prompts)}\n\nRefinement: "${note}"\n\nReturn updated JSON.`, sys, false);
     }
 
     prompts=parseJSON(raw);
@@ -2708,7 +2709,7 @@ async function translatePrompts(targetLang) {
     3. DO NOT translate or modify ANY technical parameters: "--ar 16:9", "--v 7", "--style raw", "--strength 0.50" etc.
     4. Return ONLY a valid JSON object with the exact same structure. No markdown. NO LINE BREAKS inside JSON string values.`;
     
-    const raw = await callGeminiText(JSON.stringify(prompts), sys, true);
+    const raw = await callGeminiText(JSON.stringify(prompts), sys, false);
     const newPrompts = parseJSON(raw);
     if (newPrompts && Object.keys(newPrompts).length > 0) {
       prompts = newPrompts;
@@ -2898,7 +2899,8 @@ async function analyseImageHints(){
       "composition": "<composition type, e.g. Wide Shot, Close Up...>"
     }`;
     
-    const raw = await callGeminiVision(prompt, uploads, null, true);
+    // False for jsonMode to avoid API 400 Bad Request error with images
+    const raw = await callGeminiVision(prompt, uploads, null, false);
     const detected = parseJSON(raw);
     hideLoad();
     showHints(detected);
@@ -3609,7 +3611,7 @@ function renderCompareView(data) {
         let scoreHTML = '';
         if (d.score) {
             let scClass = d.score > 85 ? 'high' : (d.score > 65 ? 'med' : 'low');
-            scoreHTML = `<span class="tscore ${scClass}">${d.score}%</span>`;
+            scoreHTML = `<span class="tscore ${scClass}"><i class="fa-solid fa-bullseye"></i> ${d.score}% Match</span>`;
         }
 
         let promptHtml = (tool.id !== 'midjourney') ? getDiffHtml(basePrompt, d.detailed) : escHtml(d.detailed || '');
@@ -3695,3 +3697,155 @@ function exportPDF() {
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
         doc.text("CONCEPT:", margin, y);
+        doc.setFont("helvetica", "normal");
+        const cLines = doc.splitTextToSize(sel.subj, maxW);
+        doc.text(cLines, margin, y + 5);
+        y += 5 + (cLines.length * 4) + 5;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.text("STYLE:", margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text((T[lang].styles[sel.siIdx] || 'None') + (sel.sd ? ' ('+sel.sd+')' : ''), margin + 15, y);
+    y += 12;
+
+    const addText = (txt, size, isBold, color) => {
+        doc.setFont("helvetica", isBold ? "bold" : "normal");
+        doc.setFontSize(size);
+        doc.setTextColor(color[0], color[1], color[2]);
+        const lines = doc.splitTextToSize(txt, maxW);
+        const lineHeight = size * 0.4;
+        
+        if (y + (lines.length * lineHeight) > 280) {
+            doc.addPage();
+            y = 20;
+        }
+        doc.text(lines, margin, y);
+        y += lines.length * lineHeight + 2; 
+    };
+
+    const allTools=[...TOOLS,...getCustomTools()];
+    allTools.forEach(tool => {
+        let toolKey = Object.keys(prompts).find(k => k.toLowerCase().includes(tool.id.toLowerCase()) || tool.id.toLowerCase().includes(k.toLowerCase()));
+        let d = toolKey ? prompts[toolKey] : prompts[tool.id];
+        if(!d) return;
+        if(typeof d === 'string') d = { detailed: d, short: '', negative: '', score: null };
+
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, y, 210 - margin, y);
+        y += 8;
+
+        let scoreTxt = d.score ? ` (${d.score}% Match)` : '';
+        addText(tool.name + scoreTxt, 14, true, [0, 0, 0]);
+        y += 2;
+
+        addText(T[lang].ldet.toUpperCase(), 9, true, [100, 100, 100]);
+        addText(d.detailed || '', 10, false, [40, 40, 40]);
+        y += 3;
+
+        if(d.short) {
+            addText(T[lang].lshort.toUpperCase(), 9, true, [100, 100, 100]);
+            addText(d.short, 10, false, [80, 80, 80]);
+            y += 3;
+        }
+        
+        if(d.negative) {
+            addText(T[lang].lneg.toUpperCase(), 9, true, [230, 57, 70]);
+            addText(d.negative, 10, false, [230, 57, 70]);
+            y += 3;
+        }
+        y += 5;
+    });
+
+    doc.save("SUETOS_Creative_Brief.pdf");
+    toast(lang==='fr'?"Brief PDF téléchargé !":"Creative Brief downloaded!");
+}
+
+// ── ART DIRECTOR LIVE PREVIEW ──
+function buildArtDirectorPreview() {
+  const card = document.getElementById('artdir-card');
+  const body = document.getElementById('artdir-body');
+  if (!card || !body) return;
+
+  const style = T['en'].styles[sel.siIdx] || 'none';
+  const light  = T['en'].lights[sel.liIdx]  || 'none';
+  const comp   = T['en'].comps[sel.ciIdx]   || 'none';
+  const op     = (sel.op && sel.op !== 'None') ? sel.op : null;
+  const subj   = sel.subj || '';
+
+  if (!subj) { card.classList.remove('on'); return; }
+  card.classList.add('on');
+
+  // Determine medium
+  const photoStyles   = ['B&W Photo','Cinematic','Photo Pro HD','Photorealism','Street Photo','Architecture'];
+  const illustStyles  = ['Anime','Illustration','Watercolor','Fine Art','Impressionism','Pop Art','Concept Art'];
+  const digitalStyles = ['Cyberpunk','Octane 3D','Minimalism','Surrealism'];
+  let medium = 'mixed', mediumLabel = '✦ Creative';
+  if (photoStyles.includes(style))    { medium = 'photo';        mediumLabel = '📷 Photography'; }
+  else if (illustStyles.includes(style)) { medium = 'illustration'; mediumLabel = '🎨 Illustration'; }
+  else if (digitalStyles.includes(style)) { medium = 'digital';     mediumLabel = '⚡ Digital/3D'; }
+
+  // MJ params summary
+  const mjSummary = [];
+  if (sel.mjVersion) mjSummary.push(sel.mjVersion);
+  if (sel.mjStylize) mjSummary.push('stylize ' + sel.mjStylize);
+  if (sel.mjChaos > 0) mjSummary.push('chaos ' + sel.mjChaos);
+  if (sel.mjWeird > 0) mjSummary.push('weird ' + sel.mjWeird);
+  if (sel.mjRaw) mjSummary.push('--style raw');
+
+  // Optics insight
+  let opticsInsight = '';
+  if (op) {
+    if (op.includes('Leica') || op.includes('Noctilux')) opticsInsight = 'Signature Leica micro-contrast, buttery smooth bokeh, 3D subject separation';
+    else if (op.includes('Hasselblad')) opticsInsight = 'Medium format rendering — extraordinary tonal depth and edge-to-edge sharpness';
+    else if (op.includes('Anamorphic') || op.includes('anamorphic')) opticsInsight = 'Oval bokeh, horizontal lens flares, cinematic widescreen rendering';
+    else if (op.includes('Macro')) opticsInsight = '1:1 magnification — microscopic textures, razor-thin depth of field, abstract scale';
+    else if (op.includes('Tilt-Shift')) opticsInsight = 'Miniature effect — selective focus plane, dreamy perspective compression';
+    else if (op.includes('Fisheye')) opticsInsight = 'Ultra-wide barrel distortion — immersive environmental compression';
+    else if (op.includes('Polaroid') || op.includes('Holga') || op.includes('Lomography')) opticsInsight = 'Lo-fi analog rendering — vignette, color shift, soft halation';
+    else if (op.includes('Infrared')) opticsInsight = 'False color rendering — foliage glows white, skies turn black, ethereal atmosphere';
+    else if (op.includes('f/0.95') || op.includes('f/1.0') || op.includes('f/1.2')) opticsInsight = 'Ultra-fast lens — extreme subject isolation, luminous low-light rendering';
+    else opticsInsight = 'Camera-specific optical signature will be embedded in all prompts';
+  }
+
+  const fr = lang === 'fr';
+  body.innerHTML = `
+    <div class="artdir-row">
+      <div class="artdir-key">${fr?'Mode artistique':'Artistic mode'}</div>
+      <span class="artdir-tag">${mediumLabel}</span>
+      ${style !== 'none' ? '<span class="artdir-tag">'+style+'</span>' : ''}
+      ${light !== 'none' ? '<span class="artdir-tag">'+light+'</span>' : ''}
+      ${comp  !== 'none' ? '<span class="artdir-tag">'+comp+'</span>' : ''}
+    </div>
+    ${op ? `<div class="artdir-row"><div class="artdir-key">${fr?'Signature optique':'Optics signature'}</div><div style="font-size:11.5px;color:var(--silver);">${opticsInsight}</div></div>` : ''}
+    <div class="artdir-row">
+      <div class="artdir-key">Midjourney params</div>
+      ${mjSummary.map(p => '<span class="artdir-tag">'+p+'</span>').join('')}
+    </div>
+  `;
+}
+
+// ══ INIT LORS DU CHARGEMENT ══
+document.addEventListener("DOMContentLoaded", () => {
+    // MAISON NOIR: dark is default — body.light = light mode opt-in
+    const savedDark = localStorage.getItem('suetos_dark');
+    if (savedDark === '0') { isDark = false; document.body.classList.add('light'); }
+    else { isDark = true; } // dark by default (no class needed)
+    document.getElementById('dark-icon').className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+    initDZ();
+    buildPB();
+    buildSG();
+    buildLG();
+    buildCG();
+    buildAR();
+    buildOP();
+    ui(true);
+    
+    document.querySelectorAll('textarea.tinp').forEach(ta => {
+        ta.addEventListener('input', function() { autoResize(this); });
+    });
+});
+
+</script>
+</body>
+</html>
