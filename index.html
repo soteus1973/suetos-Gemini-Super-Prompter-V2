@@ -10,7 +10,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 
 :root {
@@ -1567,7 +1566,7 @@ select.sinp { -webkit-appearance: none; appearance: none; }
 <div class="modal-overlay" id="settings-modal">
   <div class="modal-box">
     <div class="modal-title" id="settings-title">Settings</div>
-    <div class="modal-desc" id="settings-desc">Entrez votre propre clé API Gemini (laissez vide pour utiliser l'IA intégrée gratuite).</div>
+    <div class="modal-desc" id="settings-desc">API Key required for online use. (The Flash model is 100% free via Google Free Tier).</div>
     
     <div style="position:relative; margin-bottom:16px;">
       <label class="modal-label" id="settings-lbl-key">Gemini API Key</label>
@@ -1576,11 +1575,10 @@ select.sinp { -webkit-appearance: none; appearance: none; }
     </div>
     
     <div style="margin-bottom:24px;">
-      <label class="modal-label" id="settings-lbl-model">AI Model (If using API key)</label>
-      <select class="modal-inp" id="st-model" style="margin-bottom:0; cursor:pointer;">
-        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Stable & Fast)</option>
-        <option value="gemini-1.5-pro">Gemini 1.5 Pro (High Quality)</option>
-      </select>
+      <label class="modal-label" id="settings-lbl-model">AI Model</label>
+      <div class="modal-inp" style="background: var(--veil); color: var(--gold); font-weight: 600; cursor: default; pointer-events: none; border-color: rgba(201,160,64,0.3);">
+        <i class="fa-solid fa-bolt" style="margin-right: 8px;"></i> Gemini Flash (Fast & Free Tier)
+      </div>
     </div>
 
     <div class="modal-row">
@@ -1622,7 +1620,7 @@ select.sinp { -webkit-appearance: none; appearance: none; }
 <div class="shell">
   <div class="hdr">
     <div class="logo-g">
-      <img src="PICTO%20LOGO%20300x300%20PIXELS%20copie.png" alt="SUETOS" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img src="logo.png" alt="SUETOS" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="logo-fb">S</div>
       <div>
         <div class="brand-n">SUETOS<span>ImagePrompter</span></div>
@@ -1825,7 +1823,7 @@ en:{
   eSubj:'Please describe your concept first.',eApi:'Generation failed.',eCopy:'Copied!',
   libTitle:'Prompt Library',libSaveLbl:'Save current prompts',libSaveTxt:'Save to Library',libSavedLbl:'Saved Prompts',libEmpty:'No saved prompts yet.\nGenerate prompts and click "Save to Library".',libNamePh:'Name this set…',libLoaded:'Prompts loaded!',libSaved:'Saved to library!',libDeleted:'Deleted.',
   phSD:'e.g. influenced by Moebius, neon accents…',phMood:'e.g. eerie silence, sense of wonder…',
-  set:'Settings', setDesc:'Enter your own Gemini API key (leave empty to use the free built-in AI).', setKey:'Gemini API Key', setSave:'Save',
+  set:'Settings', setDesc:'API Key required for online use. (The Flash model is 100% free via Google Free Tier).', setKey:'Gemini API Key', setSave:'Save',
   modeLbl: 'Generation Mode',
   modeRef: 'Style Reference', modeEdit: 'Image-to-Image (Edit)',
   modeDescRef: 'Uses uploaded image as aesthetic inspiration for a new creation.',
@@ -1861,7 +1859,7 @@ en:{
   eSubj:'Veuillez décrire votre concept.',eApi:'Génération échouée.',eCopy:'Copié !',
   libTitle:'Bibliothèque',libSaveLbl:'Sauvegarder les prompts actuels',libSaveTxt:'Sauvegarder',libSavedLbl:'Prompts Sauvegardés',libEmpty:'Aucun prompt sauvegardé.\nGénérez des prompts et cliquez "Sauvegarder".',libNamePh:'Nommer ce jeu de prompts…',libLoaded:'Prompts chargés !',libSaved:'Sauvegardé !',libDeleted:'Supprimé.',
   phSD:'ex. inspiré de Moebius, accents néon…',phMood:'ex. silence inquiétant, émerveillement…',
-  set:'Paramètres', setDesc:'Entrez votre propre clé API Gemini (laissez vide pour utiliser l\'IA intégrée gratuite).', setKey:'Clé API Gemini', setSave:'Enregistrer',
+  set:'Paramètres', setDesc:'Clé API requise pour le web. (Le modèle Flash est 100% gratuit via le Free Tier Google).', setKey:'Clé API Gemini', setSave:'Enregistrer',
   modeLbl: 'Mode de Génération',
   modeRef: 'Inspiration (Style)', modeEdit: 'Image-to-Image (Édition)',
   modeDescRef: 'Utilise l\'image uploadée comme inspiration esthétique pour créer une nouvelle image.',
@@ -2104,9 +2102,9 @@ function syncLangUI() {
    se('lbl-copyall',fr?'Tout Copier':'Copy All');
    se('lbl-dice',fr?'Inspiration':'Inspire Me');
    se('settings-title',T[lang].set);
-   se('settings-desc',T[lang].setDesc);
+   se('settings-desc',fr?'Clé API requise pour le web. (Le modèle Flash est 100% gratuit via le Free Tier Google).':'API Key required for online use. (The Flash model is 100% free via Google Free Tier).');
    se('settings-lbl-key',T[lang].setKey);
-   se('settings-lbl-model', fr ? 'Modèle IA (Si clé API)' : 'AI Model (If using API key)');
+   se('settings-lbl-model', fr ? 'Modèle IA (Verrouillé sur gratuit)' : 'AI Model (Locked to Free Tier)');
    se('settings-btn-cancel',fr?'Annuler':'Cancel');
    se('settings-btn-save-lbl',T[lang].setSave);
 }
@@ -2188,12 +2186,12 @@ function getActiveKey() {
 }
 
 function getGeminiModel() {
-  if (!hasApiKey()) return 'gemini-2.5-flash-preview-09-2025'; // Canvas environment
-  let saved = localStorage.getItem('suetos_api_model');
-  if (saved && saved.trim() !== '') {
-      return saved.trim();
-  }
-  return 'gemini-1.5-flash'; // Safe default
+  // 100% FLASH ONLY. No Pro model.
+  // If we are in the AI sandbox (no key provided), use the sandbox preview model
+  if (!hasApiKey() && envApiKey === "") return 'gemini-2.5-flash-preview-09-2025';
+  
+  // If hosted online with a real key, use the stable, free-tier Flash model
+  return 'gemini-1.5-flash'; 
 }
 
 function openSettingsModal() {
@@ -2201,13 +2199,9 @@ function openSettingsModal() {
   document.getElementById('st-key').type = 'password';
   document.getElementById('st-eye-icon').className = 'fa-regular fa-eye';
   
-  const mod = document.getElementById('st-model');
-  if(mod) {
-      let savedMod = localStorage.getItem('suetos_api_model') || 'gemini-1.5-flash';
-      mod.value = savedMod;
-  }
-
-  document.getElementById('settings-desc').textContent = lang==='fr'?'Entrez votre propre clé API Gemini (laissez vide pour utiliser l\'IA intégrée gratuite).':'Enter your own Gemini API key (leave empty to use the free built-in AI).';
+  document.getElementById('settings-desc').textContent = lang==='fr'
+    ? 'Clé API requise pour le web. (Le modèle Flash est 100% gratuit via le Free Tier Google).'
+    : 'API Key required for online use. (The Flash model is 100% free via Google Free Tier).';
   document.getElementById('settings-modal').classList.add('on');
 }
 
@@ -2239,9 +2233,6 @@ function saveSettings() {
     return;
   }
   localStorage.setItem('suetos_api_key', k);
-  
-  const mod = document.getElementById('st-model');
-  if(mod) localStorage.setItem('suetos_api_model', mod.value);
   
   closeSettingsModal();
   toast(lang==='fr' ? 'Paramètres enregistrés !' : 'Settings saved!');
@@ -2319,13 +2310,16 @@ async function fetchGeminiWithBackoff(url, payload) {
 function handleApiError(e, customMsg = '') {
     console.error("API Error:", e);
     let msg = String(e.message || "Unknown error");
-    if (msg.toLowerCase().includes("failed to fetch")) {
+    let msgLower = msg.toLowerCase();
+    
+    // FIX: Catch empty/invalid API key online requests instantly, even if the key exists but is fake
+    if (msg.includes("INVALID_API_KEY") || msg.includes("401") || msg.includes("403") || msgLower.includes("api key not valid") || (msg.includes("400") && !hasApiKey() && envApiKey === "")) {
+        openSettingsModal();
+        toast(lang==='fr' ? 'Clé API requise ou invalide. Vérifiez les paramètres.' : 'API Key required or invalid. Check settings.');
+    } else if (msgLower.includes("failed to fetch")) {
         toast(lang==='fr' ? 'Erreur réseau (CORS). Retirez les restrictions de votre clé API Google.' : 'Network Error (CORS). Remove restrictions from your Google API Key.');
     } else if (msg.includes("QUOTA_EXCEEDED") || msg.includes("429")) {
         toast(lang==='fr' ? 'Quota API dépassé (ou facturation requise en Europe).' : 'API Quota exceeded (or EU Free Tier blocked).');
-    } else if (msg.includes("INVALID_API_KEY") || msg.includes("401") || msg.includes("403")) {
-        openSettingsModal();
-        toast(lang==='fr' ? 'Vérifiez votre clé API et activez l\'API.' : 'Check API Key and enable API access.');
     } else if (msg.includes("404")) {
         toast(lang==='fr' ? 'Modèle IA introuvable. Remise à zéro sur Gemini 1.5 Flash. Cliquez à nouveau sur Générer.' : 'Model not found. Resetting to 1.5 Flash. Click generate again.');
     } else if (msg.includes("Safety")) {
@@ -2484,7 +2478,7 @@ function autoAdaptMJParams() {
 
   // ── LIGHTING MODIFIERS ──
   if (['Ethereal','Mystical','Dreamy'].includes(light))       { sel.mjWeird += 80;  sel.mjStylize += 60; }
-  if (['Surreal','Dark Cinema','Gothic'].includes(light))     { sel.mjChaos += 8;   sel.mjWeird   += 100; }
+  if (['Surreal','Dark Cinema','Gothic'].includes(light))     { sel.mjChaos += 8;   sel.mjWeird  += 100; }
   if (['Neon Night','Sci-Fi'].includes(light))                { sel.mjStylize += 80; sel.mjWeird  += 150; }
   if (['Noir','Chiaroscuro'].includes(light))                 { sel.mjChaos += 5; }
   if (['Golden Hour','Pastel','Soft Studio'].includes(light)) { sel.mjStylize = Math.max(sel.mjStylize, 180); }
